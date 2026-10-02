@@ -1,0 +1,267 @@
+/* ══════════════════════════════════════════════════════════════════
+   resume-render.css — 参数化 A4 简历渲染引擎（样式层）
+   ──────────────────────────────────────────────────────────────────
+   设计原则：
+   1) 结构由「版式族」(family) 决定：single / sidebar / headerBar / twoCol
+   2) 外观由 CSS 变量决定：配色 / 字体 / 字号 / 行距 / 间距 / 页边距
+      ⇒ 调样式只改变量，无需重渲染 DOM（毫秒级响应）
+   3) 画布固定 A4：794 × 1123 px（@96dpi），保证预览与导出同尺度
+   ══════════════════════════════════════════════════════════════════ */
+
+.rr-page {
+  /* ── 可调变量（由 JS 写入 inline style 覆盖）── */
+  --rr-accent: #5B5CFF;
+  --rr-accent-soft: #EEEDFE;
+  --rr-accent-deep: #3C3489;
+  --rr-text: #2A2F3A;
+  --rr-muted: #7A8391;
+  --rr-line: #E4E7EE;
+  --rr-soft: #F7F8FB;
+  --rr-font: "Microsoft YaHei", "PingFang SC", sans-serif;
+  --rr-fs: 13px;
+  --rr-lh: 1.72;
+  --rr-gap: 20px;
+  --rr-pad: 44px;
+  --rr-name-size: 30px;
+  --rr-photo-size: 92px;
+  --rr-radius: 0px;
+
+  width: 794px;
+  min-height: 1123px;
+  box-sizing: border-box;
+  padding: var(--rr-pad);
+  background: #fff;
+  color: var(--rr-text);
+  font-family: var(--rr-font);
+  font-size: var(--rr-fs);
+  line-height: var(--rr-lh);
+  position: relative;
+  overflow: hidden;
+}
+
+.rr-page * { box-sizing: border-box; }
+.rr-page p { margin: 0; }
+
+/* ── 通用：模块（区块）── */
+.rr-sec { margin-top: var(--rr-gap); }
+.rr-sec:first-child { margin-top: 0; }
+
+.rr-sec-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: calc(var(--rr-fs) * 1.18);
+  font-weight: 700;
+  color: var(--rr-accent-deep);
+  letter-spacing: .5px;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1.5px solid var(--rr-accent);
+}
+.rr-sec-title .rr-sec-ico { flex: 0 0 auto; font-size: 1em; }
+
+/* 标题样式变体 */
+.rr-sec-title.is-plain { border-bottom: none; padding-bottom: 0; }
+.rr-sec-title.is-bar {
+  border-bottom: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  background: var(--rr-accent-soft);
+}
+.rr-sec-title.is-leftbar {
+  border-bottom: none;
+  padding-left: 10px;
+  border-left: 3px solid var(--rr-accent);
+}
+
+/* ── 条目 ── */
+.rr-item { margin-bottom: 12px; }
+.rr-item:last-child { margin-bottom: 0; }
+
+.rr-item-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.rr-item-title { font-weight: 700; color: var(--rr-text); }
+.rr-item-meta {
+  flex: 0 0 auto;
+  color: var(--rr-muted);
+  font-size: calc(var(--rr-fs) * 0.92);
+  white-space: nowrap;
+}
+.rr-item-sub {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--rr-muted);
+  font-size: calc(var(--rr-fs) * 0.96);
+  margin-top: 1px;
+}
+.rr-item-desc {
+  margin-top: 4px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ── 头部（单栏 / 双栏族）── */
+.rr-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding-bottom: 14px;
+  border-bottom: 2px solid var(--rr-accent);
+}
+.rr-head-main { min-width: 0; flex: 1 1 auto; }
+.rr-name {
+  font-size: var(--rr-name-size);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 2px;
+  color: var(--rr-accent-deep);
+}
+.rr-intent {
+  margin-top: 6px;
+  font-size: calc(var(--rr-fs) * 1.06);
+  color: var(--rr-accent);
+  font-weight: 600;
+}
+.rr-contact {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  color: var(--rr-muted);
+  font-size: calc(var(--rr-fs) * 0.95);
+}
+.rr-contact span { white-space: nowrap; }
+
+.rr-photo {
+  flex: 0 0 auto;
+  width: var(--rr-photo-size);
+  height: calc(var(--rr-photo-size) * 1.35);
+  border-radius: var(--rr-radius);
+  overflow: hidden;
+  background: var(--rr-soft);
+  border: 1px solid var(--rr-line);
+}
+.rr-photo.is-circle {
+  height: var(--rr-photo-size);
+  border-radius: 50%;
+}
+.rr-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.rr-photo .rr-photo-ph {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  color: #B9C0CC; font-size: 11px;
+}
+
+/* ── 族二：左侧栏 ── */
+.rr-page.fam-sidebar { padding: 0; display: flex; align-items: stretch; }
+.rr-side {
+  flex: 0 0 32%;
+  background: var(--rr-accent-deep);
+  color: #fff;
+  padding: 34px 20px;
+}
+.rr-side .rr-photo {
+  width: 100%; height: auto; aspect-ratio: 1 / 1.32;
+  margin: 0 auto 18px; border: 2px solid rgba(255,255,255,.35);
+  background: rgba(255,255,255,.12);
+}
+.rr-side .rr-photo.is-circle { aspect-ratio: 1/1; border-radius: 50%; }
+.rr-side-sec { margin-bottom: 20px; }
+.rr-side-sec:last-child { margin-bottom: 0; }
+.rr-side-title {
+  font-size: calc(var(--rr-fs) * 1.04);
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding-bottom: 6px;
+  margin-bottom: 9px;
+  border-bottom: 1px solid rgba(255,255,255,.3);
+}
+.rr-side-line {
+  font-size: calc(var(--rr-fs) * 0.95);
+  line-height: 1.9;
+  word-break: break-word;
+  opacity: .95;
+}
+.rr-main { flex: 1 1 auto; padding: 34px 28px; min-width: 0; }
+.rr-main .rr-sec-title { color: var(--rr-accent-deep); }
+
+/* 侧栏是深色底，其内部区块需反色适配 */
+.rr-side .rr-sec { margin-top: 20px; }
+.rr-side .rr-sec-title {
+  color: #fff;
+  font-size: calc(var(--rr-fs) * 1.04);
+  border-bottom: 1px solid rgba(255, 255, 255, .3);
+  padding-bottom: 6px;
+}
+.rr-side .rr-item { margin-bottom: 9px; }
+.rr-side .rr-item-title,
+.rr-side .rr-item-desc,
+.rr-side .rr-item-meta,
+.rr-side .rr-item-sub { color: #fff; }
+.rr-side .rr-item-meta,
+.rr-side .rr-item-sub { opacity: .78; }
+.rr-side .rr-tag { background: rgba(255, 255, 255, .16); color: #fff; }
+
+/* ── 族三：顶部横幅 ── */
+.rr-banner {
+  margin: calc(var(--rr-pad) * -1);
+  margin-bottom: var(--rr-gap);
+  padding: calc(var(--rr-pad) * 0.62) var(--rr-pad);
+  background: var(--rr-accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+.rr-banner .rr-name { color: #fff; }
+.rr-banner .rr-intent { color: rgba(255,255,255,.9); }
+.rr-banner .rr-contact { color: rgba(255,255,255,.86); margin-top: 10px; }
+.rr-banner .rr-photo { border-color: rgba(255,255,255,.5); background: rgba(255,255,255,.15); }
+.rr-banner .rr-photo .rr-photo-ph { color: rgba(255,255,255,.6); }
+
+/* ── 族四：双栏 ── */
+.rr-cols { column-count: 2; column-gap: 26px; }
+.rr-cols .rr-sec { break-inside: avoid; }
+
+/* ── 技能 / 兴趣 标签 ── */
+.rr-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.rr-tag {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--rr-accent-soft);
+  color: var(--rr-accent-deep);
+  font-size: calc(var(--rr-fs) * 0.9);
+}
+
+/* ── 基本信息网格（单栏族头部下方）── */
+.rr-basic-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 3px 22px;
+}
+.rr-basic-grid.is-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.rr-page > .rr-basic-grid { margin-top: var(--rr-gap); }
+.rr-basic-row { color: var(--rr-text); font-size: calc(var(--rr-fs) * 0.98); }
+.rr-basic-row b { color: var(--rr-muted); font-weight: 400; }
+
+/* ── 空状态 ── */
+.rr-empty {
+  padding: 40px 20px;
+  text-align: center;
+  color: #A6ADBA;
+  font-size: 13px;
+  line-height: 2;
+}
+
+/* ── 分页（Paged.js 接入后由它接管；此处提供打印兜底）── */
+@media print {
+  .rr-page { padding: 0; min-height: 0; }
+}

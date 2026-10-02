@@ -1,0 +1,2350 @@
+{
+ "3": {
+  "id": 3,
+  "name": "工程造价员求职",
+  "kind": "free",
+  "display_id": 1,
+  "modules_api": [
+   {
+    "id": 341,
+    "template_id": 3,
+    "module_key": "skills",
+    "label": "专业技能",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 342,
+    "template_id": 3,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 343,
+    "template_id": 3,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 344,
+    "template_id": 3,
+    "module_key": "work_experience",
+    "label": "工作经历",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 345,
+    "template_id": 3,
+    "module_key": "location",
+    "label": "所在地",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 346,
+    "template_id": 3,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 347,
+    "template_id": 3,
+    "module_key": "job_title",
+    "label": "求职意向",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 348,
+    "template_id": 3,
+    "module_key": "contact",
+    "label": "电话",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 11,
+  "editable": 11,
+  "with_ph": 4,
+  "ph_sample": [
+   "专业技能",
+   "个人优势",
+   "姓名",
+   "工作经历",
+   "所在地",
+   "教育背景",
+   "求职意向",
+   "电话"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 161390,
+  "preview_sec": 6.9
+ },
+ "4": {
+  "id": 4,
+  "name": "高端行政助理求职简历模板",
+  "kind": "free",
+  "display_id": 2,
+  "modules_api": [
+   {
+    "id": 354,
+    "template_id": 4,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 355,
+    "template_id": 4,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 356,
+    "template_id": 4,
+    "module_key": "work_experience",
+    "label": "工作经历",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 357,
+    "template_id": 4,
+    "module_key": "location",
+    "label": "所在地",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 358,
+    "template_id": 4,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 359,
+    "template_id": 4,
+    "module_key": "job_title",
+    "label": "求职意向",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 360,
+    "template_id": 4,
+    "module_key": "contact",
+    "label": "电话",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 6,
+  "editable": 6,
+  "with_ph": 4,
+  "ph_sample": [
+   "个人优势",
+   "姓名",
+   "工作经历",
+   "所在地",
+   "求职意向",
+   "电话",
+   "邮箱"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 372702,
+  "preview_sec": 8.6
+ },
+ "5": {
+  "id": 5,
+  "name": "简约风求职",
+  "kind": "free",
+  "display_id": 3,
+  "modules_api": [
+   {
+    "id": 366,
+    "template_id": 5,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 80,
+    "max_words": 200
+   },
+   {
+    "id": 367,
+    "template_id": 5,
+    "module_key": "work_experience",
+    "label": "工作经历",
+    "min_words": 150,
+    "max_words": 400
+   },
+   {
+    "id": 368,
+    "template_id": 5,
+    "module_key": "projects",
+    "label": "项目经历",
+    "min_words": 100,
+    "max_words": 300
+   },
+   {
+    "id": 369,
+    "template_id": 5,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 50,
+    "max_words": 150
+   },
+   {
+    "id": 370,
+    "template_id": 5,
+    "module_key": "skills",
+    "label": "专业技能",
+    "min_words": 50,
+    "max_words": 150
+   }
+  ],
+  "ok": true,
+  "boxes": 15,
+  "editable": 15,
+  "with_ph": 3,
+  "ph_sample": [
+   "个人优势",
+   "姓名",
+   "教育背景"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 377390,
+  "preview_sec": 9.2
+ },
+ "7": {
+  "id": 7,
+  "name": "应聘岗位JAVA开发工程师",
+  "kind": "free",
+  "display_id": 4,
+  "modules_api": [
+   {
+    "id": 413,
+    "template_id": 7,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 80,
+    "max_words": 200
+   },
+   {
+    "id": 414,
+    "template_id": 7,
+    "module_key": "work_experience",
+    "label": "工作经历",
+    "min_words": 150,
+    "max_words": 400
+   },
+   {
+    "id": 415,
+    "template_id": 7,
+    "module_key": "projects",
+    "label": "项目经历",
+    "min_words": 100,
+    "max_words": 300
+   },
+   {
+    "id": 416,
+    "template_id": 7,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 50,
+    "max_words": 150
+   },
+   {
+    "id": 417,
+    "template_id": 7,
+    "module_key": "skills",
+    "label": "专业技能",
+    "min_words": 50,
+    "max_words": 150
+   }
+  ],
+  "ok": true,
+  "boxes": 12,
+  "editable": 12,
+  "with_ph": 3,
+  "ph_sample": [
+   "个人优势",
+   "姓名",
+   "求职意向"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 339290,
+  "preview_sec": 7.0
+ },
+ "9": {
+  "id": 9,
+  "name": "财务会计求职简历word模板",
+  "kind": "free",
+  "display_id": 5,
+  "modules_api": [
+   {
+    "id": 423,
+    "template_id": 9,
+    "module_key": "skills",
+    "label": "专业技能",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 424,
+    "template_id": 9,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 425,
+    "template_id": 9,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 426,
+    "template_id": 9,
+    "module_key": "work_experience",
+    "label": "工作经历",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 427,
+    "template_id": 9,
+    "module_key": "location",
+    "label": "所在地",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 428,
+    "template_id": 9,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 429,
+    "template_id": 9,
+    "module_key": "job_title",
+    "label": "求职意向",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 430,
+    "template_id": 9,
+    "module_key": "contact",
+    "label": "电话",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 15,
+  "editable": 15,
+  "with_ph": 5,
+  "ph_sample": [
+   "个人优势",
+   "姓名",
+   "工作经历",
+   "所在地",
+   "求职意向",
+   "电话",
+   "邮箱"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 505450,
+  "preview_sec": 7.6
+ },
+ "11": {
+  "id": 11,
+  "name": "财务相关",
+  "kind": "free",
+  "display_id": 6,
+  "modules_api": [
+   {
+    "id": 439,
+    "template_id": 11,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 440,
+    "template_id": 11,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 441,
+    "template_id": 11,
+    "module_key": "work_experience",
+    "label": "工作经历",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 442,
+    "template_id": 11,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 443,
+    "template_id": 11,
+    "module_key": "job_title",
+    "label": "求职意向",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 58,
+  "editable": 50,
+  "with_ph": 3,
+  "ph_sample": [
+   "个人优势",
+   "姓名",
+   "求职意向"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 399474,
+  "preview_sec": 7.1
+ },
+ "1": {
+  "id": 1,
+  "name": "产品经理个人",
+  "kind": "free",
+  "display_id": 7,
+  "modules_api": [
+   {
+    "id": 444,
+    "template_id": 1,
+    "module_key": "skills",
+    "label": "专业技能",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 445,
+    "template_id": 1,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 446,
+    "template_id": 1,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 447,
+    "template_id": 1,
+    "module_key": "work_experience",
+    "label": "工作经历",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 448,
+    "template_id": 1,
+    "module_key": "location",
+    "label": "所在地",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 449,
+    "template_id": 1,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 450,
+    "template_id": 1,
+    "module_key": "job_title",
+    "label": "求职意向",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 451,
+    "template_id": 1,
+    "module_key": "contact",
+    "label": "电话",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 15,
+  "editable": 15,
+  "with_ph": 4,
+  "ph_sample": [
+   "个人优势",
+   "姓名",
+   "工作经历",
+   "求职意向"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 395882,
+  "preview_sec": 6.5
+ },
+ "12": {
+  "id": 12,
+  "name": "创意求职",
+  "kind": "free",
+  "display_id": 8,
+  "modules_api": [
+   {
+    "id": 454,
+    "template_id": 12,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 455,
+    "template_id": 12,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 25,
+  "editable": 25,
+  "with_ph": 2,
+  "ph_sample": [
+   "个人优势",
+   "教育背景"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 504450,
+  "preview_sec": 6.6
+ },
+ "13": {
+  "id": 13,
+  "name": "大学生求职用的",
+  "kind": "free",
+  "display_id": 9,
+  "modules_api": [
+   {
+    "id": 456,
+    "template_id": 13,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 457,
+    "template_id": 13,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 458,
+    "template_id": 13,
+    "module_key": "work_experience",
+    "label": "工作经历",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 459,
+    "template_id": 13,
+    "module_key": "location",
+    "label": "所在地",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 460,
+    "template_id": 13,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 461,
+    "template_id": 13,
+    "module_key": "contact",
+    "label": "电话",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 20,
+  "editable": 20,
+  "with_ph": 2,
+  "ph_sample": [
+   "个人优势",
+   "姓名"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 295630,
+  "preview_sec": 7.6
+ },
+ "14": {
+  "id": 14,
+  "name": "电商运营专员",
+  "kind": "free",
+  "display_id": 10,
+  "modules_api": [
+   {
+    "id": 462,
+    "template_id": 14,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 463,
+    "template_id": 14,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 464,
+    "template_id": 14,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 465,
+    "template_id": 14,
+    "module_key": "contact",
+    "label": "电话",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 12,
+  "editable": 12,
+  "with_ph": 3,
+  "ph_sample": [
+   "个人优势",
+   "姓名",
+   "电话",
+   "邮箱"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 325662,
+  "preview_sec": 6.5
+ },
+ "15": {
+  "id": 15,
+  "name": "定制行政助理求职模板",
+  "kind": "free",
+  "display_id": 11,
+  "modules_api": [
+   {
+    "id": 496,
+    "template_id": 15,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 497,
+    "template_id": 15,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 498,
+    "template_id": 15,
+    "module_key": "work_experience",
+    "label": "工作经历",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 499,
+    "template_id": 15,
+    "module_key": "location",
+    "label": "所在地",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 500,
+    "template_id": 15,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 501,
+    "template_id": 15,
+    "module_key": "job_title",
+    "label": "求职意向",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 502,
+    "template_id": 15,
+    "module_key": "contact",
+    "label": "电话",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 6,
+  "editable": 6,
+  "with_ph": 4,
+  "ph_sample": [
+   "个人优势",
+   "姓名",
+   "工作经历",
+   "所在地",
+   "教育背景",
+   "求职意向",
+   "电话",
+   "邮箱"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 420374,
+  "preview_sec": 6.5
+ },
+ "16": {
+  "id": 16,
+  "name": "非常好用的",
+  "kind": "free",
+  "display_id": 12,
+  "modules_api": [
+   {
+    "id": 477,
+    "template_id": 16,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 478,
+    "template_id": 16,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 479,
+    "template_id": 16,
+    "module_key": "work_experience",
+    "label": "工作经历",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 480,
+    "template_id": 16,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 481,
+    "template_id": 16,
+    "module_key": "job_title",
+    "label": "求职意向",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 482,
+    "template_id": 16,
+    "module_key": "contact",
+    "label": "电话",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 15,
+  "editable": 15,
+  "with_ph": 4,
+  "ph_sample": [
+   "个人优势",
+   "姓名",
+   "求职意向",
+   "电话",
+   "邮箱"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 287182,
+  "preview_sec": 6.6
+ },
+ "17": {
+  "id": 17,
+  "name": "高端商务风格人事经理",
+  "kind": "free",
+  "display_id": 13,
+  "modules_api": [
+   {
+    "id": 503,
+    "template_id": 17,
+    "module_key": "skills",
+    "label": "专业技能",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 504,
+    "template_id": 17,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 505,
+    "template_id": 17,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 506,
+    "template_id": 17,
+    "module_key": "work_experience",
+    "label": "工作经历",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 507,
+    "template_id": 17,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 508,
+    "template_id": 17,
+    "module_key": "contact",
+    "label": "联系方式",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 25,
+  "editable": 14,
+  "with_ph": 8,
+  "ph_sample": [
+   "专业技能",
+   "个人优势",
+   "姓名",
+   "工作经历",
+   "教育背景",
+   "联系方式"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 157730,
+  "preview_sec": 6.2
+ },
+ "18": {
+  "id": 18,
+  "name": "个人简历模板",
+  "kind": "free",
+  "display_id": 14,
+  "modules_api": [
+   {
+    "id": 509,
+    "template_id": 18,
+    "module_key": "skills",
+    "label": "专业技能",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 510,
+    "template_id": 18,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 511,
+    "template_id": 18,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 512,
+    "template_id": 18,
+    "module_key": "work_experience",
+    "label": "工作经历",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 513,
+    "template_id": 18,
+    "module_key": "location",
+    "label": "所在地",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 514,
+    "template_id": 18,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 515,
+    "template_id": 18,
+    "module_key": "job_title",
+    "label": "求职意向",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 516,
+    "template_id": 18,
+    "module_key": "contact",
+    "label": "电话",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 14,
+  "editable": 14,
+  "with_ph": 5,
+  "ph_sample": [
+   "个人优势",
+   "姓名",
+   "工作经历",
+   "教育背景",
+   "求职意向",
+   "邮箱"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 258242,
+  "preview_sec": 8.4
+ },
+ "19": {
+  "id": 19,
+  "name": "个人简历求职（简约风）",
+  "kind": "free",
+  "display_id": 15,
+  "modules_api": [
+   {
+    "id": 517,
+    "template_id": 19,
+    "module_key": "skills",
+    "label": "专业技能",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 518,
+    "template_id": 19,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 519,
+    "template_id": 19,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 520,
+    "template_id": 19,
+    "module_key": "work_experience",
+    "label": "工作经历",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 521,
+    "template_id": 19,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 522,
+    "template_id": 19,
+    "module_key": "job_title",
+    "label": "求职意向",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 15,
+  "editable": 15,
+  "with_ph": 5,
+  "ph_sample": [
+   "个人优势",
+   "姓名",
+   "工作经历",
+   "教育背景",
+   "求职意向"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 246574,
+  "preview_sec": 7.0
+ },
+ "20": {
+  "id": 20,
+  "name": "个人简约求职",
+  "kind": "free",
+  "display_id": 16,
+  "modules_api": [
+   {
+    "id": 523,
+    "template_id": 20,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 524,
+    "template_id": 20,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 525,
+    "template_id": 20,
+    "module_key": "work_experience",
+    "label": "工作经历",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 526,
+    "template_id": 20,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 527,
+    "template_id": 20,
+    "module_key": "job_title",
+    "label": "求职意向",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 22,
+  "editable": 22,
+  "with_ph": 4,
+  "ph_sample": [
+   "个人优势",
+   "姓名",
+   "工作经历",
+   "教育背景",
+   "求职意向"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 290134,
+  "preview_sec": 7.4
+ },
+ "31": {
+  "id": 31,
+  "name": "公关媒介",
+  "kind": "free",
+  "display_id": 17,
+  "modules_api": [
+   {
+    "id": 588,
+    "template_id": 31,
+    "module_key": "skills",
+    "label": "专业技能",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 589,
+    "template_id": 31,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 590,
+    "template_id": 31,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 591,
+    "template_id": 31,
+    "module_key": "work_experience",
+    "label": "工作经历",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 592,
+    "template_id": 31,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 593,
+    "template_id": 31,
+    "module_key": "job_title",
+    "label": "求职意向",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 24,
+  "editable": 18,
+  "with_ph": 5,
+  "ph_sample": [
+   "个人优势",
+   "姓名",
+   "工作经历",
+   "教育背景",
+   "求职意向"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 190710,
+  "preview_sec": 6.9
+ },
+ "32": {
+  "id": 32,
+  "name": "国际贸易风",
+  "kind": "free",
+  "display_id": 18,
+  "modules_api": [
+   {
+    "id": 594,
+    "template_id": 32,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 595,
+    "template_id": 32,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 596,
+    "template_id": 32,
+    "module_key": "work_experience",
+    "label": "工作经历",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 597,
+    "template_id": 32,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 25,
+  "editable": 22,
+  "with_ph": 4,
+  "ph_sample": [
+   "个人优势",
+   "姓名",
+   "工作经历",
+   "教育背景"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 398786,
+  "preview_sec": 7.1
+ },
+ "33": {
+  "id": 33,
+  "name": "互联网行业",
+  "kind": "free",
+  "display_id": 19,
+  "modules_api": [
+   {
+    "id": 598,
+    "template_id": 33,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 599,
+    "template_id": 33,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 600,
+    "template_id": 33,
+    "module_key": "work_experience",
+    "label": "工作经历",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 601,
+    "template_id": 33,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 602,
+    "template_id": 33,
+    "module_key": "job_title",
+    "label": "求职意向",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 603,
+    "template_id": 33,
+    "module_key": "contact",
+    "label": "电话",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 604,
+    "template_id": 33,
+    "module_key": "projects",
+    "label": "项目经历",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 27,
+  "editable": 27,
+  "with_ph": 6,
+  "ph_sample": [
+   "个人优势",
+   "姓名",
+   "工作经历",
+   "教育背景",
+   "求职意向",
+   "电话",
+   "邮箱"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 300130,
+  "preview_sec": 6.6
+ },
+ "34": {
+  "id": 34,
+  "name": "护士护理",
+  "kind": "free",
+  "display_id": 20,
+  "modules_api": [
+   {
+    "id": 605,
+    "template_id": 34,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 606,
+    "template_id": 34,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 607,
+    "template_id": 34,
+    "module_key": "work_experience",
+    "label": "工作经历",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 608,
+    "template_id": 34,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 609,
+    "template_id": 34,
+    "module_key": "job_title",
+    "label": "求职意向",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 610,
+    "template_id": 34,
+    "module_key": "contact",
+    "label": "电话",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 14,
+  "editable": 14,
+  "with_ph": 5,
+  "ph_sample": [
+   "个人优势",
+   "姓名",
+   "工作经历",
+   "教育背景",
+   "求职意向",
+   "电话",
+   "邮箱"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 261186,
+  "preview_sec": 6.6
+ },
+ "35": {
+  "id": 35,
+  "name": "护士",
+  "kind": "free",
+  "display_id": 21,
+  "modules_api": [
+   {
+    "id": 611,
+    "template_id": 35,
+    "module_key": "skills",
+    "label": "专业技能",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 612,
+    "template_id": 35,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 613,
+    "template_id": 35,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 614,
+    "template_id": 35,
+    "module_key": "location",
+    "label": "所在地",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 615,
+    "template_id": 35,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 616,
+    "template_id": 35,
+    "module_key": "job_title",
+    "label": "求职意向",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 17,
+  "editable": 13,
+  "with_ph": 5,
+  "ph_sample": [
+   "个人优势",
+   "姓名",
+   "所在地",
+   "教育背景",
+   "求职意向"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 354754,
+  "preview_sec": 6.3
+ },
+ "36": {
+  "id": 36,
+  "name": "灰色左右风格",
+  "kind": "free",
+  "display_id": 22,
+  "modules_api": [
+   {
+    "id": 617,
+    "template_id": 36,
+    "module_key": "skills",
+    "label": "专业技能",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 618,
+    "template_id": 36,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 619,
+    "template_id": 36,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 620,
+    "template_id": 36,
+    "module_key": "work_experience",
+    "label": "工作经历",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 621,
+    "template_id": 36,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 21,
+  "editable": 21,
+  "with_ph": 3,
+  "ph_sample": [
+   "个人优势",
+   "姓名",
+   "工作经历"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 388566,
+  "preview_sec": 6.8
+ },
+ "37": {
+  "id": 37,
+  "name": "检验相关求职",
+  "kind": "free",
+  "display_id": 23,
+  "modules_api": [
+   {
+    "id": 622,
+    "template_id": 37,
+    "module_key": "skills",
+    "label": "专业技能",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 623,
+    "template_id": 37,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 624,
+    "template_id": 37,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 625,
+    "template_id": 37,
+    "module_key": "work_experience",
+    "label": "工作经历",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 626,
+    "template_id": 37,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 627,
+    "template_id": 37,
+    "module_key": "job_title",
+    "label": "求职意向",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 31,
+  "editable": 30,
+  "with_ph": 3,
+  "ph_sample": [
+   "专业技能",
+   "工作经历",
+   "求职意向"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 393046,
+  "preview_sec": 8.2
+ },
+ "38": {
+  "id": 38,
+  "name": "个人简历电子版",
+  "kind": "free",
+  "display_id": 24,
+  "modules_api": [
+   {
+    "id": 628,
+    "template_id": 38,
+    "module_key": "skills",
+    "label": "专业技能",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 629,
+    "template_id": 38,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 630,
+    "template_id": 38,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 631,
+    "template_id": 38,
+    "module_key": "work_experience",
+    "label": "工作经历",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 632,
+    "template_id": 38,
+    "module_key": "location",
+    "label": "所在地",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 633,
+    "template_id": 38,
+    "module_key": "contact",
+    "label": "电话",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 14,
+  "editable": 14,
+  "with_ph": 2,
+  "ph_sample": [
+   "姓名",
+   "工作经历"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 410854,
+  "preview_sec": 6.6
+ },
+ "40": {
+  "id": 40,
+  "name": "简约word版",
+  "kind": "free",
+  "display_id": 25,
+  "modules_api": [
+   {
+    "id": 639,
+    "template_id": 40,
+    "module_key": "skills",
+    "label": "专业技能",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 640,
+    "template_id": 40,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 641,
+    "template_id": 40,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 642,
+    "template_id": 40,
+    "module_key": "work_experience",
+    "label": "工作经历",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 643,
+    "template_id": 40,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 13,
+  "editable": 13,
+  "with_ph": 4,
+  "ph_sample": [
+   "个人优势",
+   "姓名",
+   "工作经历",
+   "教育背景"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 309338,
+  "preview_sec": 8.7
+ },
+ "41": {
+  "id": 41,
+  "name": "简约时尚人事经理",
+  "kind": "free",
+  "display_id": 26,
+  "modules_api": [
+   {
+    "id": 644,
+    "template_id": 41,
+    "module_key": "skills",
+    "label": "专业技能",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 645,
+    "template_id": 41,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 646,
+    "template_id": 41,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 647,
+    "template_id": 41,
+    "module_key": "work_experience",
+    "label": "工作经历",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 648,
+    "template_id": 41,
+    "module_key": "location",
+    "label": "所在地",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 649,
+    "template_id": 41,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 650,
+    "template_id": 41,
+    "module_key": "job_title",
+    "label": "求职意向",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 651,
+    "template_id": 41,
+    "module_key": "contact",
+    "label": "电话",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 15,
+  "editable": 15,
+  "with_ph": 4,
+  "ph_sample": [
+   "个人优势",
+   "姓名",
+   "工作经历",
+   "所在地",
+   "求职意向",
+   "电话",
+   "邮箱"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 225150,
+  "preview_sec": 8.0
+ },
+ "42": {
+  "id": 42,
+  "name": "简约时尚人事经理求职模板",
+  "kind": "free",
+  "display_id": 27,
+  "modules_api": [
+   {
+    "id": 652,
+    "template_id": 42,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 653,
+    "template_id": 42,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 654,
+    "template_id": 42,
+    "module_key": "work_experience",
+    "label": "工作经历",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 655,
+    "template_id": 42,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 656,
+    "template_id": 42,
+    "module_key": "job_title",
+    "label": "求职意向",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 657,
+    "template_id": 42,
+    "module_key": "contact",
+    "label": "电话",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 9,
+  "editable": 9,
+  "with_ph": 4,
+  "ph_sample": [
+   "姓名",
+   "工作经历",
+   "教育背景",
+   "求职意向"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 387174,
+  "preview_sec": 8.7
+ },
+ "43": {
+  "id": 43,
+  "name": "教师",
+  "kind": "free",
+  "display_id": 28,
+  "modules_api": [
+   {
+    "id": 658,
+    "template_id": 43,
+    "module_key": "skills",
+    "label": "专业技能",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 659,
+    "template_id": 43,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 660,
+    "template_id": 43,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 661,
+    "template_id": 43,
+    "module_key": "work_experience",
+    "label": "工作经历",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 662,
+    "template_id": 43,
+    "module_key": "location",
+    "label": "所在地",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 663,
+    "template_id": 43,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 664,
+    "template_id": 43,
+    "module_key": "job_title",
+    "label": "求职意向",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 665,
+    "template_id": 43,
+    "module_key": "contact",
+    "label": "电话",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 15,
+  "editable": 15,
+  "with_ph": 6,
+  "ph_sample": [
+   "个人优势",
+   "姓名",
+   "工作经历",
+   "所在地",
+   "教育背景",
+   "求职意向",
+   "电话",
+   "邮箱"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 348206,
+  "preview_sec": 6.7
+ },
+ "44": {
+  "id": 44,
+  "name": "精致且创意人事经理模板",
+  "kind": "free",
+  "display_id": 29,
+  "modules_api": [
+   {
+    "id": 666,
+    "template_id": 44,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 667,
+    "template_id": 44,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 668,
+    "template_id": 44,
+    "module_key": "work_experience",
+    "label": "工作经历",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 669,
+    "template_id": 44,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 670,
+    "template_id": 44,
+    "module_key": "job_title",
+    "label": "求职意向",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 13,
+  "editable": 13,
+  "with_ph": 4,
+  "ph_sample": [
+   "个人优势",
+   "姓名",
+   "工作经历",
+   "教育背景",
+   "求职意向"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 234906,
+  "preview_sec": 6.5
+ },
+ "45": {
+  "id": 45,
+  "name": "蓝色大气行政主管岗位",
+  "kind": "free",
+  "display_id": 30,
+  "modules_api": [
+   {
+    "id": 671,
+    "template_id": 45,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 672,
+    "template_id": 45,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 673,
+    "template_id": 45,
+    "module_key": "work_experience",
+    "label": "工作经历",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 674,
+    "template_id": 45,
+    "module_key": "location",
+    "label": "所在地",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 675,
+    "template_id": 45,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 676,
+    "template_id": 45,
+    "module_key": "job_title",
+    "label": "求职意向",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 677,
+    "template_id": 45,
+    "module_key": "contact",
+    "label": "电话",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 678,
+    "template_id": 45,
+    "module_key": "projects",
+    "label": "项目经历",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 7,
+  "editable": 7,
+  "with_ph": 4,
+  "ph_sample": [
+   "个人优势",
+   "姓名",
+   "工作经历",
+   "所在地",
+   "教育背景",
+   "求职意向",
+   "电话",
+   "邮箱"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 236158,
+  "preview_sec": 6.9
+ },
+ "46": {
+  "id": 46,
+  "name": "蓝色风个人",
+  "kind": "free",
+  "display_id": 31,
+  "modules_api": [
+   {
+    "id": 679,
+    "template_id": 46,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 680,
+    "template_id": 46,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 681,
+    "template_id": 46,
+    "module_key": "work_experience",
+    "label": "工作经历",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 682,
+    "template_id": 46,
+    "module_key": "location",
+    "label": "所在地",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 683,
+    "template_id": 46,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 684,
+    "template_id": 46,
+    "module_key": "contact",
+    "label": "电话",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 10,
+  "editable": 10,
+  "with_ph": 4,
+  "ph_sample": [
+   "个人优势",
+   "姓名",
+   "工作经历",
+   "教育背景"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 325050,
+  "preview_sec": 7.3
+ },
+ "8": {
+  "id": 8,
+  "name": "宝石绿风格",
+  "kind": "vip",
+  "display_id": 1,
+  "modules_api": [
+   {
+    "id": 420,
+    "template_id": 8,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 421,
+    "template_id": 8,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 422,
+    "template_id": 8,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 23,
+  "editable": 23,
+  "with_ph": 2,
+  "ph_sample": [
+   "个人优势",
+   "姓名"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 340706,
+  "preview_sec": 7.0
+ },
+ "10": {
+  "id": 10,
+  "name": "财务",
+  "kind": "vip",
+  "display_id": 2,
+  "modules_api": [
+   {
+    "id": 431,
+    "template_id": 10,
+    "module_key": "skills",
+    "label": "专业技能",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 432,
+    "template_id": 10,
+    "module_key": "summary",
+    "label": "个人优势",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 433,
+    "template_id": 10,
+    "module_key": "name",
+    "label": "姓名",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 434,
+    "template_id": 10,
+    "module_key": "work_experience",
+    "label": "工作经历",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 435,
+    "template_id": 10,
+    "module_key": "location",
+    "label": "所在地",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 436,
+    "template_id": 10,
+    "module_key": "education",
+    "label": "教育背景",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 437,
+    "template_id": 10,
+    "module_key": "job_title",
+    "label": "求职意向",
+    "min_words": 30,
+    "max_words": 500
+   },
+   {
+    "id": 438,
+    "template_id": 10,
+    "module_key": "contact",
+    "label": "电话",
+    "min_words": 30,
+    "max_words": 500
+   }
+  ],
+  "ok": true,
+  "boxes": 14,
+  "editable": 14,
+  "with_ph": 4,
+  "ph_sample": [
+   "个人优势",
+   "姓名",
+   "所在地",
+   "求职意向",
+   "电话",
+   "邮箱"
+  ],
+  "preview_ok": true,
+  "preview_pages": 1,
+  "preview_bytes": 397818,
+  "preview_sec": 6.9
+ }
+}

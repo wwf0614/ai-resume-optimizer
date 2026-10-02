@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的简历 - 简历星球</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --primary: #5B5CFF;
+    --primary-light: #F0EFFF;
+    --primary-hover: #4A4BF0;
+    --grad-main: linear-gradient(135deg, #5B5CFF, #9B59B6);
+    --grad-blue: linear-gradient(135deg, #4F8DFF, #5B5CFF);
+    --vip-gold: linear-gradient(135deg, #FFA94D, #FF7A00);
+    --bg: #F7F9FC;
+    --card: #FFFFFF;
+    --ink: #1F2933;
+    --gray: #6B7280;
+    --line: #E8ECF3;
+    --danger: #E5484D;
+    --danger-bg: #FFF0F0;
+    --sidebar-w: 210px;
+    --radius: 18px;
+    --shadow-card: 0 4px 18px rgba(31,41,51,.05);
+    --shadow-hover: 0 14px 32px rgba(31,41,51,.14);
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+    background: linear-gradient(180deg, #F1EEFF 0%, var(--bg) 420px);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* ── 背景装饰（与首页主题一致） ── */
+  .bg-decor { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+  .blob { position: absolute; border-radius: 50%; filter: blur(70px); opacity: .45; }
+  .blob-1 { width: 420px; height: 420px; background: radial-gradient(circle, #FFC66B, transparent 70%); top: -140px; right: -80px; }
+  .blob-2 { width: 380px; height: 380px; background: radial-gradient(circle, #B39DFF, transparent 70%); top: 120px; left: -140px; }
+  .blob-3 { width: 260px; height: 260px; background: radial-gradient(circle, #7FD4FF, transparent 70%); bottom: 120px; right: 8%; }
+
+  /* ── 左侧栏 ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    min-width: var(--sidebar-w);
+    background: rgba(255,255,255,.9);
+    backdrop-filter: blur(14px);
+    border-right: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 50;
+    padding: 24px 16px 20px;
+  }
+  .sb-user { text-align: center; padding-bottom: 18px; border-bottom: 1px solid var(--line); margin-bottom: 16px; }
+  .sb-avatar {
+    width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 10px;
+    background: var(--grad-main); color: #fff; font-size: 30px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 18px rgba(91,92,255,.3); position: relative;
+  }
+  .sb-avatar::after {
+    content: ""; position: absolute; inset: -3px; border-radius: 50%;
+    background: conic-gradient(from 0deg, #5B5CFF, #9B59B6, #4F8DFF, #5B5CFF);
+    z-index: -1; opacity: .35;
+  }
+  .sb-name {
+    font-size: 15px; font-weight: 700; color: var(--ink); max-width: 160px;
+    margin: 0 auto 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .sb-id { font-size: 11.5px; color: var(--gray); margin-bottom: 12px; }
+  .btn-vip {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--vip-gold); color: #fff; border: none; border-radius: 8px;
+    padding: 7px 18px; font-size: 13px; font-weight: 700; cursor: pointer;
+    transition: all .2s; font-family: inherit; box-shadow: 0 4px 12px rgba(255,149,0,.25);
+  }
+  .btn-vip:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(255,149,0,.35); }
+
+  /* 左侧菜单 */
+  .sb-menu { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .sb-item {
+    display: flex; align-items: center; gap: 10px; padding: 11px 14px;
+    border-radius: 10px; font-size: 14.5px; font-weight: 600; cursor: pointer;
+    transition: all .2s; text-decoration: none; color: var(--gray);
+    border: none; background: none; width: 100%; font-family: inherit;
+  }
+  .sb-item:hover { background: var(--primary-light); color: var(--primary); }
+  .sb-item.active {
+    background: var(--primary-light); color: var(--primary);
+    box-shadow: inset 3px 0 0 var(--primary);
+  }
+  .sb-icon { font-size: 17px; width: 22px; text-align: center; flex-shrink: 0; }
+
+  /* ── 主内容区 ── */
+  .main {
+    flex: 1; margin-left: var(--sidebar-w);
+    padding: 28px 32px 40px; min-height: 100vh;
+  }
+  .page-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 22px;
+  }
+  .page-head-left, .page-head-right { display: flex; align-items: center; gap: 14px; }
+  .page-title {
+    font-size: 19px; font-weight: 800; color: var(--ink);
+  }
+  .page-title span { color: var(--primary); font-size: 15px; font-weight: 700; }
+  .batch-toggle {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; color: var(--gray); cursor: pointer; user-select: none;
+  }
+  .batch-toggle input { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
+  .batch-count { font-size: 13px; color: var(--primary); font-weight: 700; }
+  .btn-batch-del {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--danger-bg); color: var(--danger); border: 1px solid #F5C2C7;
+    border-radius: 999px; padding: 9px 18px; font-size: 13px; font-weight: 700;
+    cursor: pointer; transition: all .2s; font-family: inherit;
+  }
+  .btn-batch-del:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
+  .btn-new {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--grad-main); color: #fff; border: none; border-radius: 999px;
+    padding: 10px 22px; font-size: 13.5px; font-weight: 700; cursor: pointer;
+    transition: all .2s; font-family: inherit;
+    box-shadow: 0 6px 16px rgba(91,92,255,.32);
+  }
+  .btn-new:hover { transform: translateY(-1px); box-shadow: 0 10px 22px rgba(91,92,255,.4); }
+
+  /* ── 简历卡片网格 ── */
+  .resume-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  .resume-card {
+    background: var(--card); border-radius: var(--radius);
+    border: 1px solid var(--line);
+    overflow: hidden; position: relative;
+    cursor: default; transition: all .25s;
+    box-shadow: var(--shadow-card);
+  }
+  .resume-card.batch-mode .rc-checkbox-wrap { opacity: 1; pointer-events: auto; }
+  .rc-checkbox-wrap {
+    position: absolute; top: 10px; left: 10px; z-index: 11;
+    width: 24px; height: 24px; background: #fff; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,.14); opacity: 0; pointer-events: none;
+    transition: opacity .2s;
+  }
+  .resume-card:hover .rc-checkbox-wrap { opacity: 1; pointer-events: auto; }
+  .rc-checkbox { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
+  .resume-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+    border-color: #C7BFFF;
+  }
+  .rc-preview {
+    width: 100%; aspect-ratio: 3 / 4;
+    object-fit: cover; object-position: top;
+    background: #F7F8FC; display: block;
+    border-bottom: 1px solid var(--line);
+  }
+  .rc-body { padding: 10px 13px 12px; }
+  .rc-name {
+    font-size: 14px; font-weight: 700; color: var(--ink);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .rc-meta {
+    font-size: 11.5px; color: var(--gray); margin-top: 3px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .rc-time { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rc-tag {
+    display: inline-block; padding: 1px 7px; border-radius: 999px;
+    font-size: 10.5px; font-weight: 600; background: var(--primary-light); color: var(--primary);
+  }
+
+  /* 悬停操作层 */
+  .rc-overlay {
+    position: absolute; inset: 0; z-index: 10;
+    background: rgba(23,26,38,.55); backdrop-filter: blur(4px);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px; opacity: 0; transition: opacity .25s; pointer-events: none;
+  }
+  .resume-card:hover .rc-overlay { opacity: 1; pointer-events: auto; }
+  .btn-edit-overlay {
+    background: var(--grad-main); color: #fff; border: none; border-radius: 999px;
+    padding: 10px 34px; font-size: 14.5px; font-weight: 700; cursor: pointer;
+    transition: all .2s; font-family: inherit;
+    box-shadow: 0 6px 18px rgba(91,92,255,.4);
+  }
+  .btn-edit-overlay:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(91,92,255,.48); }
+  .btn-del-overlay {
+    background: transparent; color: rgba(255,255,255,.88); border: none;
+    font-size: 13px; font-weight: 600; cursor: pointer; padding: 5px 16px;
+    transition: all .2s; font-family: inherit;
+  }
+  .btn-del-overlay:hover { color: #fff; text-decoration: underline; }
+
+  /* 空状态 */
+  .empty-state {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; margin: 8px auto; max-width: 460px;
+    padding: 52px 30px; color: var(--gray);
+    background: #fff; border: 1px dashed #C7BFFF; border-radius: var(--radius);
+    box-shadow: 0 4px 18px rgba(31,41,51,.05);
+    cursor: pointer; transition: all .2s;
+  }
+  .empty-state:hover { border-color: #5B5CFF; box-shadow: 0 10px 24px rgba(91,92,255,.12); transform: translateY(-2px); }
+  .empty-icon { font-size: 56px; margin-bottom: 14px; opacity: .45; }
+  .empty-title { font-size: 17px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+  .empty-desc { font-size: 13.5px; margin-bottom: 22px; }
+  .empty-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--grad-main); color: #fff; border: none; border-radius: 999px;
+    padding: 11px 26px; font-size: 14px; font-weight: 700; cursor: pointer;
+    font-family: inherit; pointer-events: none;
+    box-shadow: 0 6px 16px rgba(91,92,255,.32);
+  }
+
+  /* 加载骨架屏 */
+  .skeleton-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+  .skeleton-card {
+    background: var(--card); border-radius: var(--radius);
+    border: 1px solid var(--line); overflow: hidden;
+  }
+  .sk-preview {
+    width: 100%; aspect-ratio: 3 / 4;
+    background: linear-gradient(110deg, #f0f0f0 30%, #e8e8e8 50%, #f0f0f0 70%);
+    background-size: 200% 100%; animation: sk-shimmer 1.5s infinite;
+  }
+  .sk-body { padding: 12px 13px; }
+  .sk-line { height: 14px; background: #eee; border-radius: 4px; margin-bottom: 6px; }
+  .sk-line.short { width: 60%; }
+  .sk-line.tiny { width: 40%; height: 11px; }
+  @keyframes sk-shimmer { to { background-position-x: -200%; } }
+
+  /* 删除确认弹窗 */
+  .del-modal {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: rgba(23,26,38,.5); backdrop-filter: blur(4px);
+    align-items: center; justify-content: center;
+  }
+  .del-modal.show { display: flex; }
+  .del-box {
+    background: #fff; border-radius: var(--radius); padding: 28px 30px;
+    width: 380px; max-width: 90vw; text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,.2);
+    animation: dmIn .2s ease;
+  }
+  @keyframes dmIn { from { opacity: 0; transform: scale(.96) translateY(10px); } }
+  .del-icon { font-size: 44px; margin-bottom: 12px; }
+  .del-title { font-size: 17px; font-weight: 800; color: var(--ink); margin-bottom: 6px; }
+  .del-desc { font-size: 13px; color: var(--gray); margin-bottom: 22px; line-height: 1.6; }
+  .del-btns { display: flex; gap: 10px; justify-content: center; }
+  .btn-cancel {
+    flex: 1; padding: 10px; border: 1px solid var(--line); background: #fff;
+    border-radius: 12px; font-size: 14px; font-weight: 600; color: var(--gray);
+    cursor: pointer; transition: .2s; font-family: inherit;
+  }
+  .btn-cancel:hover { background: #F9FAFB; }
+  .btn-confirm-del {
+    flex: 1; padding: 10px; border: none; background: var(--danger);
+    border-radius: 12px; font-size: 14px; font-weight: 700; color: #fff;
+    cursor: pointer; transition: .2s; font-family: inherit;
+  }
+  .btn-confirm-del:hover { background: #CC3344; }
+
+  /* Toast */
+  .toast {
+    position: fixed; left: 50%; bottom: 34px; transform: translateX(-50%) translateY(80px);
+    background: #2A2F3D; color: #fff; font-size: 13px; padding: 11px 20px;
+    border-radius: 999px; box-shadow: 0 10px 28px rgba(0,0,0,.25);
+    opacity: 0; transition: all .3s; z-index: 300; pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* 响应式 */
+  @media (max-width: 900px) {
+    .resume-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+    .main { padding: 20px 16px 30px; }
+  }
+  @media (max-width: 640px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; }
+    .resume-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 背景装饰（与首页主题一致） -->
+<div class="bg-decor">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+</div>
+
+<!-- 左侧栏 -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-user">
+    <div class="sb-avatar" id="sbAvatar">?</div>
+    <div class="sb-name" id="sbName">加载中...</div>
+    <div class="sb-id" id="sbId">ID: --</div>
+    <button class="btn-vip" onclick="showToast('会员功能即将上线，敬请期待')">
+      开通会员
+    </button>
+  </div>
+  <nav class="sb-menu">
+    <a class="sb-item active" href="/static/my-resumes.html">
+      <span class="sb-icon">📄</span>我的简历
+    </a>
+    <a class="sb-item" href="/static/editor.html" target="_blank" title="新建/编辑简历">
+      <span class="sb-icon">✎</span>新建简历
+    </a>
+    <a class="sb-item" href="#" onclick="showToast('订单管理功能即将上线');return false;">
+      <span class="sb-icon">🧾</span>我的订单
+    </a>
+    <a class="sb-item" href="/" title="返回首页">
+      <span class="sb-icon">🏠</span>返回首页
+    </a>
+  </nav>
+</aside>
+
+<!-- 主内容 -->
+<main class="main" id="mainArea">
+  <div class="page-head">
+    <div class="page-head-left">
+      <h1 class="page-title">简历列表<span id="draftCount">(0)</span></h1>
+      <label class="batch-toggle" id="batchToggle" hidden>
+        <input type="checkbox" id="selectAllCb">
+        <span>全选</span>
+      </label>
+      <span class="batch-count" id="batchCount" hidden>已选 0 项</span>
+    </div>
+    <div class="page-head-right">
+      <button class="btn-batch-del" id="batchDelBtn" hidden>删除选中</button>
+      <button class="btn-new" onclick="createNew()">＋ 新建简历</button>
+    </div>
+  </div>
+
+  <!-- 骨架屏 -->
+  <div class="skeleton-grid" id="skeletonGrid">
+    <div class="skeleton-card"><div class="sk-preview"></div><div class="sk-body"><div class="sk-line"></div><div class="sk-line short"></div><div class="sk-line tiny"></div></div></div>
+    <div class="skeleton-card"><div class="sk-preview"></div><div class="sk-body"><div class="sk-line"></div><div class="sk-line short"></div><div class="sk-line tiny"></div></div></div>
+    <div class="skeleton-card"><div class="sk-preview"></div><div class="sk-body"><div class="sk-line"></div><div class="sk-line short"></div><div class="sk-line tiny"></div></div></div>
+  </div>
+
+  <!-- 卡片网格 -->
+  <div class="resume-grid" id="resumeGrid" style="display:none;"></div>
+
+  <!-- 空状态 -->
+  <div class="empty-state" id="emptyState" style="display:none;" onclick="createNew()" title="创建第一份简历">
+    <div class="empty-icon">📋</div>
+    <div class="empty-title">还没有简历</div>
+    <div class="empty-desc">点击创建你的第一份 AI 智能简历</div>
+    <span class="empty-link">＋ 立即创建</span>
+  </div>
+</main>
+
+<!-- 删除确认弹窗 -->
+<div class="del-modal" id="delModal">
+  <div class="del-box">
+    <div class="del-icon">🗑️</div>
+    <div class="del-title" id="delTitle">确认删除该简历？</div>
+    <div class="del-desc" id="delDesc">删除后无法恢复，请确认操作。</div>
+    <div class="del-btns">
+      <button class="btn-cancel" onclick="closeDelModal()">取消</button>
+      <button class="btn-confirm-del" id="confirmDelBtn">确认删除</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════
+   我的简历 · 简历列表页
+   ═══════════════════════════════════════════ */
+
+const $ = id => document.getElementById(id);
+
+// ── 认证工具（与 index.html 一致）──
+const TOKEN_KEY = 'resume_planet_token';
+const USER_KEY = 'resume_planet_user';
+function getToken() { return localStorage.getItem(TOKEN_KEY) || ''; }
+function authHeaders(h) {
+  const o = Object.assign({}, h || {});
+  const t = getToken();
+  if (t) o['Authorization'] = 'Bearer ' + t;
+  return o;
+}
+function clearAuth() {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
+}
+function authUrl(url) {
+  const t = getToken();
+  if (!t) return url;
+  return url + (url.indexOf('?') > -1 ? '&' : '?') + 'token=' + encodeURIComponent(t);
+}
+
+let currentUser = null;
+let draftList = [];
+let templateMap = {};       // template_id → template info (含 preview_url)
+let pendingDeleteId = null;
+let pendingDeleteBatch = [];
+let selectedIds = new Set();
+let batchMode = false;      // 是否进入批量选择模式（hover 即显示复选框）
+
+// ── Toast ──
+let toastTimer = null;
+function showToast(msg) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ── 时间格式化 ──
+function timeAgo(iso) {
+  if (!iso) return '';
+  try {
+    const d = new Date(iso);
+    const now = new Date();
+    const diff = Math.floor((now - d) / 1000);
+    if (diff < 60) return '刚刚';
+    if (diff < 3600) return Math.floor(diff / 60) + ' 分钟前';
+    if (diff < 86400) return Math.floor(diff / 3600) + ' 小时前';
+    if (diff < 604800) return Math.floor(diff / 86400) + ' 天前';
+    return d.toLocaleDateString('zh-CN');
+  } catch(e) { return ''; }
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── 初始化：校验登录态 ──
+async function init() {
+  const t = getToken();
+  if (!t) { location.href = '/login'; return; }
+
+  try {
+    const resp = await fetch('/api/me', { headers: authHeaders(), cache: 'no-store' });
+    if (!resp.ok) { clearAuth(); location.href = '/login'; return; }
+    currentUser = await resp.json();
+    localStorage.setItem(USER_KEY, JSON.stringify(currentUser));
+    applyUserInfo(currentUser);
+  } catch(e) { clearAuth(); location.href = '/login'; return; }
+
+  // 并行加载草稿列表和模板信息
+  await Promise.all([loadTemplates(), loadDrafts()]);
+}
+
+function applyUserInfo(user) {
+  const name = user.nickname || user.account || '用户';
+  $('sbName').textContent = name;
+  $('sbAvatar').textContent = name.trim().charAt(0).toUpperCase();
+  $('sbId').textContent = 'ID: ' + (user.id || '--');
+}
+
+// ── 加载模板映射（用于卡片缩略图）：免费 + VIP 模板都要加载 ──
+async function loadTemplates() {
+  try {
+    const freeResp = await fetch('/templates', { headers: authHeaders(), cache: 'no-store' }).catch(() => null);
+    const vipResp = await fetch('/api/vip-templates', { headers: authHeaders(), cache: 'no-store' }).catch(() => null);
+    if (freeResp && freeResp.ok) {
+      const list = await freeResp.json();
+      list.forEach(t => { templateMap[t.id] = t; });
+    }
+    if (vipResp && vipResp.ok) {
+      const list = await vipResp.json();
+      list.forEach(t => { templateMap[t.id] = t; });
+    }
+  } catch(e) { /* 静默 */ }
+}
+
+// ── 加载草稿列表 ──
+async function loadDrafts() {
+  // 隐藏骨架屏
+  $('skeletonGrid').style.display = 'none';
+
+  try {
+    const resp = await fetch('/api/draft/list', { headers: authHeaders(), cache: 'no-store' });
+    if (resp.status === 401) { clearAuth(); location.href = '/login'; return; }
+    if (!resp.ok) throw new Error('加载失败');
+
+    draftList = await resp.json();
+    renderCards();
+  } catch(e) {
+    $('resumeGrid').style.display = 'none';
+    $('emptyState').style.display = 'flex';
+    $('emptyState').querySelector('.empty-title').textContent = '加载失败';
+    $('emptyState').querySelector('.empty-desc').textContent = e.message + '，请刷新重试';
+    const emptyLink = $('emptyState').querySelector('.empty-link');
+    if (emptyLink) emptyLink.style.display = 'none';
+  }
+}
+
+// ── 渲染简历卡片 ──
+function renderCards() {
+  const grid = $('resumeGrid');
+  const empty = $('emptyState');
+  const countEl = $('draftCount');
+
+  countEl.textContent = '(' + draftList.length + ')';
+
+  if (!draftList.length) {
+    grid.style.display = 'none';
+    empty.style.display = 'flex';
+    // 重置空状态为默认文案
+    empty.querySelector('.empty-title').textContent = '还没有简历';
+    empty.querySelector('.empty-desc').textContent = '点击创建你的第一份 AI 智能简历';
+    const emptyLink = empty.querySelector('.empty-link');
+    if (emptyLink) emptyLink.style.display = '';
+    return;
+  }
+
+  empty.style.display = 'none';
+  grid.style.display = 'grid';
+
+  grid.innerHTML = draftList.map(d => {
+    const tpl = templateMap[d.template_id];
+    // 即使 templateMap 没加载到，也按 template_id 直接构造预览图 URL
+    const fallbackUrl = d.template_id ? `/static/previews/t${d.template_id}.png?v=5` : '';
+    const previewUrl = (tpl && tpl.preview_url) || fallbackUrl;
+    const thumb = previewUrl
+      ? `<img class="rc-preview" src="${escapeHtml(previewUrl)}" alt="${escapeHtml(d.title)}" loading="lazy" onerror="this.onerror=null;this.style.display='none';this.parentNode.insertAdjacentHTML('beforeend','<div class=\\'rc-preview rc-fallback\\' style=\\'display:flex;align-items:center;justify-content:center;font-size:48px;color:#DDD;\\'>📄</div>')">`
+      : `<div class="rc-preview" style="display:flex;align-items:center;justify-content:center;font-size:48px;color:#DDD;">📄</div>`;
+    const tplName = tpl ? tpl.name : (d.template_id ? `模板 #${d.template_id}` : '默认模板');
+    const timeStr = timeAgo(d.updated_at);
+
+    return `<div class="resume-card" data-id="${d.id}">
+      <label class="rc-checkbox-wrap" title="选中以批量删除">
+        <input type="checkbox" class="rc-checkbox" data-cb-id="${d.id}" ${selectedIds.has(d.id) ? 'checked' : ''}>
+      </label>
+      ${thumb}
+      <div class="rc-body">
+        <div class="rc-name">${escapeHtml(d.title)}</div>
+        <div class="rc-meta">
+          <span class="rc-tag">${escapeHtml(tplName)}</span>
+          <span class="rc-time">${timeStr}</span>
+        </div>
+      </div>
+      <div class="rc-overlay">
+        <button class="btn-edit-overlay" data-edit-id="${d.id}">在线编辑</button>
+        <button class="btn-del-overlay" data-del-id="${d.id}" data-del-title="${escapeHtml(d.title)}">删除</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  // 绑定事件
+  grid.querySelectorAll('.btn-edit-overlay').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      openEditor(parseInt(btn.dataset.editId, 10));
+    });
+  });
+
+  grid.querySelectorAll('.btn-del-overlay').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      openDelModal(parseInt(btn.dataset.delId, 10), btn.dataset.delTitle);
+    });
+  });
+
+  // 批量选择：卡片上任意非按钮区域点击即切换选择状态
+  grid.querySelectorAll('.resume-card').forEach(card => {
+    card.addEventListener('click', e => {
+      if (e.target.closest('.rc-overlay') || e.target.closest('.rc-checkbox-wrap')) return;
+      if (!batchMode) { enterBatchMode(); }
+      const id = parseInt(card.dataset.id, 10);
+      const cb = card.querySelector('.rc-checkbox');
+      toggleSelect(id, !selectedIds.has(id));
+      if (cb) cb.checked = selectedIds.has(id);
+    });
+  });
+
+  grid.querySelectorAll('.rc-checkbox').forEach(cb => {
+    cb.addEventListener('change', e => {
+      e.stopPropagation();
+      const id = parseInt(cb.dataset.cbId, 10);
+      toggleSelect(id, cb.checked);
+    });
+  });
+}
+
+// ── 批量选择模式 ──
+function enterBatchMode() {
+  batchMode = true;
+  document.querySelectorAll('.resume-card').forEach(c => c.classList.add('batch-mode'));
+  $('batchToggle').hidden = false;
+  updateBatchUI();
+}
+
+function exitBatchMode() {
+  batchMode = false;
+  selectedIds.clear();
+  document.querySelectorAll('.resume-card').forEach(c => c.classList.remove('batch-mode'));
+  document.querySelectorAll('.rc-checkbox').forEach(cb => cb.checked = false);
+  $('batchToggle').hidden = true;
+  $('batchCount').hidden = true;
+  $('batchDelBtn').hidden = true;
+  $('selectAllCb').checked = false;
+}
+
+function toggleSelect(id, checked) {
+  if (checked) selectedIds.add(id); else selectedIds.delete(id);
+  if (selectedIds.size === 0 && batchMode) {
+    // 全部取消后保持批量模式，但隐藏工具栏
+    updateBatchUI();
+  } else if (selectedIds.size > 0 && !batchMode) {
+    enterBatchMode();
+  } else {
+    updateBatchUI();
+  }
+}
+
+function updateBatchUI() {
+  const n = selectedIds.size;
+  const total = draftList.length;
+  $('batchCount').textContent = `已选 ${n} 项`;
+  $('batchCount').hidden = n === 0;
+  $('batchDelBtn').hidden = n === 0;
+  $('selectAllCb').checked = n > 0 && n === total;
+}
+
+// ── 打开编辑器（带 draft_id）──
+function openEditor(draftId) {
+  const url = draftId
+    ? '/static/editor.html?draft_id=' + encodeURIComponent(draftId)
+    : '/static/editor.html';
+  window.open(url, '_blank');
+}
+
+function createNew() { window.open('/static/editor.html', '_blank'); }
+
+// ── 删除流程（单条 + 批量）──
+function openDelModal(id, title) {
+  pendingDeleteId = id;
+  pendingDeleteBatch = [];
+  $('delTitle').textContent = '确认删除该简历？';
+  $('delDesc').textContent = `「${title}」将被永久删除，此操作不可撤销。`;
+  $('delModal').classList.add('show');
+}
+
+function openBatchDelModal() {
+  pendingDeleteId = null;
+  pendingDeleteBatch = Array.from(selectedIds);
+  const n = pendingDeleteBatch.length;
+  $('delTitle').textContent = `确认删除这 ${n} 份简历？`;
+  $('delDesc').textContent = '删除后无法恢复，请确认操作。';
+  $('delModal').classList.add('show');
+}
+
+function closeDelModal() {
+  $('delModal').classList.remove('show');
+  pendingDeleteId = null;
+  pendingDeleteBatch = [];
+  // 重置按钮状态
+  const btn = $('confirmDelBtn');
+  btn.textContent = '确认删除';
+  btn.disabled = false;
+}
+
+$('confirmDelBtn').addEventListener('click', async () => {
+  const btn = $('confirmDelBtn');
+  btn.textContent = '删除中…';
+  btn.disabled = true;
+
+  if (pendingDeleteBatch.length > 0) {
+    await doBatchDelete(btn);
+    return;
+  }
+  if (!pendingDeleteId) { closeDelModal(); return; }
+
+  try {
+    const resp = await fetch('/api/draft/' + pendingDeleteId, {
+      method: 'DELETE',
+      headers: authHeaders()
+    });
+    if (!resp.ok) {
+      const d = await resp.json().catch(() => ({}));
+      const msg = typeof d.detail === 'string' ? d.detail
+        : (d.detail ? JSON.stringify(d.detail) : ('请求失败 (' + resp.status + ')'));
+      throw new Error(msg);
+    }
+
+    showToast('已删除');
+    draftList = draftList.filter(d => d.id !== pendingDeleteId);
+    renderCards();
+    closeDelModal();
+  } catch(e) {
+    showToast('删除失败：' + e.message);
+    btn.textContent = '确认删除';
+    btn.disabled = false;
+  }
+});
+
+async function doBatchDelete(btn) {
+  try {
+    const resp = await fetch('/api/draft/batch-delete', {
+      method: 'POST',
+      headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
+      body: JSON.stringify({ ids: pendingDeleteBatch })
+    });
+    if (!resp.ok) {
+      const d = await resp.json().catch(() => ({}));
+      const msg = typeof d.detail === 'string' ? d.detail
+        : (d.detail ? JSON.stringify(d.detail) : ('请求失败 (' + resp.status + ')'));
+      throw new Error(msg);
+    }
+    const r = await resp.json();
+    showToast(`已删除 ${r.deleted || pendingDeleteBatch.length} 份简历`);
+    draftList = draftList.filter(d => !selectedIds.has(d.id));
+    exitBatchMode();
+    renderCards();
+    closeDelModal();
+  } catch(e) {
+    showToast('批量删除失败：' + e.message);
+    btn.textContent = '确认删除';
+    btn.disabled = false;
+  }
+}
+
+$('batchDelBtn').addEventListener('click', openBatchDelModal);
+
+$('selectAllCb').addEventListener('change', e => {
+  const checked = e.target.checked;
+  document.querySelectorAll('.rc-checkbox').forEach(cb => {
+    const id = parseInt(cb.dataset.cbId, 10);
+    cb.checked = checked;
+    if (checked) selectedIds.add(id); else selectedIds.delete(id);
+  });
+  if (!batchMode && selectedIds.size > 0) enterBatchMode();
+  else updateBatchUI();
+});
+
+$('delModal').addEventListener('click', e => {
+  if (e.target === $('delModal')) closeDelModal();
+});
+
+// 按 Esc 退出批量选择模式
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && batchMode) exitBatchMode();
+});
+
+// ── 启动 ──
+init();
+</script>
+</body>
+</html>

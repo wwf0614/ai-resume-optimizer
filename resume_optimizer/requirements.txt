@@ -1,0 +1,16 @@
+fastapi
+uvicorn[standard]
+python-multipart
+pdfplumber
+python-docx
+openai
+python-dotenv
+pdf2docx
+docx2pdf
+pymupdf<1.24
+pymysql
+cryptography
+pillow
+pytesseract
+opencv-python
+jieba

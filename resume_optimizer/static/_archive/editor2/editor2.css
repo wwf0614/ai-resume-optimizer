@@ -1,0 +1,115 @@
+/* ══════════════════════════════════════════════════
+ * 新版编辑器（模板骨架 + 就地富文本编辑）样式
+ * ══════════════════════════════════════════════════ */
+
+.rt2-paper {
+  width: 720px; max-width: 100%;
+  min-height: 0; padding: 0; background: transparent;
+  box-shadow: none; overflow: visible;
+}
+.rt2-loading {
+  min-height: 480px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 14px;
+  color: #8A93A3; font-size: 13.5px; background: #fff;
+  border-radius: 4px; box-shadow: 0 2px 16px rgba(0,0,0,.08);
+}
+.rt2-loading[hidden] { display: none; }
+
+/* 页面 = 底图 + 编辑层 */
+.rt2-page {
+  position: relative; width: 100%; overflow: hidden;
+  background: #fff; border-radius: 2px;
+  box-shadow: 0 2px 16px rgba(0,0,0,.08);
+}
+.rt2-bg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  display: block; pointer-events: none; user-select: none;
+}
+
+/* 可编辑盒子 */
+.rt2-box {
+  position: absolute; overflow: visible; cursor: text;
+  outline: none; z-index: 2;
+}
+.rt2-box > * { max-width: 100%; }
+.rt2-box:focus, .rt2-box.rt2-active {
+  background: rgba(91,92,255,.05);
+  box-shadow: 0 0 0 1.5px rgba(91,92,255,.55);
+  border-radius: 2px;
+}
+.rt2-box ul, .rt2-box ol { margin: 0; padding-left: 1.4em; }
+.rt2-box div { min-height: 1em; }
+
+/* 照片层 */
+.rt2-photo {
+  position: absolute; z-index: 3; cursor: pointer;
+  border: 1.5px dashed transparent; border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color .15s;
+}
+.rt2-photo:hover { border-color: rgba(91,92,255,.65); }
+.rt2-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.rt2-photo .rt2-photo-hint {
+  position: absolute; bottom: -22px; left: 50%; transform: translateX(-50%);
+  background: rgba(30,32,48,.8); color: #fff; font-size: 11px;
+  padding: 2px 10px; border-radius: 10px; white-space: nowrap;
+  opacity: 0; pointer-events: none; transition: opacity .15s;
+}
+.rt2-photo:hover .rt2-photo-hint { opacity: 1; }
+.rt2-photo.rt2-ellipse { border-radius: 50%; }
+
+/* 板块定位闪烁 */
+@keyframes rt2Flash {
+  0%, 100% { box-shadow: 0 0 0 1.5px rgba(91,92,255,0); background: rgba(91,92,255,0); }
+  25%, 75% { box-shadow: 0 0 0 2px #5B5CFF; background: rgba(91,92,255,.14); }
+}
+.rt2-flash { animation: rt2Flash .9s ease 2; }
+
+/* 浮动格式工具栏 */
+.rt2-fmt {
+  position: fixed; z-index: 600;
+  display: flex; align-items: center; gap: 3px;
+  background: #fff; border: 1px solid #E4E0FF; border-radius: 10px;
+  padding: 5px 7px; box-shadow: 0 8px 26px rgba(40,30,90,.18);
+}
+.rt2-fmt[hidden] { display: none; }
+.rt2-fmt button {
+  background: transparent; border: none; border-radius: 6px;
+  min-width: 28px; height: 28px; font-size: 13px; color: #444;
+  cursor: pointer; transition: .12s;
+}
+.rt2-fmt button:hover { background: #F0EDFF; color: #5B5CFF; }
+.rt2-fmt select {
+  border: 1px solid #E4E0FF; border-radius: 6px; height: 26px;
+  font-size: 12px; color: #444; background: #fff; cursor: pointer;
+}
+.rt2-fmt-sep { width: 1px; height: 18px; background: #ECE8FF; margin: 0 2px; }
+.rt2-color-btn {
+  display: inline-flex; align-items: center; gap: 2px; font-size: 13px;
+  border-radius: 6px; padding: 0 6px; height: 28px; cursor: pointer;
+}
+.rt2-color-btn:hover { background: #F0EDFF; }
+.rt2-color-btn input { width: 16px; height: 16px; border: none; padding: 0; background: none; cursor: pointer; }
+
+/* 板块导航 */
+.rt2-nav { display: flex; flex-direction: column; gap: 6px; }
+.rt2-nav-group { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.rt2-nav-head {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 12px; background: #F8F7FF; font-size: 13px; font-weight: 700;
+  color: #4A44C8; cursor: default;
+}
+.rt2-nav-item {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 8px 12px; border: none; background: #fff; text-align: left;
+  font-size: 12.5px; color: #444; cursor: pointer; transition: background .12s;
+  border-top: 1px solid #F2F0FA;
+}
+.rt2-nav-item:hover { background: #F6F4FF; color: var(--primary); }
+.rt2-nav-item .st { margin-left: auto; font-size: 11px; color: #A9A4AF; }
+.rt2-nav-item .st.filled { color: #16A36A; }
+
+/* 窄屏 */
+@media (max-width: 1024px) {
+  .rt2-paper { width: 100%; }
+}

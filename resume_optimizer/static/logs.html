@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>运行日志 - 简历星球</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; background: #F7F9FC; color: #1F2933; padding: 24px; }
+  .head { max-width: 1100px; margin: 0 auto 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .head h1 { font-size: 20px; }
+  .head h1 span { background: linear-gradient(135deg,#5B5CFF,#9B59B6); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  input, select { padding: 8px 12px; border: 1px solid #DCE1EE; border-radius: 10px; font-size: 13px; font-family: inherit; }
+  input:focus { outline: none; border-color: #5B5CFF; }
+  button { padding: 9px 18px; border: none; border-radius: 10px; background: linear-gradient(135deg,#5B5CFF,#9B59B6); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .status { font-size: 12px; color: #6B7280; }
+  .card { background: #fff; border: 1px solid #E8ECF3; border-radius: 14px; box-shadow: 0 4px 16px rgba(31,41,51,.05); overflow: hidden; max-width: 1100px; margin: 0 auto; }
+  .tbl-wrap { overflow: auto; max-height: calc(100vh - 170px); }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th { background: #F5F6FB; text-align: left; padding: 10px 12px; color: #6B7280; font-weight: 600; position: sticky; top: 0; border-bottom: 1px solid #E8ECF3; white-space: nowrap; }
+  td { padding: 8px 12px; border-bottom: 1px solid #F0F2F8; vertical-align: top; }
+  tr:hover td { background: #FAF9FF; }
+  .ev { font-weight: 700; color: #5B5CFF; white-space: nowrap; }
+  .err { color: #E5484D; font-weight: 700; }
+  .detail { color: #4B5563; word-break: break-all; }
+  .empty { text-align: center; color: #9AA4B8; padding: 40px; }
+</style>
+</head>
+<body>
+<div class="head">
+  <h1><span>简历星球</span> · 运行日志</h1>
+  <div class="controls">
+    <input type="password" id="pwd" placeholder="管理员密码">
+    <input type="text" id="filter" placeholder="筛选关键字…">
+    <select id="evFilter">
+      <option value="">全部事件</option>
+      <option value="optimize_start">优化开始</option>
+      <option value="optimize_done">优化完成</option>
+      <option value="llm_call">AI 调用</option>
+      <option value="fill_done">模板填充</option>
+      <option value="download">下载</option>
+      <option value="template_upload">模板上传</option>
+      <option value="template_delete">模板删除</option>
+      <option value="request_error">错误</option>
+    </select>
+    <button id="loadBtn">加载日志</button>
+    <span class="status" id="status">未连接</span>
+  </div>
+</div>
+<div class="card">
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>时间</th><th>事件</th><th>详情</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let timer = null;
+let pwd = "";
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+async function loadLogs() {
+  pwd = $("pwd").value || pwd;
+  if (!pwd) { $("status").textContent = "请输入管理员密码"; return; }
+  try {
+    const resp = await fetch("/admin/logs?limit=300", { headers: { "X-Admin-Password": pwd } });
+    if (!resp.ok) {
+      const d = await resp.json().catch(() => ({}));
+      $("status").textContent = "加载失败：" + (d.detail || resp.status);
+      return;
+    }
+    const data = await resp.json();
+    render(data.logs || []);
+    $("status").textContent = "已连接 · " + (data.logs || []).length + " 条 · 每 5 秒自动刷新";
+  } catch (e) {
+    $("status").textContent = "网络错误：" + e.message;
+  }
+}
+
+function render(logs) {
+  const kw = $("filter").value.trim().toLowerCase();
+  const ev = $("evFilter").value;
+  const rows = logs.filter(function(l) {
+    if (ev && l.event !== ev) return false;
+    if (!kw) return true;
+    return JSON.stringify(l).toLowerCase().indexOf(kw) >= 0;
+  });
+  const tbody = $("tbody");
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="3" class="empty">暂无匹配日志</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(function(l) {
+    const keys = Object.keys(l).filter(function(k) { return !["event", "ts", "level"].includes(k); });
+    const detail = keys.map(function(k) { return "<b>" + esc(k) + ":</b> " + esc(l[k]); }).join(" · ");
+    const cls = l.event === "request_error" || l.event === "llm_error" ? "err" : "ev";
+    return "<tr><td>" + esc(l.ts) + "</td><td class=\"" + cls + "\">" + esc(l.event) + "</td>"
+      + "<td class=\"detail\">" + detail + "</td></tr>";
+  }).join("");
+}
+
+$("loadBtn").addEventListener("click", loadLogs);
+$("filter").addEventListener("input", function() {
+  if (pwd) loadLogs();
+});
+$("evFilter").addEventListener("change", function() {
+  if (pwd) loadLogs();
+});
+$("pwd").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") { loadLogs(); startAuto(); }
+});
+
+function startAuto() {
+  clearInterval(timer);
+  timer = setInterval(loadLogs, 5000);
+}
+loadLogs();
+</script>
+</body>
+</html>

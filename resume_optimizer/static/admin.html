@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>模板管理 - 简历优化系统</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; background: #f0f2f5; color: #333; min-height: 100vh; padding: 32px 16px; }
+  .container { width: 100%; max-width: 880px; margin: 0 auto; }
+  h1 { font-size: 22px; margin-bottom: 6px; }
+  .subtitle { color: #888; font-size: 13px; margin-bottom: 20px; }
+  .back-link { font-size: 13px; color: #888; text-decoration: none; float: right; }
+  .back-link:hover { color: #4a7cf7; }
+  .card { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,.08); padding: 24px; margin-bottom: 20px; }
+  .card-title { font-size: 15px; font-weight: 600; margin-bottom: 12px; }
+  .alert { display: none; background: #fdecea; color: #c0392b; border: 1px solid #f5c6cb; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 14px; }
+  .alert.show { display: block; }
+  .alert.ok { display: none; background: #eafaf1; color: #1e8449; border-color: #a9dfbf; }
+  .alert.ok.show { display: block; }
+  label { display: block; font-size: 13px; color: #555; margin-bottom: 4px; }
+  input[type=text], input[type=number], input[type=password], textarea { width: 100%; border: 1px solid #d9dee5; border-radius: 8px; padding: 9px 12px; font-size: 14px; font-family: inherit; }
+  input:focus, textarea:focus { outline: none; border-color: #4a7cf7; }
+  .form-row { margin-bottom: 14px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .btn { display: inline-block; background: #4a7cf7; color: #fff; border: none; border-radius: 8px; padding: 10px 26px; font-size: 14px; cursor: pointer; transition: background .2s; }
+  .btn:hover { background: #3a68e0; }
+  .btn:disabled { background: #a8bdf7; cursor: not-allowed; }
+  .btn-danger { background: #e74c3c; padding: 6px 14px; font-size: 12px; }
+  .btn-danger:hover { background: #c0392b; }
+  .btn-mini { background: #eef1f5; color: #4a7cf7; padding: 5px 12px; font-size: 12px; }
+  .btn-mini:hover { background: #e0e6ee; }
+  /* 模块配置行 */
+  .mod-row { display: grid; grid-template-columns: 1fr 1fr 90px 90px 34px; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .mod-row select { border: 1px solid #d9dee5; border-radius: 8px; padding: 8px; font-size: 13px; }
+  .mod-row input { padding: 8px; font-size: 13px; }
+  .mod-rm { cursor: pointer; color: #c0392b; font-size: 16px; text-align: center; font-weight: 700; user-select: none; }
+  .add-mod { color: #4a7cf7; font-size: 13px; cursor: pointer; user-select: none; }
+  /* 模板列表 */
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #eef1f5; font-size: 13px; vertical-align: top; }
+  th { color: #888; font-weight: 600; background: #fafbfc; }
+  .tpl-mods { display: flex; flex-wrap: wrap; gap: 4px; }
+  .mod-tag { font-size: 11px; background: #eef1f5; color: #555; border-radius: 4px; padding: 1px 6px; }
+  .empty { color: #999; text-align: center; padding: 24px; font-size: 13px; }
+  .ops { display: flex; gap: 6px; }
+  .tbl-wrap { overflow: auto; }
+  .ev { font-weight: 700; color: #4a7cf7; white-space: nowrap; }
+  .err { color: #E5484D; font-weight: 700; }
+  .detail { color: #4B5563; word-break: break-all; font-size: 12px; }
+  .login-box { max-width: 360px; margin: 0 auto; padding: 12px 0; }
+  .pwd-row { display: flex; gap: 10px; align-items: center; }
+  .pwd-row input { flex: 1; }
+  .lock-note { font-size: 12px; color: #999; margin-top: 8px; }
+  /* 模板配置（训练）工具 */
+  .cfg-box { border: 2px dashed #b8a8ff; background: rgba(83,64,245,.05); border-radius: 3px; cursor: pointer; box-sizing: border-box; }
+  .cfg-box:hover { border-color: #5340f5; background: rgba(83,64,245,.10); }
+  .cfg-box.sel { border-style: solid; border-color: #5340f5; background: rgba(83,64,245,.14); box-shadow: 0 0 0 2px rgba(83,64,245,.2); }
+  .cfg-tag { position: absolute; top: 0; left: 0; font-size: 9px; background: #5340f5; color: #fff; padding: 1px 4px; border-radius: 0 0 4px 0; max-width: 100%; overflow: hidden; white-space: nowrap; }
+  .cfg-txt { position: absolute; inset: 0; font-size: 10px; color: #666; padding: 16px 4px 2px; overflow: hidden; pointer-events: none; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+    <div>
+      <h1>管理后台</h1>
+      <p class="subtitle">上传简历模板（.docx，含 {{占位符}}），配置各模块字数限制，管理模板库</p>
+    </div>
+    <div style="display:flex;gap:8px;flex:none;align-items:center">
+      <a class="back-link" href="/" style="float:none">← 返回首页</a>
+      <button class="btn btn-mini" id="logoutBtn" style="display:none">退出登录</button>
+    </div>
+  </div>
+
+  <div class="alert" id="alert"></div>
+  <div class="alert ok" id="okAlert"></div>
+
+  <!-- 上传模板 -->
+  <div class="card" id="uploadCard" style="display:none">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+      <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#5B8CFF,#3B6FE0);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px">📤</div>
+      <span style="font-size:17px;font-weight:700;color:#333">上传新模板</span>
+    </div>
+    <div style="font-size:12.5px;color:#8A94A6;margin-bottom:14px">支持 .docx，可多选批量导入</div>
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px">
+      <div style="flex:1;border:1px solid #D9DFEA;border-radius:8px;padding:9px 12px;font-size:13px;color:#555;background:#FAFBFC;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="filePathBox">未选择文件</div>
+      <button class="btn" id="pickFileBtn" style="padding:9px 18px;border-radius:8px">📦 选择文件</button>
+      <input type="file" id="tplFile" accept=".docx" multiple hidden>
+      <div id="fileCount" style="font-size:12px;color:#888"></div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn" id="uploadBtn" style="background:linear-gradient(135deg,#5B8CFF,#3B6FE0);border-radius:8px;padding:11px 26px">上传所选模板</button>
+      <button class="btn" id="batchUploadBtn" style="background:linear-gradient(135deg,#34C77B,#1FAF63);border-radius:8px;padding:11px 26px">📦 批量导入全部所选</button>
+    </div>
+  </div>
+
+  <!-- 模板列表 -->
+  <div class="card" id="listCard" style="display:none">
+    <div class="card-title">📚 免费模板</div>
+    <div id="tplList"></div>
+  </div>
+
+  <!-- VIP 模板中心 -->
+  <div class="card" id="vipCard" style="display:none">
+    <div class="card-title">👑 VIP模板中心</div>
+    <div style="font-size:12.5px;color:#8A94A6;margin-bottom:12px">
+      VIP 模板与免费模板相互独立：上传后自动上架，供用户端简历编辑器使用（付费功能后续接入）。
+      也可在下方「免费模板」列表中把已上架免费模板「设为VIP」。
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px">
+      <div style="flex:1;border:1px solid #D9DFEA;border-radius:8px;padding:9px 12px;font-size:13px;color:#555;background:#FAFBFC;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="vipFilePathBox">未选择文件</div>
+      <button class="btn" id="vipPickBtn" style="padding:9px 18px;border-radius:8px">📦 选择VIP模板</button>
+      <input type="file" id="vipTplFile" accept=".docx" multiple hidden>
+    </div>
+    <button class="btn" id="vipUploadBtn" style="background:linear-gradient(135deg,#A855F7,#7C3AED);border-radius:8px;padding:11px 26px">⬆ 上传为VIP模板</button>
+    <div id="vipList" style="margin-top:16px"></div>
+  </div>
+
+  <!-- 用户 VIP 管理 -->
+  <div class="card" id="vipUserCard" style="display:none">
+    <div class="card-title">👑 用户 VIP 管理</div>
+    <div style="font-size:12.5px;color:#8A94A6;margin-bottom:12px">
+      开通/取消用户 VIP：VIP 用户才能使用在线编辑器与 VIP 模板中心（付费功能后续接入）。
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+      <input type="text" id="vipUserAccount" placeholder="用户账号（手机号/邮箱）" style="flex:1;border:1px solid #D9DFEA;border-radius:8px;padding:9px 12px;font-size:13px">
+      <button class="btn" id="vipUserOn" style="background:linear-gradient(135deg,#A855F7,#7C3AED);padding:9px 18px;border-radius:8px">开通 VIP</button>
+      <button class="btn" id="vipUserOff" style="background:#E8EAF0;color:#333;padding:9px 18px;border-radius:8px">取消 VIP</button>
+    </div>
+    <div id="vipUserStatus" style="font-size:12.5px;color:#888"></div>
+  </div>
+
+  <!-- 模板配置（训练）弹窗 -->
+  <div id="cfgModal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(15,20,35,.55);backdrop-filter:blur(4px);align-items:center;justify-content:center">
+    <div style="width:960px;max-width:96vw;max-height:92vh;overflow:auto;background:#fff;border-radius:14px;padding:20px;box-shadow:0 24px 70px rgba(0,0,0,.3)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span style="font-size:17px;font-weight:700">模板配置（训练）· <span id="cfgTplName"></span></span>
+        <button class="btn btn-mini" onclick="closeCfgModal()">✕ 关闭</button>
+      </div>
+      <div style="font-size:12.5px;color:#8A94A6;margin-bottom:14px;line-height:1.7">
+        点击预览中任意文本框，在右侧选择它属于哪个信息模块（基本信息/教育背景/工作经验…），
+        保存后编辑器按此配置显示/隐藏模块内容。装饰性内容请选「固定内容」。文本框编号即编辑器中的可编辑区域。
+      </div>
+      <div style="display:flex;gap:16px">
+        <div id="cfgCanvas" style="flex:1;position:relative;border:1px solid #e5e7eb;background:#fff;min-height:500px;overflow:hidden"></div>
+        <div style="width:240px;flex-shrink:0">
+          <div id="cfgSelInfo" style="font-size:13px;color:#555;margin-bottom:8px;background:#f7f8fa;border-radius:8px;padding:10px;word-break:break-all">未选择文本框</div>
+          <select id="cfgModuleSel" style="width:100%;height:36px;border:1px solid #d9dfea;border-radius:8px;padding:0 8px;margin-bottom:10px;font-size:13px"></select>
+          <button class="btn" id="cfgAssignBtn" style="width:100%;background:#5340f5;color:#fff;border-radius:8px;padding:10px">应用归属</button>
+          <div style="margin-top:16px">
+            <button class="btn" id="cfgSaveBtn" style="width:100%;background:#1e8449;color:#fff;border-radius:8px;padding:11px">💾 保存全部配置</button>
+          </div>
+          <div id="cfgStats" style="font-size:12px;color:#888;margin-top:10px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 板块绑定配置 -->
+  <div class="card" id="mappingCard" style="display:none">
+    <div class="card-title">🔗 模板板块绑定配置</div>
+    <div style="font-size:12.5px;color:#8A94A6;margin-bottom:12px">系统自动识别模板板块与字段，可手动绑定标准 key；无占位符模板按此映射填充（有数据填、无数据留白）。</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <select id="mapTplSelect" style="flex:1;border:1px solid #d9dee5;border-radius:8px;padding:9px 12px;font-size:13px"></select>
+      <button class="btn" id="mapLoadBtn" style="padding:9px 18px">读取映射</button>
+    </div>
+    <div id="mapBody" style="font-size:13px"></div>
+    <div style="margin-top:12px">
+      <button class="btn" id="mapSaveBtn" style="background:linear-gradient(135deg,#5B8CFF,#3B6FE0)">保存绑定</button>
+      <span id="mapStatus" style="font-size:12px;color:#888;margin-left:8px"></span>
+    </div>
+  </div>
+
+  <!-- 全局同义词库 -->
+  <div class="card" id="aliasCard" style="display:none">
+    <div class="card-title">📖 全局同义词库</div>
+    <div style="font-size:12.5px;color:#8A94A6;margin-bottom:12px">新增同义词后全平台模板自动生效（如「工作经验/工作经历/实习经历」→ work_history）。</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+      <select id="aliasKind" style="border:1px solid #d9dee5;border-radius:8px;padding:8px;font-size:13px">
+        <option value="section">板块同义词</option>
+        <option value="field">字段同义词</option>
+      </select>
+      <input type="text" id="aliasKey" placeholder="标准 key（如 work_history / phone）" style="flex:1;min-width:180px;border:1px solid #d9dee5;border-radius:8px;padding:9px 12px;font-size:13px">
+      <input type="text" id="aliasName" placeholder="同义词（如 实习工作）" style="flex:1;min-width:140px;border:1px solid #d9dee5;border-radius:8px;padding:9px 12px;font-size:13px">
+      <button class="btn" id="aliasAddBtn" style="padding:9px 18px">＋ 添加</button>
+    </div>
+    <div id="aliasList"></div>
+  </div>
+
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const MODULE_KEYS = ["summary", "work_experience", "projects", "education", "skills"];
+const MODULE_LABELS = {
+  summary: "个人优势", work_experience: "工作经历", projects: "项目经历",
+  education: "教育背景", skills: "专业技能",
+};
+let adminToken = sessionStorage.getItem("resume_admin_token") || "";
+let activePage = 1;
+const ACTIVE_PAGE_SIZE = 10;
+
+const AUTH_HEADER = function() { return { "Authorization": "Bearer " + adminToken }; };
+
+// 未登录/令牌失效：跳转管理员登录页
+function requireAdminLogin() {
+  sessionStorage.removeItem("resume_admin_token");
+  location.href = "/admin/login";
+}
+
+// 统一请求：自动附带令牌，401/403 时跳转登录页
+async function adminFetch(url, options) {
+  const opts = Object.assign({}, options || {});
+  const headers = Object.assign({}, opts.headers || {}, AUTH_HEADER());
+  opts.headers = headers;
+  const resp = await fetch(url, opts);
+  if (resp.status === 401 || resp.status === 403) {
+    requireAdminLogin();
+    throw new Error("登录已过期，请重新登录");
+  }
+  return resp;
+}
+
+function showAlert(msg) { const a = $("alert"); a.textContent = msg; a.classList.add("show"); }
+function hideAlert() { $("alert").classList.remove("show"); }
+function showOk(msg) { const a = $("okAlert"); a.textContent = msg; a.classList.add("show"); setTimeout(() => a.classList.remove("show"), 3000); }
+
+function enterAdmin() {
+  $("logoutBtn").style.display = "inline-block";
+  $("uploadCard").style.display = "block";
+  $("listCard").style.display = "block";
+  $("vipCard").style.display = "block";
+  $("vipUserCard").style.display = "block";
+  $("mappingCard").style.display = "block";
+  $("aliasCard").style.display = "block";
+  loadTemplates();
+  loadAliases();
+  loadVipTemplates();
+  fillMapTplSelect();
+}
+
+$("logoutBtn").addEventListener("click", async () => {
+  try {
+    await fetch("/api/admin/logout", { method: "POST", headers: AUTH_HEADER() });
+  } catch (e) {}
+  requireAdminLogin();
+});
+
+// ── 板块绑定配置 ──
+const STD_SECTION_KEYS = {
+  education_info: "教育背景", work_history: "工作履历", skill_info: "技能合集",
+  campus_exp: "校园经历", honor_cert: "证书荣誉", self_evaluate: "自我评价",
+};
+const STD_FIELD_KEYS = {
+  name: "姓名", age: "年龄", education_degree: "学历", phone: "手机号",
+  email: "邮箱", wechat: "微信", address: "详细地址", intention_job: "求职意向",
+  city: "现居城市", political_status: "政治面貌",
+};
+let mapTplId = null;
+let mapBindings = { sections: {}, fields: {} };
+
+function fillMapTplSelect() {
+  const sel = $("mapTplSelect");
+  sel.innerHTML = "";
+  const list = window.__ADMIN_TPLS__ || [];
+  list.forEach(function(t) {
+    const opt = document.createElement("option");
+    opt.value = t.id;
+    opt.textContent = "#" + t.id + " " + t.name;
+    sel.appendChild(opt);
+  });
+  if (list.length) sel.value = list[0].id;
+}
+
+async function openMapping(tplId) {
+  $("mapTplSelect").value = tplId;
+  await loadMapping(tplId);
+  $("mappingCard").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+async function loadMapping(tplId) {
+  mapTplId = tplId;
+  $("mapStatus").textContent = "读取中…";
+  try {
+    const resp = await adminFetch("/admin/templates/" + tplId + "/mapping");
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.detail || "读取失败");
+    mapBindings = {
+      sections: Object.assign({}, data.bindings.sections || {}),
+      fields: Object.assign({}, data.bindings.fields || {}),
+    };
+    renderMapping(data.detected || {});
+    $("mapStatus").textContent = "已读取（自动识别 + 已保存绑定）";
+  } catch (e) {
+    $("mapBody").innerHTML = '<div class="empty">读取失败：' + e.message + '</div>';
+    $("mapStatus").textContent = "";
+  }
+}
+
+function bindSelect(opts, current) {
+  return '<select class="map-bind" data-cur="' + current + '">'
+    + '<option value="">— 不绑定 —</option>'
+    + Object.keys(opts).map(function(k) {
+      return '<option value="' + k + '"' + (current === k ? " selected" : "") + '>' + k + "（" + opts[k] + "）</option>";
+    }).join("")
+    + '</select>';
+}
+
+function renderMapping(detected) {
+  const sections = detected.sections || [];
+  const fields = detected.fields || [];
+  let html = '<div style="font-weight:700;margin:8px 0 4px">板块识别</div>';
+  if (!sections.length) html += '<div style="color:#999;font-size:12px">未识别到板块标题</div>';
+  sections.forEach(function(s, i) {
+    html += '<div data-group="section" style="display:flex;align-items:center;gap:8px;margin:5px 0">'
+      + '<span style="width:130px;flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + s.title + '">' + s.title + '</span>'
+      + bindSelect(STD_SECTION_KEYS, s.key)
+      + '<span style="color:#999;font-size:12px">内容框 ' + s.boxes.length + ' 个</span></div>';
+  });
+  html += '<div style="font-weight:700;margin:12px 0 4px">基础字段识别</div>';
+  if (!fields.length) html += '<div style="color:#999;font-size:12px">未识别到基础字段行</div>';
+  fields.forEach(function(f, i) {
+    html += '<div data-group="field" style="display:flex;align-items:center;gap:8px;margin:5px 0">'
+      + '<span style="width:130px;flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + f.label + '">' + f.label + '</span>'
+      + bindSelect(STD_FIELD_KEYS, f.key)
+      + '</div>';
+  });
+  $("mapBody").innerHTML = html || '<div class="empty">未识别到板块或字段</div>';
+}
+
+$("mapLoadBtn").addEventListener("click", function() {
+  if ($("mapTplSelect").value) loadMapping(parseInt($("mapTplSelect").value, 10));
+});
+
+$("mapSaveBtn").addEventListener("click", async function() {
+  if (!mapTplId) return;
+  const sections = {};
+  const fields = {};
+  $("mapBody").querySelectorAll("div[data-group]").forEach(function(row) {
+    const selEl = row.querySelector("select.map-bind");
+    const label = row.querySelector("span[style*='width']");
+    if (!selEl || !label || !selEl.value) return;
+    const title = label.textContent;
+    if (row.dataset.group === "field") fields[title] = selEl.value;
+    else sections[title] = selEl.value;
+  });
+  $("mapStatus").textContent = "保存中…";
+  try {
+    const fd = new FormData();
+    fd.append("bindings", JSON.stringify({ sections: sections, fields: fields }));
+    const resp = await adminFetch("/admin/templates/" + mapTplId + "/mapping", { method: "POST", body: fd });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.detail || "保存失败");
+    $("mapStatus").textContent = "✅ 绑定已保存，填充时立即生效";
+  } catch (e) {
+    $("mapStatus").textContent = "保存失败：" + e.message;
+  }
+});
+
+// ── 全局同义词库 ──
+async function loadAliases() {
+  try {
+    const resp = await adminFetch("/admin/aliases");
+    const data = await resp.json();
+    if (!resp.ok) throw new Error("加载失败");
+    const list = data.aliases || [];
+    if (!list.length) {
+      $("aliasList").innerHTML = '<div class="empty">暂无自定义同义词，使用内置默认映射</div>';
+      return;
+    }
+    $("aliasList").innerHTML = '<table><thead><tr><th>类型</th><th>标准 key</th><th>同义词</th><th></th></tr></thead><tbody>'
+      + list.map(function(a) {
+        return '<tr><td>' + (a.kind === "section" ? "板块" : "字段") + '</td>'
+          + '<td>' + a.std_key + '</td><td>' + a.alias + '</td>'
+          + '<td><button class="btn btn-danger" style="padding:4px 12px;font-size:12px" onclick="deleteAlias(' + a.id + ')">删除</button></td></tr>';
+      }).join("") + '</tbody></table>';
+  } catch (e) {
+    $("aliasList").innerHTML = '<div class="empty">加载失败：' + e.message + '</div>';
+  }
+}
+
+$("aliasAddBtn").addEventListener("click", async function() {
+  const kind = $("aliasKind").value;
+  const key = $("aliasKey").value.trim();
+  const name = $("aliasName").value.trim();
+  if (!key || !name) { showAlert("请填写标准 key 与同义词"); return; }
+  try {
+    const fd = new FormData();
+    fd.append("kind", kind);
+    fd.append("std_key", key);
+    fd.append("alias", name);
+    const resp = await adminFetch("/admin/aliases", { method: "POST", body: fd });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.detail || "添加失败");
+    $("aliasKey").value = "";
+    $("aliasName").value = "";
+    showOk("同义词已添加，全平台模板生效");
+    loadAliases();
+  } catch (e) {
+    showAlert("添加失败：" + e.message);
+  }
+});
+
+async function deleteAlias(id) {
+  if (!confirm("确认删除该同义词？")) return;
+  try {
+    const resp = await adminFetch("/admin/aliases/" + id, { method: "DELETE" });
+    if (!resp.ok) throw new Error("删除失败");
+    showOk("已删除");
+    loadAliases();
+  } catch (e) {
+    showAlert("删除失败：" + e.message);
+  }
+}
+
+// ── 上传模板 ──
+$("pickFileBtn").addEventListener("click", function() { $("tplFile").click(); });
+$("tplFile").addEventListener("change", function() {
+  const n = this.files.length;
+  if (n) {
+    const names = Array.from(this.files).map(function(f) { return f.name; }).join("、");
+    $("filePathBox").textContent = names.length > 50 ? names.slice(0, 50) + "…" : names;
+    $("fileCount").textContent = "已选 " + n + " 个";
+  } else {
+    $("filePathBox").textContent = "未选择文件";
+    $("fileCount").textContent = "";
+  }
+});
+
+$("uploadBtn").addEventListener("click", async () => {
+  hideAlert();
+  const files = $("tplFile").files;
+  if (!files.length) { showAlert("请选择 .docx 模板文件"); return; }
+  // 多选时直接走批量导入，避免只上传第一个文件
+  if (files.length > 1) { $("batchUploadBtn").click(); return; }
+  const file = files[0];
+
+  const fd = new FormData();
+  fd.append("name", "");  // 留空：系统自动识别模板名称
+  fd.append("description", "");  // 留空：系统自动识别模板描述
+  fd.append("modules", "");  // 留空：系统自动识别模块配置
+  fd.append("file", file);
+
+  const btn = $("uploadBtn");
+  btn.disabled = true;
+  try {
+    const resp = await adminFetch("/admin/templates/upload", { method: "POST", body: fd });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.detail || data.error || "上传失败");
+    showOk("模板「" + (data.name || "未命名") + "」已接收，等待人工审核");
+    $("tplFile").value = "";
+    $("filePathBox").textContent = "未选择文件";
+    $("fileCount").textContent = "";
+    activePage = 1;
+    loadTemplates();
+  } catch (e) {
+    showAlert("上传失败：" + e.message);
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+// ── 批量导入 ──
+$("batchUploadBtn").addEventListener("click", async () => {
+  hideAlert();
+  const files = $("tplFile").files;
+  if (!files.length) { showAlert("请先选择模板文件（可多选）"); return; }
+  if (files.length === 1) { $("uploadBtn").click(); return; }
+  const btn = $("batchUploadBtn");
+  btn.disabled = true;
+  btn.textContent = "正在批量导入…";
+  try {
+    const fd = new FormData();
+    for (const f of files) fd.append("files", f);
+    const resp = await adminFetch("/admin/templates/batch_upload", { method: "POST", body: fd });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.detail || data.error || "批量导入失败");
+    const failed = (data.results || []).filter(function(r) { return !r.ok; });
+    let msg = data.message || "批量导入完成";
+    if (failed.length) msg += "；失败 " + failed.length + " 个：" + failed.map(function(r) { return r.filename + (r.error ? "(" + r.error + ")" : ""); }).join("、");
+    showOk(msg);
+    $("tplFile").value = "";
+    $("filePathBox").textContent = "未选择文件";
+    $("fileCount").textContent = "";
+    activePage = 1;
+    loadTemplates();
+  } catch (e) {
+    showAlert("批量导入失败：" + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "📦 批量导入全部所选";
+  }
+});
+
+// ── VIP 模板中心 ──
+$("vipPickBtn").addEventListener("click", function() { $("vipTplFile").click(); });
+$("vipTplFile").addEventListener("change", function() {
+  const n = this.files.length;
+  $("vipFilePathBox").textContent = n
+    ? Array.from(this.files).map(function(f) { return f.name; }).join("、")
+    : "未选择文件";
+});
+
+$("vipUploadBtn").addEventListener("click", async () => {
+  hideAlert();
+  const files = $("vipTplFile").files;
+  if (!files.length) { showAlert("请先选择 .docx 模板文件"); return; }
+  const btn = $("vipUploadBtn");
+  btn.disabled = true;
+  btn.textContent = "正在上传…";
+  try {
+    let okCount = 0;
+    for (const file of Array.from(files)) {
+      const fd = new FormData();
+      fd.append("name", "");
+      fd.append("description", "");
+      fd.append("modules", "");
+      fd.append("is_vip", "1");
+      fd.append("file", file);
+      const resp = await adminFetch("/admin/templates/upload", { method: "POST", body: fd });
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data.detail || data.error || "上传失败");
+      okCount++;
+    }
+    showOk("已上传 " + okCount + " 套 VIP 模板（已自动上架）");
+    $("vipTplFile").value = "";
+    $("vipFilePathBox").textContent = "未选择文件";
+    loadVipTemplates();
+    loadTemplates();
+  } catch (e) {
+    showAlert("上传失败：" + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "⬆ 上传为VIP模板";
+  }
+});
+
+async function loadVipTemplates() {
+  const box = $("vipList");
+  try {
+    const resp = await adminFetch("/admin/templates/list");
+    const data = await resp.json();
+    if (!resp.ok) throw new Error("加载失败");
+    const list = (data.templates || []).filter(function(t) { return t.is_vip == 1 && t.is_active == 1; }).sort(function(a, b) { return (a.display_id || 0) - (b.display_id || 0); });
+    if (!list.length) {
+      box.innerHTML = '<div class="empty">暂无 VIP 模板，可上传或把免费模板「设为VIP」</div>';
+      return;
+    }
+    box.innerHTML = '<div class="card-title">👑 VIP模板中心（' + list.length + '）</div>'
+      + '<table><thead><tr><th>ID</th><th>名称</th><th>操作</th></tr></thead><tbody>'
+      + list.map(function(t) {
+          return '<tr>'
+            + '<td>' + (t.display_id || t.id) + '</td>'
+            + '<td><b>' + t.name + '</b><br><span style="color:#999;font-size:12px">' + (t.description || "") + '</span></td>'
+            + '<td><div class="ops">'
+            + '<button class="btn btn-mini" onclick="openMapping(' + t.id + ')">🔗 映射</button>'
+            + '<button class="btn btn-mini" style="background:#EEF2FF;color:#4F46E5" onclick="openConfigTool(' + t.id + ')">⚙ 配置</button>'
+            + '<button class="btn btn-mini" style="background:#F3E8FF;color:#7C3AED" onclick="vipSetFlag(' + t.id + ',0)">移出VIP</button>'
+            + '<button class="btn btn-danger" onclick="delTemplate(' + t.id + ')">删除</button></div></td>'
+            + '</tr>';
+        }).join("") + '</tbody></table>';
+  } catch (e) {
+    box.innerHTML = '<div class="empty">加载失败：' + e.message + '</div>';
+  }
+}
+
+async function vipSetFlag(id, isVip) {
+  hideAlert();
+  const actionName = isVip ? "设为VIP" : "移出VIP";
+  if (!confirm("确认将模板 #" + id + " " + actionName + "？")) return;
+  try {
+    const fd = new FormData();
+    fd.append("is_vip", String(isVip));
+    const resp = await adminFetch("/admin/templates/" + id + "/vip", { method: "POST", body: fd });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.detail || data.error || "操作失败");
+    showOk(data.message || "操作成功");
+    loadVipTemplates();
+    loadTemplates();
+  } catch (e) {
+    showAlert("操作失败：" + e.message);
+  }
+}
+
+// ── 编辑器可用性（决定模板是否出现在编辑器「更换模板」面板） ──
+// 注意：与 is_vip 无关。editable=0 的模板仍在首页模板中心展示与下载，
+// 只是不进编辑器。用于把不适配热区编辑的模板从编辑器侧收敛掉。
+async function setEditableFlag(id, editable) {
+  hideAlert();
+  const actionName = editable ? "允许在编辑器中使用" : "从编辑器模板库移除";
+  if (!confirm("确认将模板 #" + id + " " + actionName + "？")) return;
+  try {
+    const fd = new FormData();
+    fd.append("editable", String(editable));
+    const resp = await adminFetch("/admin/templates/" + id + "/editable", { method: "POST", body: fd });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.detail || data.error || "操作失败");
+    showOk(data.message || "操作成功");
+    loadTemplates();
+  } catch (e) {
+    showAlert("操作失败：" + e.message);
+  }
+}
+
+async function batchSetEditable(editable) {
+  hideAlert();
+  const ids = Array.prototype.slice.call(document.querySelectorAll('.tpl-chk[data-group="active"]:checked'))
+    .map(function(c) { return c.getAttribute("data-tpl"); });
+  if (!ids.length) { showAlert("请先勾选模板"); return; }
+  const actionName = editable ? "允许在编辑器中使用" : "从编辑器模板库移除";
+  if (!confirm("确认将所选 " + ids.length + " 套模板" + actionName + "？")) return;
+  try {
+    const fd = new FormData();
+    fd.append("editable", String(editable));
+    fd.append("ids", ids.join(","));
+    const resp = await adminFetch("/admin/templates/editable/batch", { method: "POST", body: fd });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.detail || data.error || "操作失败");
+    showOk(data.message || "操作成功");
+    loadTemplates();
+  } catch (e) {
+    showAlert("操作失败：" + e.message);
+  }
+}
+
+// ── 模板配置（训练） ──
+const CFG_MODULES = [
+  { key: "", label: "固定内容" },
+  { key: "basic", label: "基本信息" },
+  { key: "job", label: "意向职位" },
+  { key: "education", label: "教育背景" },
+  { key: "work", label: "工作经验" },
+  { key: "project", label: "项目经历" },
+  { key: "internship", label: "实习经历" },
+  { key: "campus", label: "校园经历" },
+  { key: "skills", label: "特长技能" },
+  { key: "honors", label: "荣誉证书" },
+  { key: "selfEval", label: "自我评价" },
+  { key: "hobbies", label: "兴趣爱好" },
+  { key: "custom", label: "自定义" }
+];
+let cfgState = null;
+
+async function openConfigTool(id) {
+  hideAlert();
+  $("cfgModal").style.display = "flex";
+  $("cfgCanvas").innerHTML = '<div style="padding:30px;color:#999">正在加载模板结构…</div>';
+  const sel = $("cfgModuleSel");
+  sel.innerHTML = CFG_MODULES.map(function(m) { return '<option value="' + m.key + '">' + m.label + "</option>"; }).join("");
+  try {
+    const resp = await adminFetch("/api/admin/template-config/" + id);
+    const data = await resp.json();
+    if (!resp.ok) throw new Error("加载失败");
+    cfgState = { id: id, structure: data, assign: {} };
+    Object.keys(data.config || {}).forEach(function(k) {
+      cfgState.assign[k] = (data.config[k] && data.config[k].module) || "";
+    });
+    $("cfgTplName").textContent = data.name || ("#" + id);
+    renderCfgCanvas();
+    updateCfgStats();
+    selectCfgBox(null);
+  } catch (e) {
+    $("cfgCanvas").innerHTML = '<div style="padding:30px;color:#c0392b">加载失败：' + e.message + "</div>";
+  }
+}
+
+function closeCfgModal() { $("cfgModal").style.display = "none"; cfgState = null; }
+
+function renderCfgCanvas() {
+  const canvas = $("cfgCanvas");
+  const st = cfgState.structure;
+  const scale = Math.min(1, 640 / (st.page_w || 794));
+  canvas.style.height = Math.round((st.page_h || 1123) * scale) + "px";
+  canvas.innerHTML = "";
+  (st.boxes || []).forEach(function(b) {
+    if (b.editable === false) return;
+    const div = document.createElement("div");
+    div.className = "cfg-box";
+    div.dataset.id = b.id;
+    div.style.cssText = "position:absolute;left:" + Math.round(b.x * scale) + "px;top:" + Math.round(b.y * scale)
+      + "px;width:" + Math.max(30, Math.round(b.w * scale)) + "px;height:" + Math.max(18, Math.round(b.h * scale)) + "px;";
+    const label = CFG_MODULES.find(function(m) { return m.key === (cfgState.assign[b.id] || ""); });
+    div.innerHTML = '<span class="cfg-tag">#' + b.id + " " + (label ? label.label : "未配置") + '</span>'
+      + '<span class="cfg-txt">' + (b.text || "").replace(/\{\{[^}]*\}\}/g, "").slice(0, 30).replace(/\n/g, " ") + "</span>";
+    div.addEventListener("click", function() { selectCfgBox(b.id); });
+    canvas.appendChild(div);
+  });
+}
+
+function selectCfgBox(id) {
+  const canvas = $("cfgCanvas");
+  canvas.querySelectorAll(".cfg-box").forEach(function(el) {
+    el.classList.toggle("sel", el.dataset.id === String(id));
+  });
+  if (id === null || id === undefined) {
+    $("cfgSelInfo").textContent = "未选择文本框（点击预览中的框进行配置）";
+    return;
+  }
+  const box = cfgState.structure.boxes.find(function(b) { return String(b.id) === String(id); });
+  $("cfgSelInfo").textContent = "#" + id + "：" + ((box && box.text || "").replace(/\{\{[^}]*\}\}/g, "").slice(0, 60).replace(/\n/g, " ") || "（空文本框）");
+  $("cfgModuleSel").value = cfgState.assign[id] || "";
+}
+
+function updateCfgStats() {
+  const total = Object.keys(cfgState.assign).length;
+  const boxes = (cfgState.structure.boxes || []).filter(function(b) { return b.editable !== false; }).length;
+  $("cfgStats").textContent = "已配置 " + total + " / " + boxes + " 个可编辑文本框";
+}
+
+$("cfgAssignBtn").addEventListener("click", function() {
+  const selBox = $("cfgCanvas").querySelector(".cfg-box.sel");
+  if (!selBox) { showAlert("请先在预览中点击一个文本框"); return; }
+  const id = selBox.dataset.id;
+  cfgState.assign[id] = $("cfgModuleSel").value;
+  renderCfgCanvas();
+  selectCfgBox(id);
+  updateCfgStats();
+  showOk("已设置 #" + id + " → " + $("cfgModuleSel").selectedOptions[0].text);
+});
+
+$("cfgSaveBtn").addEventListener("click", async function() {
+  if (!cfgState) return;
+  const fd = new FormData();
+  fd.append("config", JSON.stringify(cfgState.assign));
+  try {
+    const resp = await adminFetch("/api/admin/template-config/" + cfgState.id, { method: "POST", body: fd });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.detail || "保存失败");
+    showOk(data.message || "配置已保存");
+    closeCfgModal();
+    loadVipTemplates();
+  } catch (e) {
+    showAlert("保存失败：" + e.message);
+  }
+});
+
+// ── 用户 VIP 管理 ──
+$("vipUserOn").addEventListener("click", function() { setUserVip(1); });
+$("vipUserOff").addEventListener("click", function() { setUserVip(0); });
+async function setUserVip(isVip) {
+  hideAlert();
+  const account = $("vipUserAccount").value.trim();
+  if (!account) { showAlert("请输入用户账号"); return; }
+  try {
+    const fd = new FormData();
+    fd.append("account", account);
+    fd.append("is_vip", String(isVip));
+    const resp = await adminFetch("/api/admin/user-vip", { method: "POST", body: fd });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.detail || data.error || "操作失败");
+    $("vipUserStatus").textContent = data.message + "（账号：" + data.user.account + "，VIP：" + (data.user.is_vip ? "已开通" : "未开通") + "）";
+    showOk(data.message);
+  } catch (e) {
+    showAlert("操作失败：" + e.message);
+  }
+}
+
+// ── 模板列表 ──
+async function loadTemplates() {
+  const box = $("tplList");
+  try {
+    const resp = await adminFetch("/admin/templates/list");
+    const data = await resp.json();
+    if (!resp.ok) throw new Error("加载失败");
+    const list = data.templates || [];
+    window.__ADMIN_TPLS__ = list;
+    fillMapTplSelect();
+    if (!list.length) {
+      box.innerHTML = '<div class="empty">暂无模板，上传第一个模板吧</div>';
+      return;
+    }
+    const pending = list.filter(function(t) { return t.review_status === "pending"; });
+    const allActive = list.filter(function(t) { return t.review_status === "approved" && t.is_active == 1; });
+    const freeActive = allActive.filter(function(t) { return !t.is_vip; }).sort(function(a, b) { return (a.display_id || 0) - (b.display_id || 0); });
+    const rejected = list.filter(function(t) { return t.review_status === "rejected"; });
+    let html = "";
+    if (pending.length) {
+      html += '<div class="card-title" style="color:#E8890C">🕐 待人工审核（' + pending.length + '）</div>';
+      html += '<div style="margin-bottom:8px;display:flex;align-items:center;gap:8px">'
+        + '<label style="font-size:12px;cursor:pointer"><input type="checkbox" id="selAllPending" style="margin-right:4px">全选</label>'
+        + '<span style="font-size:12px;color:#999">已选 <b id="selCountPending">0</b> 套</span>'
+        + '<button class="btn" style="background:#1e8449;padding:4px 14px;font-size:12px" id="batchApproveBtn" disabled>✅ 批量通过上架</button>'
+        + '</div>';
+      html += pending.map(renderReviewRow).join("");
+    }
+    if (freeActive.length) {
+      const totalPages = Math.max(1, Math.ceil(freeActive.length / ACTIVE_PAGE_SIZE));
+      if (activePage > totalPages) activePage = totalPages;
+      const startIdx = (activePage - 1) * ACTIVE_PAGE_SIZE;
+      const pageItems = freeActive.slice(startIdx, startIdx + ACTIVE_PAGE_SIZE);
+      html += '<div class="card-title">📚 免费模板（' + freeActive.length + '）</div>';
+      html += '<div style="margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">'
+        + '<label style="font-size:12px;cursor:pointer"><input type="checkbox" id="selAllActive" style="margin-right:4px">全选</label>'
+        + '<span style="font-size:12px;color:#999">已选 <b id="selCountActive">0</b> 套</span>'
+        + '<button class="btn" id="batchEditableOnBtn" disabled style="background:#E7F6EC;color:#1E8449;padding:4px 14px;font-size:12px">✏️ 允许编辑器使用</button>'
+        + '<button class="btn" id="batchEditableOffBtn" disabled style="background:#F3F4F6;color:#4B5563;padding:4px 14px;font-size:12px">🚫 移出编辑器</button>'
+        + '<button class="btn btn-danger" id="batchDelBtn" disabled style="padding:4px 14px;font-size:12px">🗑 批量删除所选</button>'
+        + '</div>'
+        + '<table><thead><tr><th style="width:32px"></th><th>ID</th><th>名称</th><th>编辑器</th><th>操作</th></tr></thead><tbody>'
+        + pageItems.map(function(t) {
+          const ed = (t.editable === undefined || t.editable === null) ? 1 : Number(t.editable);
+          return '<tr>'
+            + '<td><input type="checkbox" class="tpl-chk" data-tpl="' + t.id + '" data-group="active"></td>'
+            + '<td>' + (t.display_id || t.id) + '</td>'
+            + '<td><b>' + t.name + '</b><br><span style="color:#999;font-size:12px">' + (t.description || "") + '</span></td>'
+            + '<td><button class="btn btn-mini" style="background:' + (ed ? '#E7F6EC;color:#1E8449' : '#F3F4F6;color:#6B7280') + '" '
+            + 'title="点击切换：是否出现在编辑器的「更换模板」面板" '
+            + 'onclick="setEditableFlag(' + t.id + ',' + (ed ? 0 : 1) + ')">' + (ed ? '✏️ 可用' : '🚫 已隐藏') + '</button></td>'
+            + '<td><div class="ops">'
+            + '<button class="btn btn-mini" onclick="openMapping(' + t.id + ')">🔗 映射</button>'
+            + (t.is_vip ? '' : '<button class="btn btn-mini" style="background:#F3E8FF;color:#7C3AED" onclick="vipSetFlag(' + t.id + ',1)">👑 设为VIP</button>')
+            + '<button class="btn btn-danger" onclick="delTemplate(' + t.id + ')">删除</button></div></td>'
+            + '</tr>';
+        }).join("") + '</tbody></table>';
+      if (totalPages > 1) {
+        html += '<div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px">'
+          + '<button class="btn btn-mini" id="activePrev" ' + (activePage <= 1 ? "disabled" : "") + '>‹ 上一页</button>'
+          + '<span style="font-size:12px;color:#666">第 ' + activePage + ' / ' + totalPages + ' 页</span>'
+          + '<button class="btn btn-mini" id="activeNext" ' + (activePage >= totalPages ? "disabled" : "") + '>下一页 ›</button>'
+          + '</div>';
+      }
+    }
+    if (rejected.length) {
+      html += '<div class="card-title" style="color:#999">🗑 已拒绝（' + rejected.length + '）</div>';
+      html += rejected.map(function(t) {
+        return '<div style="padding:8px 12px;border:1px solid #eee;border-radius:8px;margin-bottom:8px;font-size:13px">'
+          + '<b>' + t.name + '</b> <span style="color:#999">(id=' + t.id + ')</span> '
+          + '<button class="btn btn-mini" onclick="reviewTemplate(' + t.id + ',\'approve\')">重新通过</button></div>';
+      }).join("");
+    }
+    box.innerHTML = html;
+    bindBatchUI();
+  } catch (e) {
+    box.innerHTML = '<div class="empty">加载失败：' + e.message + '</div>';
+  }
+}
+
+function renderReviewRow(t) {
+  let report = {};
+  try { report = JSON.parse(t.validation_report || "{}"); } catch (e) {}
+  const checks = (report.render_checks || []).map(function(c) {
+    return '<div style="font-size:12px;margin:2px 0">' + (c.ok ? "✅" : "❌") + " " + c.name
+      + ' <span style="color:#999">' + (c.detail || "") + '</span></div>';
+  }).join("");
+  const warns = [];
+  if (report.missing_placeholders && report.missing_placeholders.length) {
+    warns.push("缺少占位符：" + report.missing_placeholders.join("、"));
+  }
+  if (report.unknown_placeholders && report.unknown_placeholders.length) {
+    warns.push("未配置占位符：" + report.unknown_placeholders.join("、"));
+  }
+  return '<div style="border:1px solid #f0c36d;background:#FFFBF0;border-radius:10px;padding:12px 14px;margin-bottom:10px">'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">'
+    + '<div><label style="cursor:pointer"><input type="checkbox" class="tpl-chk" data-tpl="' + t.id + '" data-group="pending" style="margin-right:6px">'
+    + '<b>' + t.name + '</b></label> <span style="color:#999;font-size:12px">(id=' + t.id + ')</span></div>'
+    + '<div class="ops">'
+    + '<button class="btn" style="background:#1e8449" onclick="reviewTemplate(' + t.id + ',\'approve\')">✅ 通过上架</button>'
+    + '<button class="btn btn-danger" onclick="reviewTemplate(' + t.id + ',\'reject\')">✕ 拒绝</button>'
+    + '</div></div>'
+    + '<div style="font-size:12px;color:#555;margin-top:8px">' + (t.description || "") + '</div>'
+    + (warns.length ? '<div style="font-size:12px;color:#B45309;margin-top:6px">⚠️ ' + warns.join("；") + '</div>' : "")
+    + (checks ? '<div style="margin-top:6px">' + checks + '</div>' : '<div style="font-size:12px;color:#999;margin-top:6px">未运行渲染体检</div>')
+    + '</div>';
+}
+
+async function reviewTemplate(id, action) {
+  hideAlert();
+  if (action === "approve" && !confirm("确认通过该模板并上架？")) return;
+  if (action === "reject" && !confirm("确认拒绝该模板？")) return;
+  try {
+    const fd = new FormData();
+    fd.append("action", action);
+    const resp = await adminFetch("/admin/templates/" + id + "/review", { method: "POST", body: fd });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.detail || data.error || "操作失败");
+    showOk(data.message || "操作成功");
+    activePage = 1;
+    loadTemplates();
+  } catch (e) {
+    showAlert("操作失败：" + e.message);
+  }
+}
+
+async function delTemplate(id) {
+  if (!confirm("确认删除该模板？")) return;
+  hideAlert();
+  try {
+    const resp = await adminFetch("/admin/templates/" + id, { method: "DELETE" });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.detail || data.error || "删除失败");
+    showOk("模板已删除");
+    activePage = 1;
+    loadTemplates();
+    loadVipTemplates();
+  } catch (e) {
+    showAlert("删除失败：" + e.message);
+  }
+}
+
+// ── 批量操作 ──
+function bindBatchUI() {
+  const chks = document.querySelectorAll(".tpl-chk");
+  chks.forEach(function(chk) {
+    chk.addEventListener("change", updateBatchBar);
+  });
+  const selAllActive = $("selAllActive");
+  if (selAllActive) {
+    selAllActive.addEventListener("change", function() {
+      document.querySelectorAll('.tpl-chk[data-group="active"]').forEach(function(c) {
+        c.checked = selAllActive.checked;
+      });
+      updateBatchBar();
+    });
+  }
+  const selAllPending = $("selAllPending");
+  if (selAllPending) {
+    selAllPending.addEventListener("change", function() {
+      document.querySelectorAll('.tpl-chk[data-group="pending"]').forEach(function(c) {
+        c.checked = selAllPending.checked;
+      });
+      updateBatchBar();
+    });
+  }
+  const delBtn = $("batchDelBtn");
+  if (delBtn) delBtn.addEventListener("click", batchDelete);
+  const edOn = $("batchEditableOnBtn");
+  if (edOn) edOn.addEventListener("click", function() { batchSetEditable(1); });
+  const edOff = $("batchEditableOffBtn");
+  if (edOff) edOff.addEventListener("click", function() { batchSetEditable(0); });
+  const apprBtn = $("batchApproveBtn");
+  if (apprBtn) apprBtn.addEventListener("click", batchApprove);
+  // 已上架分页
+  const prevBtn = $("activePrev");
+  if (prevBtn) {
+    prevBtn.addEventListener("click", function() {
+      if (activePage > 1) { activePage--; loadTemplates(); }
+    });
+  }
+  const nextBtn = $("activeNext");
+  if (nextBtn) {
+    nextBtn.addEventListener("click", function() {
+      activePage++; loadTemplates();
+    });
+  }
+}
+
+function selectedIds(group) {
+  return Array.from(document.querySelectorAll('.tpl-chk[data-group="' + group + '"]:checked'))
+    .map(function(c) { return c.dataset.tpl; });
+}
+
+function updateBatchBar() {
+  const a = selectedIds("active");
+  const p = selectedIds("pending");
+  const cA = $("selCountActive");
+  const cP = $("selCountPending");
+  const dA = $("batchDelBtn");
+  const dP = $("batchApproveBtn");
+  if (cA) cA.textContent = a.length;
+  if (cP) cP.textContent = p.length;
+  if (dA) dA.disabled = a.length === 0;
+  if (dP) dP.disabled = p.length === 0;
+  const edOn = $("batchEditableOnBtn");
+  const edOff = $("batchEditableOffBtn");
+  if (edOn) edOn.disabled = a.length === 0;
+  if (edOff) edOff.disabled = a.length === 0;
+}
+
+async function batchDelete() {
+  const ids = selectedIds("active");
+  if (!ids.length) return;
+  if (!confirm("确认批量删除选中的 " + ids.length + " 套模板？删除后列表将按 ID 重新排序。")) return;
+  hideAlert();
+  try {
+    const fd = new FormData();
+    fd.append("action", "delete");
+    fd.append("ids", ids.join(","));
+    const resp = await adminFetch("/admin/templates/batch", { method: "POST", body: fd });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.detail || data.error || "批量删除失败");
+    showOk(data.message || "批量删除成功");
+    activePage = 1;
+    loadTemplates();
+  } catch (e) {
+    showAlert("批量删除失败：" + e.message);
+  }
+}
+
+async function batchApprove() {
+  const ids = selectedIds("pending");
+  if (!ids.length) return;
+  if (!confirm("确认批量通过选中的 " + ids.length + " 套模板并上架？")) return;
+  hideAlert();
+  try {
+    const fd = new FormData();
+    fd.append("action", "approve");
+    fd.append("ids", ids.join(","));
+    const resp = await adminFetch("/admin/templates/batch", { method: "POST", body: fd });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.detail || data.error || "批量操作失败");
+    showOk(data.message || "批量操作成功");
+    activePage = 1;
+    loadTemplates();
+  } catch (e) {
+    showAlert("批量操作失败：" + e.message);
+  }
+}
+
+// 已登录直接进入；未登录跳转管理员登录页
+if (adminToken) enterAdmin();
+else requireAdminLogin();
+</script>
+</body>
+</html>

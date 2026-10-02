@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# 本地配置（真实密钥，模板见 resume_optimizer/.env.example）
+resume_optimizer/.env
+
+# 前端依赖与构建产物
+node_modules/
+
+# 运行时生成（本地保留，不入库）
+resume_optimizer/temp/
+resume_optimizer/logs/
+resume_optimizer/static/previews/
+*.log
+
+# 含个人信息的本地资料（保留本地，不入库）
+_deleted_backup_20260924/
+测试结果/
+调整方案/
+参考模板/
+项目状态交接.md
+技术诊断报告_20260813.md
+
+# Word 锁文件与备份
+~$*.docx
+*.bak
+
+# 系统文件
+.DS_Store
+Thumbs.db
