@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# 本地配置（真实密钥，模板见 resume_optimizer/.env.example）
+resume_optimizer/.env
+
+# 前端依赖与构建产物
+node_modules/
+
+# 运行时生成（本地保留，不入库）
+resume_optimizer/temp/
+resume_optimizer/logs/
+resume_optimizer/static/previews/
+*.log
+
+# 含个人信息的本地资料（保留本地，不入库）
+_deleted_backup_20260924/
+测试结果/
+调整方案/
+参考模板/
+项目状态交接.md
+技术诊断报告_20260813.md
+
+# Word 锁文件与备份
+~$*.docx
+*.bak
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# ===== ↑ 以上同步自 .gitignore（「从 .gitignore 同步」只重写以上部分）=====
+.git/
+.hg/
+.svn/
+bower_components/
+jspm_packages/
+site-packages/
+venv/
+coverage/
+htmlcov/
+lcov-report/
+cmakefiles/
+cmake-build-*/
+bazel-*/
+pods/
+deriveddata/
+storybook-static/
+playwright-report/
+test-results/
+allure-results/
+allure-report/
+cdk.out/
+*.egg-info/
+*.dist-info/
+eggs/
+pip-wheel-metadata/
+wheels/
+# ----- ↑ 以上为 ZCode 默认排除规则（自定义规则请写在本行下方，不会被同步/恢复改动）-----
+# 自定义规则写在下方（本行提示可删除）

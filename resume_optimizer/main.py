@@ -580,7 +580,7 @@ def admin_logout(authorization: Optional[str] = Header(None)):
 def admin_set_user_vip(account: str = Form(""),
                        is_vip: int = Form(...),
                        _: None = Depends(_require_admin_header)):
-    """开通/取消用户 VIP：VIP 用户才能使用在线编辑器与 VIP 模板中心。"""
+    """开通/取消用户 VIP：VIP 用户才能使用简历编辑功能。模板池由管理员统一管理。"""
     if is_vip not in (0, 1):
         raise HTTPException(status_code=400, detail="is_vip 仅支持 0 / 1")
     user = db.get_user_by_account((account or "").strip().lower())
@@ -614,27 +614,6 @@ def list_templates():
                        # 编辑器模板库筛选依据；首页模板中心不据此过滤
                        "editable": 1 if r.get("editable") is None else int(r["editable"]),
                        "preview_url": f"/static/previews/t{r['id']}.png?v=5"})
-    return result
-
-
-@app.get("/api/vip-templates")
-def list_vip_templates(_: dict = Depends(_require_user)):
-    """用户端 VIP 模板中心（登录后可用），与首页免费模板中心相互独立。"""
-    rows = db.list_vip_templates()
-    result = []
-    ph_map = db.get_placeholders_map([r["id"] for r in rows])
-    for r in rows:
-        preview_path = BASE_DIR / "static" / "previews" / f"t{r['id']}.png"
-        if not preview_path.exists():
-            continue
-        result.append({
-            "id": r["id"], "name": r["name"], "description": r["description"],
-            "modules": ph_map.get(r["id"], []), "config": r.get("config") or {},
-            "display_id": r.get("display_id") or r["id"],
-            # 编辑器模板库筛选依据
-            "editable": 1 if r.get("editable") is None else int(r["editable"]),
-            "preview_url": f"/static/previews/t{r['id']}.png?v=5",
-        })
     return result
 
 
@@ -1294,6 +1273,7 @@ def review_template(
             print(f"[WARN] 审核前体检失败: {exc}")
         db.set_review(template_id, "approved", 1)
         applog.log("template_review", template_id=template_id, action="approve")
+        _sync_after_renumber()  # 新模板上架后序号保持 1..N 连续
         return {"message": "已通过审核，模板上架"}
     if action == "reject":
         db.set_review(template_id, "rejected", 0)
@@ -1391,6 +1371,7 @@ def batch_templates(
             db.set_review(tid, "approved", 1)
             ok_count += 1
             applog.log("template_review", template_id=tid, action="approve(batch)")
+        _sync_after_renumber()  # 批量上架后序号保持 1..N 连续
         return {"message": f"已批量通过 {ok_count} 套模板", "count": ok_count}
     if action == "delete":
         ok_count = 0

@@ -3,33 +3,33 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>运行日志 - 简历星球</title>
+<title>运行日志 - AI智简历</title>
+<link rel="stylesheet" href="/static/css/app.css?v=20261004c">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; background: #F7F9FC; color: #1F2933; padding: 24px; }
+  body { padding: 24px; }
   .head { max-width: 1100px; margin: 0 auto 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
   .head h1 { font-size: 20px; }
-  .head h1 span { background: linear-gradient(135deg,#5B5CFF,#9B59B6); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .head h1 span { color: var(--ink); }
+  .head h1 small { font-family: var(--sans); font-size: 13px; font-weight: 400; color: var(--ink-3); margin-left: 8px; letter-spacing: 0; }
   .controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-  input, select { padding: 8px 12px; border: 1px solid #DCE1EE; border-radius: 10px; font-size: 13px; font-family: inherit; }
-  input:focus { outline: none; border-color: #5B5CFF; }
-  button { padding: 9px 18px; border: none; border-radius: 10px; background: linear-gradient(135deg,#5B5CFF,#9B59B6); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; }
-  .status { font-size: 12px; color: #6B7280; }
-  .card { background: #fff; border: 1px solid #E8ECF3; border-radius: 14px; box-shadow: 0 4px 16px rgba(31,41,51,.05); overflow: hidden; max-width: 1100px; margin: 0 auto; }
+  .controls input, .controls select { width: auto; padding: 8px 12px; }
+  .controls button { padding: 8px 18px; }
+  .status { font-size: 12px; color: var(--ink-3); }
+  .card { max-width: 1100px; margin: 0 auto; overflow: hidden; }
   .tbl-wrap { overflow: auto; max-height: calc(100vh - 170px); }
-  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-  th { background: #F5F6FB; text-align: left; padding: 10px 12px; color: #6B7280; font-weight: 600; position: sticky; top: 0; border-bottom: 1px solid #E8ECF3; white-space: nowrap; }
-  td { padding: 8px 12px; border-bottom: 1px solid #F0F2F8; vertical-align: top; }
-  tr:hover td { background: #FAF9FF; }
-  .ev { font-weight: 700; color: #5B5CFF; white-space: nowrap; }
-  .err { color: #E5484D; font-weight: 700; }
-  .detail { color: #4B5563; word-break: break-all; }
-  .empty { text-align: center; color: #9AA4B8; padding: 40px; }
+  table { font-size: 12.5px; }
+  th { position: sticky; top: 0; z-index: 1; }
+  td { padding: 8px 12px; }
+  .ev { font-weight: 600; color: var(--accent); white-space: nowrap; }
+  .err { color: var(--danger); font-weight: 600; }
+  .detail { color: var(--ink-2); word-break: break-all; }
+  .detail b { color: var(--ink); font-weight: 600; }
+  .empty { text-align: center; color: var(--ink-3); padding: 40px; }
 </style>
 </head>
 <body>
 <div class="head">
-  <h1><span>简历星球</span> · 运行日志</h1>
+  <h1><span>AI智简历</span><small>运行日志</small></h1>
   <div class="controls">
     <input type="password" id="pwd" placeholder="管理员密码">
     <input type="text" id="filter" placeholder="筛选关键字…">
@@ -44,7 +44,7 @@
       <option value="template_delete">模板删除</option>
       <option value="request_error">错误</option>
     </select>
-    <button id="loadBtn">加载日志</button>
+    <button id="loadBtn" class="btn-primary">加载日志</button>
     <span class="status" id="status">未连接</span>
   </div>
 </div>

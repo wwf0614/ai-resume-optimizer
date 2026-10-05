@@ -29,7 +29,7 @@
   /* ── 配色主题 ──
      id 刻意与 editor.js 的 SKIN_PRESETS 对齐，使旧草稿里的 skin 字段可直用，无需映射 */
   var THEMES = {
-    default: { name: '星系紫',   accent: '#6B4CF5', deep: '#4C2FC7', soft: '#F0ECFF' },
+    default: { name: '靛青',     accent: '#34549B', deep: '#27406F', soft: '#EDF1F8' },
     blue:    { name: '商务蓝',   accent: '#1E5AE8', deep: '#123FA8', soft: '#EAF1FE' },
     green:   { name: '清新绿',   accent: '#1FA67A', deep: '#12775A', soft: '#E7F7F1' },
     orange:  { name: '活力橙',   accent: '#E2691A', deep: '#A84A0F', soft: '#FDF0E6' },

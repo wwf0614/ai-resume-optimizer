@@ -1,5 +1,5 @@
 /* ============================================================
- * 简历编辑器（简历星球 AI 智能优化系统）
+ * 简历编辑器（AI智简历 · AI 智能优化系统）
  * 路径：/static/editor.js
  * 核心：每份模板有完全不同的视觉布局（tukuppt 风格）
  * 支持：creative-border / dark-sidebar / clean-minimal /
@@ -78,7 +78,7 @@
 
   /* ============ 模块元数据 ============ */
   const MODULES = [
-    { key:'basic',       label:'基本信息', icon:'👤' },
+    { key:'basic',       label:'基本信息', icon:'' },
     { key:'intention',   label:'求职意向', icon:'🎯' },
     { key:'education',   label:'教育背景', icon:'🎓', dataKey:'education_info',    defaultOn:true },
     { key:'work',        label:'工作经验', icon:'💼', dataKey:'work_history',      defaultOn:true },
@@ -118,12 +118,12 @@
 
   /* ============ 图标行基本信息字段（用于 icon-row 布局） ============ */
   const ICON_BASIC_FIELDS = [
-    { key:'birth_date', label:'出生日期', icon:'📅' },
-    { key:'phone',      label:'手机号码', icon:'📱' },
-    { key:'email',      label:'邮箱',     icon:'✉️' },
-    { key:'height',     label:'身高',     icon:'👔' },
-    { key:'hometown',   label:'籍贯',     icon:'🏠' },
-    { key:'nation',     label:'民族',     icon:'👥' }
+    { key:'birth_date', label:'出生日期', icon:'' },
+    { key:'phone',      label:'手机号码', icon:'' },
+    { key:'email',      label:'邮箱',     icon:'' },
+    { key:'height',     label:'身高',     icon:'' },
+    { key:'hometown',   label:'籍贯',     icon:'' },
+    { key:'nation',     label:'民族',     icon:'' }
   ];
 
   /* ═══════════════════════════════════════════════════════════════
@@ -440,22 +440,25 @@
     return data;
   }
 
-  /* ============ 登录门禁（VIP 付费门禁已暂停，后续恢复） ============ */
+  /* ============ 登录门禁：简历编辑功能需要 VIP（管理员可在后台开通） ============ */
   async function ensureVipAccess() {
     const gate = $('vipGate');
-    const openBtn = $('vipGateOpenBtn');
-    const showGate = (msg) => {
+    const showGate = (title, msg) => {
       if (gate) {
+        const h = gate.querySelector('h3');
         const p = $('vipGateMsg');
+        if (h && title) h.textContent = title;
         if (p && msg) p.textContent = msg;
         gate.hidden = false;
       }
     };
     try {
-      await apiGet('/api/me');
-      return true;
+      const me = await apiGet('/api/me');
+      if (me && me.is_vip) return true;
+      showGate('需要 VIP', '简历编辑功能为 VIP 专属，请联系管理员在后台开通 VIP 后使用。');
+      return false;
     } catch (e) {
-      showGate('请先登录后再使用在线编辑器。');
+      showGate('请先登录', '登录后再使用在线编辑器。');
       return false;
     }
   }
@@ -553,6 +556,13 @@
 
   /** 全量重新渲染左侧简历预览区 */
   function renderPreview() {
+    // WPS 式文档直接编辑（富文本模式）：所见即所得，优先级最高
+    if (window.RichtextMode && window.RichtextMode.isActive()) {
+      window.RichtextMode.render();
+      renderAppearancePanel();
+      syncExactBtn();
+      return;
+    }
     // 「精确预览」模式：Word 成品图 + 热区（慢，但版式与导出完全一致）
     // 仅在用户显式切换时使用。默认走数据驱动的 HTML 渲染：毫秒级、可即时改样式。
     if (State.previewMode === 'exact' && isRealTemplateActive()) {
@@ -670,14 +680,14 @@
     paper.style.borderRadius = '';
     paper.innerHTML = `
       <div style="height:100%;min-height:560px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:#8A93A3;">
-        <div style="font-size:52px">📄</div>
+        
         <div style="font-size:16px;font-weight:700;color:#5A6472">尚未加载模板原件</div>
         <div style="font-size:13px;line-height:1.8;text-align:center;max-width:360px">
-          编辑器只展示管理端上传的模板原件（Word 渲染 + 热区编辑）。<br>
+          选择模板后即可像 WPS/Word 一样直接在文档上修改内容。<br>
           请点击右上角「更换模板」选择一个模板；<br>
           若模板一直加载失败，请联系管理员检查模板文件。
         </div>
-        <button id="noTplPickBtn" style="margin-top:6px;padding:10px 26px;border:none;border-radius:999px;background:linear-gradient(135deg,#5B5CFF,#7C5CFF);color:#fff;font-size:14px;font-weight:700;cursor:pointer">选择模板</button>
+        <button id="noTplPickBtn" style="margin-top:6px;padding:10px 26px;border:none;border-radius:999px;background:#2F4B7C;color:#fff;font-size:14px;font-weight:700;cursor:pointer">选择模板</button>
         ${State.templateId ? '<button id="noTplRetryBtn" style="margin-top:2px;padding:8px 20px;border:1px solid #C9CFDA;border-radius:999px;background:#fff;color:#5A6472;font-size:13px;cursor:pointer">重试加载当前模板</button>' : ''}
       </div>`;
     const btn = $('noTplPickBtn');
@@ -697,9 +707,9 @@
           <span class="rp-title-en">Personal resume</span>
           <div class="rp-intention" id="rpIntentionText"><span class="rp-intention-label">求职意向：</span><span id="rpIntentionValue"></span></div>
         </div>
-        <div class="rp-header-right"><div class="rp-deco-icons"><span class="rp-deco-icon">🎓</span><span class="rp-deco-icon">💼</span><span class="rp-deco-icon">🚀</span></div></div>
+        <div class="rp-header-right"><div class="rp-deco-icons"><span class="rp-deco-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/></svg></span><span class="rp-deco-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></span><span class="rp-deco-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.3-2 5-2 5s3.7-.5 5-2c.7-.8.7-2 0-2.8-.8-.7-2.2-.7-3 .8z"/><path d="M12 15l-3-3c1-3.5 3.5-7 8-9.5 1.5-.8 3.5-1 4.5-.5.5 1 .3 3-.5 4.5-2.5 4.5-6 7-9 8.5z"/><path d="M9 12H5.5L4 9.5c1.5-1 3-1.5 4.5-1.5M12 15v3.5l2.5 1.5c1-1.5 1.5-3 1.5-4.5"/></svg></span></div></div>
       </div>
-      <div class="rp-section rp-section-basic" id="rpBasic" data-module="basic"><div class="rp-basic-content"><div class="rp-basic-grid" id="rpBasicGrid"></div><div class="rp-photo-wrap" id="rpPhotoWrap"><div class="rp-photo" id="rpPhoto" title="点击编辑基本信息"><img id="rpPhotoImg" alt="照片"><span class="rp-photo-placeholder">📷</span></div></div></div></div>
+      <div class="rp-section rp-section-basic" id="rpBasic" data-module="basic"><div class="rp-basic-content"><div class="rp-basic-grid" id="rpBasicGrid"></div><div class="rp-photo-wrap" id="rpPhotoWrap"><div class="rp-photo" id="rpPhoto" title="点击编辑基本信息"><img id="rpPhotoImg" alt="照片"><span class="rp-photo-placeholder"></span></div></div></div></div>
       <div class="rp-modules" id="rpModules"></div>
       <div class="rp-footer"><span>第1页/共1页</span></div>`;
   }
@@ -834,7 +844,7 @@
         }
       });
       // 补充额外字段
-      [{key:'gender',label:'性别',icon:'👤'},{key:'city',label:'城市',icon:'🌆'},{key:'marriage',label:'婚况',icon:'💍'}].forEach(f => {
+      [{key:'gender',label:'性别',icon:''},{key:'city',label:'城市',icon:''},{key:'marriage',label:'婚况',icon:''}].forEach(f => {
         if (!isFieldVisible(f.key)) return;
         const v = (b[f.key] || '').trim();
         if (v) basicSec.appendChild(el('div', { class: 'rp-hb-basic-item' },
@@ -883,7 +893,7 @@
             if (State.photoDataUrl && State.showPhoto !== false) {
               pw.appendChild(el('img', { src: State.photoDataUrl, alt: '' }));
             } else {
-              pw.appendChild(el('div', { class: 'placeholder' }, '📷'));
+              pw.appendChild(el('div', { class: 'placeholder' }));
             }
             return pw;
           })(),
@@ -911,7 +921,7 @@
           el('span', { class: 'val' }, esc(v))
         ));
       });
-      [{key:'gender',label:'性别',icon:'👤'},{key:'email',label:'邮箱',icon:'✉️'},{key:'wechat',label:'微信',icon:'💬'}].forEach(f => {
+      [{key:'gender',label:'性别',icon:''},{key:'email',label:'邮箱',icon:''},{key:'wechat',label:'微信',icon:''}].forEach(f => {
         if (!isFieldVisible(f.key)) return;
         const v = (b[f.key] || '').trim();
         if (v) basicSec.appendChild(el('div', { class: 'rp-icon-row-item' },
@@ -962,8 +972,8 @@
           el('span', { class: 'val' }, esc(v))
         ));
       });
-      [{key:'gender',label:'性别',icon:'👤'},{key:'email',label:'邮箱',icon:'✉️'},
-        {key:'city',label:'城市',icon:'🌆'},{key:'marriage',label:'婚况',icon:'💍'}].forEach(f => {
+      [{key:'gender',label:'性别',icon:''},{key:'email',label:'邮箱',icon:''},
+        {key:'city',label:'城市',icon:''},{key:'marriage',label:'婚况',icon:''}].forEach(f => {
         if (!isFieldVisible(f.key)) return;
         const v = (b[f.key] || '').trim();
         if (v) infoCol.appendChild(el('div', { class: 'rp-icon-row-item' },
@@ -1027,7 +1037,7 @@
         photo.appendChild(el('img', { id: 'rpPhotoImg', src: State.photoDataUrl, alt: '' }));
         photo.classList.add('has-img');
       } else {
-        photo.appendChild(el('span', { class: 'rp-photo-placeholder' }, '📷'));
+        photo.appendChild(el('span', { class: 'rp-photo-placeholder' }));
       }
       photoWrap.appendChild(photo);
       basicArea.appendChild(photoWrap);
@@ -1380,20 +1390,13 @@
   }
 
   async function loadTemplates() {
-    // 编辑器同时加载「免费模板库」与「VIP模板中心」，均支持真实结构就地编辑
+    // 统一模板池：管理员在后台用「编辑器」列控制哪些模板进入此处
     try {
       const free = await apiGet('/templates');
       State.freeTemplates = keepEditable(free);
     } catch (e) {
-      console.warn('免费模板加载失败:', e.message);
+      console.warn('模板加载失败:', e.message);
       State.freeTemplates = [];
-    }
-    try {
-      const vip = await apiGet('/api/vip-templates');
-      State.vipTemplates = keepEditable(vip);
-    } catch (e) {
-      console.warn('VIP 模板加载失败:', e.message);
-      State.vipTemplates = [];
     }
   }
 
@@ -1695,6 +1698,9 @@
         order: State.order, visible: State.visible, fieldVisible: State.fieldVisible,
         style: State.style, photoDataUrl: State.photoDataUrl, showPhoto: State.showPhoto,
         realTemplateId: realTemplateId, realBoxTexts: realBoxTexts,
+        rtMode: window.RichtextMode ? window.RichtextMode.modeForSave() : false,
+        rtTemplateId: rtTemplateId,
+        rtEdits: window.RichtextMode ? window.RichtextMode.editsForSave() : {},
         /* 预览模式是「看的方式」而非简历内容，只存本地，跟随用户习惯 */
         previewMode: State.previewMode
       }));
@@ -1707,6 +1713,7 @@
       const raw = localStorage.getItem(DRAFT_KEY);
       if (!raw) return false;
       const s = JSON.parse(raw);
+      if (window.RichtextMode) window.RichtextMode.restoreLocal(s);
       State.draftId = s.draftId || null;
       State.templateId = s.templateId || null;
       realTemplateId = s.realTemplateId || null;
@@ -1794,7 +1801,10 @@
           /* 真实模板模式：把模板 id 与各盒子文本一起存云端，
              换设备/清缓存后重新打开草稿仍能进入就地编辑 */
           real_template_id: State.templateId || null,
-          real_box_texts: realBoxTexts || {}
+          real_box_texts: realBoxTexts || {},
+          /* WPS 式富文本模式：盒子级富文本编辑一起上云 */
+          richtext_mode: window.RichtextMode ? window.RichtextMode.modeForSave() : false,
+          richtext_edits: window.RichtextMode ? window.RichtextMode.editsForSave() : {}
         }
       });
       if (resp && resp.draft_id) State.draftId = resp.draft_id;
@@ -1932,6 +1942,11 @@
   }
 
   function renderRightPanel() {
+    /* WPS 式富文本模式：右侧改为「文档导航」，编辑直接在纸面上进行 */
+    if (window.RichtextMode && window.RichtextMode.isActive()) {
+      window.RichtextMode.renderNavPanel();
+      return;
+    }
     try {
       const list = $('moduleList');
       if (!list) return;
@@ -2174,7 +2189,7 @@
           if (file && file.type.startsWith('image/')) handlePhotoFile(file);
         }
       },
-        State.photoDataUrl ? '' : el('span', { class: 'ed-photo-placeholder' }, '📷'),
+        State.photoDataUrl ? '' : el('span', { class: 'ed-photo-placeholder' }),
       ),
       el('input', { type:'file', id:'basicPhotoInput', accept:'image/*', style:'display:none',
         onchange: (e) => { const f=e.target.files[0]; if(f) handlePhotoFile(f); }
@@ -2202,7 +2217,7 @@
         }
       }, '保存')
     );
-    showModal(modalShell('基本信息 ✏️', body, footer));
+    showModal(modalShell('基本信息', body, footer));
   }
 
   function handlePhotoFile(file) {
@@ -2572,7 +2587,7 @@
   let currentSetting=null;
   /* 配色：id 必须与 resume-render.js 的 THEMES 一一对应（旧草稿 skin 字段可直接复用） */
   const SKIN_PRESETS=[
-    {id:'default',name:'星系紫',primary:'#6B4CF5',accent:'#A78BFA',bg:'#F5F3FF'},
+    {id:'default',name:'靛青',primary:'#34549B',accent:'#6C87C4',bg:'#FAF8F4'},
     {id:'blue',name:'商务蓝',primary:'#1E5AE8',accent:'#3D8BFF',bg:'#F2F6FC'},
     {id:'green',name:'清新绿',primary:'#1FA67A',accent:'#5DC79E',bg:'#F1FAF5'},
     {id:'orange',name:'活力橙',primary:'#E2691A',accent:'#FF8A3D',bg:'#FCF6F0'},
@@ -2621,7 +2636,8 @@
       _tplSnapshot={ templateId:State.templateId,
         structure:realStructure, structureTid:realTemplateId,
         boxTexts:realBoxTexts,
-        pages:realPreviewPages, previewTid:realPreviewTemplateId };
+        pages:realPreviewPages, previewTid:realPreviewTemplateId,
+        rt: window.RichtextMode ? window.RichtextMode.snapshot() : null };
     }
     const titles={spacing:'间距设置',skin:'皮肤设置',font:'正文字体',cover:'标题封面',template:'更换模板'};
     $('settingTitle').textContent=titles[type]||'设置';
@@ -2653,6 +2669,7 @@
       realPreviewPages=s.pages||null;
       realPreviewSrc=realPreviewPages?realPreviewPages[0]:null;
       realPreviewTemplateId=s.previewTid;
+      if (window.RichtextMode) window.RichtextMode.restoreSnap(s.rt);
       _loadStructReqId++;           // 作废所有在途的结构加载，防止慢响应再覆盖
       persistLocal();
       renderPreview();
@@ -2751,7 +2768,7 @@
     /* 精确预览模式下外观参数不生效，明确告知（不隐藏，方便用户理解两种模式） */
     if(State.previewMode==='exact' && isRealTemplateActive()){
       pane.appendChild(el('div',{class:'ed-ap-lock'},
-        el('span',{class:'ico'},'🔒'),
+        el('span',{class:'ico'},''),
         el('span',null,'当前是「精确预览」：版面完全由 Word 模板原件决定，下列外观参数暂不生效。点顶栏「精确预览」切回 HTML 预览，即可自由调整版式、字体与间距。')
       ));
     } else if(isRealTemplateActive()){
@@ -2760,7 +2777,7 @@
         class:'ed-ap-lock',
         style:'background:#EEF4FF;border-color:#CADCFF;color:#2A4B8D'
       },
-        el('span',{class:'ico'},'🧩'),
+        el('span',{class:'ico'},''),
         el('span',null,'已选模板：导出 Word/PDF 时会套用该模板的原生版式；下面调整的是 HTML 预览的版式与外观，用来快速编排内容。'),
         el('button',{type:'button',class:'ed-ap-reset',style:'flex:0 0 auto',
           onclick:()=>toggleExactPreview()},'看模板原版式')
@@ -2912,7 +2929,7 @@
       toast('生成失败：' + (e.message || '请稍后重试'), '');
     } finally {
       hideLoading();
-      if (runBtn) { runBtn.disabled = false; runBtn.textContent = '⚡ 生成简历'; }
+      if (runBtn) { runBtn.disabled = false; runBtn.textContent = '生成简历'; }
     }
   }
   function applyAiResume(data) {
@@ -2920,6 +2937,7 @@
     /* 退出真实模板模式，确保 AI 生成的结构化整份简历立即在标准预览中可见、可编辑 */
     realStructure = null;
     realTemplateId = null;
+    if (window.RichtextMode) window.RichtextMode.reset();
     if (data.basic && typeof data.basic === 'object') Object.assign(State.basic, data.basic);
     const m = data.modules || {};
     const arrKeys = ['education_info', 'work_history', 'internship_info', 'projects',
@@ -2978,7 +2996,7 @@
       toast('评分失败：'+(e.message||'请稍后重试'),'');
     }finally{
       hideLoading();
-      if(runBtn){ runBtn.disabled=false; runBtn.textContent='⚡ 开始评分'; }
+      if(runBtn){ runBtn.disabled=false; runBtn.textContent='开始评分'; }
     }
   }
   function renderMatchScoreResult(d){
@@ -2992,14 +3010,14 @@
         +`<div class="ms-dim-bar"><div class="ms-dim-fill" style="width:${v}%"></div></div></div>`;
     }).join('');
     const kwList=(arr)=> (arr&&arr.length)? arr.map(x=>`<li>${escapeHtml(String(x))}</li>`).join(''):'<li>无</li>';
-    const locTxt={pass:'✅ 地点符合',fail:'❌ 地点不符（硬门槛）',flag:'⚠️ 地点需确认',unknown:'— 未提供地点'}[d.location_gate||'unknown']||'—';
+    const locTxt={pass:'✓ 地点符合',fail:'× 地点不符（硬门槛）',flag:'! 地点需确认',unknown:'— 未提供地点'}[d.location_gate||'unknown']||'—';
     box.innerHTML=`<div class="ms-score-wrap">`
       +`<div class="ms-score-num">${d.total_score}</div>`
       +`<div class="ms-score-meta"><span class="ms-verdict ${d.recommendation||''}">${escapeHtml(d.verdict_text||'')}</span>`
       +`<div class="ms-note">综合匹配分（满分 100）· 地点闸门：${locTxt}</div></div></div>`
       +`<div>${dimHtml}</div>`
-      +`<div class="ms-cols"><div class="ms-col"><h4>✅ 命中关键词</h4><ul>${kwList(d.matched_keywords)}</ul></div>`
-      +`<div class="ms-col"><h4>➕ 建议补充</h4><ul>${kwList(d.missing_keywords)}</ul></div></div>`
+      +`<div class="ms-cols"><div class="ms-col"><h4>命中关键词</h4><ul>${kwList(d.matched_keywords)}</ul></div>`
+      +`<div class="ms-col"><h4>建议补充</h4><ul>${kwList(d.missing_keywords)}</ul></div></div>`
       +`<div class="ms-cols"><div class="ms-col"><h4>核心优势</h4><ul>${kwList(d.strengths)}</ul></div>`
       +`<div class="ms-col"><h4>待补缺口</h4><ul>${kwList(d.gaps)}</ul></div></div>`
       +`<div class="ms-note">${escapeHtml(d.note||'')}</div>`;
@@ -3024,7 +3042,7 @@
   function renderAtsReport(d){
     const body=$('atsReportBody'); if(!body) return;
     const lvl=d.pass_level||'warn';
-    const ico={pass:'✅',warn:'⚠️',fail:'❌'}[lvl]||'⚠️';
+    const ico={pass:'✓',warn:'!',fail:'×'}[lvl]||'!';
     const checksHtml=(d.checks||[]).map(c=>{
       const ci={pass:'pass',warn:'warn',fail:'fail'}[c.status]||'warn';
       return `<li><span class="ats-ico ${ci}">${ico}</span>`
@@ -3067,8 +3085,8 @@
             State.style.spacing=o.id;State.style.gap=null;State.style.padding=null;applyStyle();}
         },
           el('div',{class:'preview',style:'background:'+(o.id==='compact'?'#FCEBF5':o.id==='loose'?'#EDE9FF':'#EFEBFF')+';display:flex;flex-direction:column;gap:'+o.gap+'px;padding:10px'},
-            el('div',{style:'height:8px;background:#6B4CF5;border-radius:2px'}),
-            el('div',{style:'height:8px;background:#6B4CF5;border-radius:2px;width:70%'})
+            el('div',{style:'height:8px;background:#2F4B7C;border-radius:2px'}),
+            el('div',{style:'height:8px;background:#2F4B7C;border-radius:2px;width:70%'})
           ),
           el('div',{class:'name'},o.name)
         ))
@@ -3101,7 +3119,7 @@
           class:'ed-setting-tile'+(cur===f.id?' active':''),'data-id':f.id,
           onclick:e=>{body.querySelectorAll('.ed-setting-tile').forEach(x=>x.classList.remove('active'));e.currentTarget.classList.add('active');State.style.font=f.id;applyStyle();}
         },
-          el('div',{class:'preview',style:'display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;font-family:'+f.family+';color:#6B4CF5'},'Aa'),
+          el('div',{class:'preview',style:'display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;font-family:'+f.family+';color:#2F4B7C'},'Aa'),
           el('div',{class:'name'},f.name)
         ))
       )
@@ -3120,56 +3138,47 @@
   }
   function buildTemplateSetting(){
     const body=$('settingBody');
-    const vips=State.vipTemplates||[];
     const frees=State.freeTemplates||[];
-    if(!vips.length && !frees.length){
+    if(!frees.length){
       body.appendChild(el('div',{class:'ed-setting-section'},
-        el('h4',null,el('span',{class:'ed-vip-title'},'模板中心')),
-        el('div',{class:'ed-tpl-empty'},el('div',{class:'ed-tpl-empty-ico'},'📄'),
+        el('h4',null,'模板中心'),
+        el('div',{class:'ed-tpl-empty'},el('div',{class:'ed-tpl-empty-ico'},''),
           el('p',null,'暂无可用的模板'),
-          el('small',null,'请联系管理员在「模板管理」中启用模板'))
+          el('small',null,'请联系管理员在「模板管理」中开启模板的「编辑器」开关'))
       ));
       return;
     }
     const tplTile = t => {
-      const isVip = (State.vipTemplates||[]).some(v=>v.id===t.id);
       return el('div',{
           class:'ed-tpl-mini'+(t.id===State.templateId?' active':''),'data-id':t.id,
           onclick:e=>{
             State.templateId=t.id;
             body.querySelectorAll('.ed-tpl-mini').forEach(x=>x.classList.remove('active'));
             e.currentTarget.classList.add('active');
-            persistLocal();
-            renderPreview();          // 结构就绪前显示引导页，loadRealStructure 完成后自动重渲染
-            loadRealStructure(t.id);
-            toast('已选择「'+t.name+'」 — 正在加载模板原件…','success');
+            if (window.RichtextMode) {
+              /* WPS 式直接编辑：立即切纸面骨架给反馈，再加载富文本结构 */
+              persistLocal();
+              window.RichtextMode.switched(t);
+              toast('已选择「'+t.name+'」 — 正在打开模板原件…','success');
+            } else {
+              persistLocal();
+              renderPreview();          // 结构就绪前显示引导页，loadRealStructure 完成后自动重渲染
+              loadRealStructure(t.id);
+              toast('已选择「'+t.name+'」 — 正在加载模板原件…','success');
+            }
           }
         },
           t.preview_url?el('img',{src:t.preview_url+(t.preview_url.includes('?')?'&':'?')+'t='+Date.now(),alt:t.name,loading:'lazy'}):el('div',{class:'no-preview'},'暂无预览'),
-          el('div', { class: 'name' },
-            isVip?el('span',{class:'ed-tpl-vip-badge'},'👑 VIP'):null,
-            t.name
-          )
+          el('div', { class: 'name' }, t.name)
         );
     };
-    if(frees.length){
-      body.appendChild(el('div',{class:'ed-setting-section'},
-        el('h4',null,el('span',{class:'ed-tpl-title'},'🆓 免费模板库（点缩略图立即切换）')),
-        el('div',{class:'ed-tpl-tip'},'全部支持真实结构就地编辑，套用后直接在模板上修改'),
-        el('div',{class:'ed-tpl-grid'},
-          ...frees.map(tplTile)
-        )
-      ));
-    }
-    if(vips.length){
-      body.appendChild(el('div',{class:'ed-setting-section'},
-        el('h4',null,el('span',{class:'ed-vip-title'},'👑 VIP模板中心（点缩略图立即切换）')),
-        el('div',{class:'ed-vip-tip'},'VIP 模板由管理员在管理端「VIP模板中心」上传'),
-        el('div',{class:'ed-tpl-grid'},
-          ...vips.map(tplTile)
-        )
-      ));
-    }
+    body.appendChild(el('div',{class:'ed-setting-section'},
+      el('h4',null,el('span',{class:'ed-tpl-title'},'模板库（点缩略图立即切换）')),
+      el('div',{class:'ed-tpl-tip'},'全部支持真实结构就地编辑，套用后直接在模板上修改'),
+      el('div',{class:'ed-tpl-grid'},
+        ...frees.map(tplTile)
+      )
+    ));
   }
   function applySetting(){
     persistLocal();
@@ -3213,6 +3222,11 @@
   /* ============ 导出 ============ */
   async function renderAndExport(format){
     if(!State.templateId){toast('请先在「更换模板」中选择一个模板','error');return;}
+    // WPS 式富文本模式：走 richtext-export（富文本写回模板 docx）
+    if (window.RichtextMode && window.RichtextMode.isActive()) {
+      await window.RichtextMode.exportAs(format);
+      return;
+    }
     // 仅支持真实模板导出（写回模板文本框，保留原格式）
     if (isRealTemplateActive()) {
       await exportRealTemplate(format);
@@ -3383,6 +3397,7 @@
             realBoxTexts[k] = cleanBoxText(d.real_box_texts[k]);
           });
         }
+        if (window.RichtextMode) window.RichtextMode.restoreCloud(d);
       } else {
         realTemplateId = data.template_id || null;
       }
@@ -3474,13 +3489,37 @@
       if(avImg)avImg.src=State.photoDataUrl;
     }
     await loadTemplates();
-    // 统一激活真实模板模式：只要草稿/URL 指定了模板（不论新建还是云端恢复），
-    // 都尝试解析其可编辑盒子结构。解析失败会自动回退内置渲染器。
-    if (State.templateId && !(realStructure && realTemplateId === State.templateId)) {
-      loadRealStructure(State.templateId);
+    /* 草稿引用的模板可能已被管理端删除或换库（旧库小 id ≠ 新库大 id）：
+       校验失效即清引用并提示，避免结构接口 404 后静默回退成「无模板」空页 */
+    if (State.templateId && (State.freeTemplates||[]).length &&
+        !(State.freeTemplates||[]).some(function(t){ return t.id === State.templateId; })) {
+      State.templateId = null;
+      if (window.RichtextMode) window.RichtextMode.reset();
+      realTemplateId = null; realStructure = null; realBoxTexts = {};
+      try { localStorage.removeItem('resume_planet_templates'); } catch(e0) {}
+      persistLocal(true);
+      toast('本地草稿引用的旧模板已失效，请重新选择模板','');
+    }
+    // 统一激活模板模式：优先 WPS 式富文本直接编辑（首次解析中自动重试），
+    // 复杂版式等失败场景自动回退经典热区模式。
+    if (State.templateId) {
+      if (window.RichtextMode) window.RichtextMode.load(State.templateId, { silent: true });
+      else loadRealStructure(State.templateId);
     }
     console.log('[editor jxq v2] init complete — ', Object.keys(TEMPLATE_LAYOUTS).length, ' template layouts loaded');
   }
+
+  /* ── 对外桥：editor-richtext.js（WPS 式文档直接编辑模式）经此调用内部能力 ── */
+  window.__edBridge = {
+    State: State,
+    renderPreview: renderPreview,
+    renderRightPanel: renderRightPanel,
+    persistLocal: persistLocal,
+    setDirtyTip: setDirtyTip,
+    loadRealStructure: loadRealStructure,
+    runAtsCheck: runAtsCheck,
+    get realBoxTexts() { return realBoxTexts; }
+  };
 
   if(document.readyState==='loading'){
     document.addEventListener('DOMContentLoaded',init);

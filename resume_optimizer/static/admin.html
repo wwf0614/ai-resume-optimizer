@@ -4,60 +4,51 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>模板管理 - 简历优化系统</title>
+<link rel="stylesheet" href="/static/css/app.css?v=20261004c">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; background: #f0f2f5; color: #333; min-height: 100vh; padding: 32px 16px; }
+  /* 管理后台 · 与前台同一设计语言 */
+  body { padding: 32px 16px; }
   .container { width: 100%; max-width: 880px; margin: 0 auto; }
-  h1 { font-size: 22px; margin-bottom: 6px; }
-  .subtitle { color: #888; font-size: 13px; margin-bottom: 20px; }
-  .back-link { font-size: 13px; color: #888; text-decoration: none; float: right; }
-  .back-link:hover { color: #4a7cf7; }
-  .card { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,.08); padding: 24px; margin-bottom: 20px; }
-  .card-title { font-size: 15px; font-weight: 600; margin-bottom: 12px; }
-  .alert { display: none; background: #fdecea; color: #c0392b; border: 1px solid #f5c6cb; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 14px; }
-  .alert.show { display: block; }
-  .alert.ok { display: none; background: #eafaf1; color: #1e8449; border-color: #a9dfbf; }
-  .alert.ok.show { display: block; }
-  label { display: block; font-size: 13px; color: #555; margin-bottom: 4px; }
-  input[type=text], input[type=number], input[type=password], textarea { width: 100%; border: 1px solid #d9dee5; border-radius: 8px; padding: 9px 12px; font-size: 14px; font-family: inherit; }
-  input:focus, textarea:focus { outline: none; border-color: #4a7cf7; }
+  h1 { font-size: 22px; }
+  .subtitle { color: var(--ink-3); font-size: 13px; margin-bottom: 20px; }
+  .back-link { font-size: 13px; color: var(--ink-3); text-decoration: none; }
+  .back-link:hover { color: var(--accent); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-paper); padding: 24px; margin-bottom: 20px; }
+  .card-title { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--ink); }
+  .alert { border-radius: var(--r-md); }
+  label { display: block; font-size: 13px; color: var(--ink-2); margin-bottom: 4px; }
+  input[type=text], input[type=number], input[type=password], textarea { width: 100%; }
   .form-row { margin-bottom: 14px; }
   .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .btn { display: inline-block; background: #4a7cf7; color: #fff; border: none; border-radius: 8px; padding: 10px 26px; font-size: 14px; cursor: pointer; transition: background .2s; }
-  .btn:hover { background: #3a68e0; }
-  .btn:disabled { background: #a8bdf7; cursor: not-allowed; }
-  .btn-danger { background: #e74c3c; padding: 6px 14px; font-size: 12px; }
-  .btn-danger:hover { background: #c0392b; }
-  .btn-mini { background: #eef1f5; color: #4a7cf7; padding: 5px 12px; font-size: 12px; }
-  .btn-mini:hover { background: #e0e6ee; }
+  .btn { padding: 10px 26px; }
+  /* 内联实色背景的按钮强制白字（原渐变按钮的替代写法） */
+  .btn[style*="--accent"], .btn[style*="--success"], .btn[style*="--vip"] { color: #fff; border-color: transparent; }
+  .btn-mini { padding: 4px 12px; font-size: 12px; }
   /* 模块配置行 */
   .mod-row { display: grid; grid-template-columns: 1fr 1fr 90px 90px 34px; gap: 8px; align-items: center; margin-bottom: 8px; }
-  .mod-row select { border: 1px solid #d9dee5; border-radius: 8px; padding: 8px; font-size: 13px; }
-  .mod-row input { padding: 8px; font-size: 13px; }
-  .mod-rm { cursor: pointer; color: #c0392b; font-size: 16px; text-align: center; font-weight: 700; user-select: none; }
-  .add-mod { color: #4a7cf7; font-size: 13px; cursor: pointer; user-select: none; }
+  .mod-row select, .mod-row input { padding: 8px; font-size: 13px; }
+  .mod-rm { cursor: pointer; color: var(--danger); font-size: 16px; text-align: center; font-weight: 700; user-select: none; }
+  .add-mod { color: var(--accent); font-size: 13px; cursor: pointer; user-select: none; }
   /* 模板列表 */
-  table { width: 100%; border-collapse: collapse; }
-  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #eef1f5; font-size: 13px; vertical-align: top; }
-  th { color: #888; font-weight: 600; background: #fafbfc; }
-  .tpl-mods { display: flex; flex-wrap: wrap; gap: 4px; }
-  .mod-tag { font-size: 11px; background: #eef1f5; color: #555; border-radius: 4px; padding: 1px 6px; }
-  .empty { color: #999; text-align: center; padding: 24px; font-size: 13px; }
-  .ops { display: flex; gap: 6px; }
+  th, td { font-size: 13px; }
   .tbl-wrap { overflow: auto; }
-  .ev { font-weight: 700; color: #4a7cf7; white-space: nowrap; }
-  .err { color: #E5484D; font-weight: 700; }
-  .detail { color: #4B5563; word-break: break-all; font-size: 12px; }
+  .tpl-mods { display: flex; flex-wrap: wrap; gap: 4px; }
+  .mod-tag { font-size: 11px; background: var(--paper-deep); color: var(--ink-2); border-radius: 4px; padding: 1px 6px; }
+  .empty { color: var(--ink-3); text-align: center; padding: 24px; font-size: 13px; }
+  .ops { display: flex; gap: 6px; }
+  .ev { font-weight: 600; color: var(--accent); white-space: nowrap; }
+  .err { color: var(--danger); font-weight: 600; }
+  .detail { color: var(--ink-2); word-break: break-all; font-size: 12px; }
   .login-box { max-width: 360px; margin: 0 auto; padding: 12px 0; }
   .pwd-row { display: flex; gap: 10px; align-items: center; }
   .pwd-row input { flex: 1; }
-  .lock-note { font-size: 12px; color: #999; margin-top: 8px; }
+  .lock-note { font-size: 12px; color: var(--ink-3); margin-top: 8px; }
   /* 模板配置（训练）工具 */
-  .cfg-box { border: 2px dashed #b8a8ff; background: rgba(83,64,245,.05); border-radius: 3px; cursor: pointer; box-sizing: border-box; }
-  .cfg-box:hover { border-color: #5340f5; background: rgba(83,64,245,.10); }
-  .cfg-box.sel { border-style: solid; border-color: #5340f5; background: rgba(83,64,245,.14); box-shadow: 0 0 0 2px rgba(83,64,245,.2); }
-  .cfg-tag { position: absolute; top: 0; left: 0; font-size: 9px; background: #5340f5; color: #fff; padding: 1px 4px; border-radius: 0 0 4px 0; max-width: 100%; overflow: hidden; white-space: nowrap; }
-  .cfg-txt { position: absolute; inset: 0; font-size: 10px; color: #666; padding: 16px 4px 2px; overflow: hidden; pointer-events: none; }
+  .cfg-box { border: 2px dashed var(--accent-line); background: rgba(47,75,124,.04); cursor: pointer; box-sizing: border-box; }
+  .cfg-box:hover { border-color: var(--accent); background: rgba(47,75,124,.08); }
+  .cfg-box.sel { border-style: solid; border-color: var(--accent); background: rgba(47,75,124,.12); box-shadow: 0 0 0 2px rgba(47,75,124,.18); }
+  .cfg-tag { position: absolute; top: 0; left: 0; font-size: 9px; background: var(--accent); color: #fff; padding: 1px 4px; border-radius: 0 0 4px 0; max-width: 100%; overflow: hidden; white-space: nowrap; }
+  .cfg-txt { position: absolute; inset: 0; font-size: 10px; color: var(--ink-2); padding: 16px 4px 2px; overflow: hidden; pointer-events: none; }
 </style>
 </head>
 <body>
@@ -79,56 +70,40 @@
   <!-- 上传模板 -->
   <div class="card" id="uploadCard" style="display:none">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
-      <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#5B8CFF,#3B6FE0);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px">📤</div>
-      <span style="font-size:17px;font-weight:700;color:#333">上传新模板</span>
+      <div style="width:38px;height:38px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="19" height="19"><path d="M12 16V4m0 0l-4 4m4-4l4 4"/><path d="M4 20h16"/></svg></div>
+      <span style="font-size:17px;font-weight:700;color:var(--ink)">上传新模板</span>
     </div>
-    <div style="font-size:12.5px;color:#8A94A6;margin-bottom:14px">支持 .docx，可多选批量导入</div>
+    <div style="font-size:12.5px;color:var(--ink-3);margin-bottom:14px">支持 .docx，可多选批量导入</div>
     <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px">
-      <div style="flex:1;border:1px solid #D9DFEA;border-radius:8px;padding:9px 12px;font-size:13px;color:#555;background:#FAFBFC;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="filePathBox">未选择文件</div>
-      <button class="btn" id="pickFileBtn" style="padding:9px 18px;border-radius:8px">📦 选择文件</button>
+      <div style="flex:1;border:1px solid var(--line-strong);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--ink-2);background:var(--paper-deep);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="filePathBox">未选择文件</div>
+      <button class="btn" id="pickFileBtn" style="padding:9px 18px;border-radius:8px">选择文件</button>
       <input type="file" id="tplFile" accept=".docx" multiple hidden>
-      <div id="fileCount" style="font-size:12px;color:#888"></div>
+      <div id="fileCount" style="font-size:12px;color:var(--ink-3)"></div>
     </div>
     <div style="display:flex;gap:10px">
-      <button class="btn" id="uploadBtn" style="background:linear-gradient(135deg,#5B8CFF,#3B6FE0);border-radius:8px;padding:11px 26px">上传所选模板</button>
-      <button class="btn" id="batchUploadBtn" style="background:linear-gradient(135deg,#34C77B,#1FAF63);border-radius:8px;padding:11px 26px">📦 批量导入全部所选</button>
+      <button class="btn" id="uploadBtn" style="background:var(--accent);border-radius:8px;padding:11px 26px">上传所选模板</button>
+      <button class="btn" id="batchUploadBtn" style="background:var(--success);border-radius:8px;padding:11px 26px">批量导入全部所选</button>
     </div>
   </div>
 
   <!-- 模板列表 -->
   <div class="card" id="listCard" style="display:none">
-    <div class="card-title">📚 免费模板</div>
+    <div class="card-title">免费模板</div>
     <div id="tplList"></div>
-  </div>
-
-  <!-- VIP 模板中心 -->
-  <div class="card" id="vipCard" style="display:none">
-    <div class="card-title">👑 VIP模板中心</div>
-    <div style="font-size:12.5px;color:#8A94A6;margin-bottom:12px">
-      VIP 模板与免费模板相互独立：上传后自动上架，供用户端简历编辑器使用（付费功能后续接入）。
-      也可在下方「免费模板」列表中把已上架免费模板「设为VIP」。
-    </div>
-    <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px">
-      <div style="flex:1;border:1px solid #D9DFEA;border-radius:8px;padding:9px 12px;font-size:13px;color:#555;background:#FAFBFC;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="vipFilePathBox">未选择文件</div>
-      <button class="btn" id="vipPickBtn" style="padding:9px 18px;border-radius:8px">📦 选择VIP模板</button>
-      <input type="file" id="vipTplFile" accept=".docx" multiple hidden>
-    </div>
-    <button class="btn" id="vipUploadBtn" style="background:linear-gradient(135deg,#A855F7,#7C3AED);border-radius:8px;padding:11px 26px">⬆ 上传为VIP模板</button>
-    <div id="vipList" style="margin-top:16px"></div>
   </div>
 
   <!-- 用户 VIP 管理 -->
   <div class="card" id="vipUserCard" style="display:none">
-    <div class="card-title">👑 用户 VIP 管理</div>
-    <div style="font-size:12.5px;color:#8A94A6;margin-bottom:12px">
-      开通/取消用户 VIP：VIP 用户才能使用在线编辑器与 VIP 模板中心（付费功能后续接入）。
+    <div class="card-title">用户 VIP 管理</div>
+    <div style="font-size:12.5px;color:var(--ink-3);margin-bottom:12px">
+      开通/取消用户 VIP：VIP 用户才能使用简历编辑功能。模板统一在上方列表管理，用「编辑器」列控制是否加入编辑器。
     </div>
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
-      <input type="text" id="vipUserAccount" placeholder="用户账号（手机号/邮箱）" style="flex:1;border:1px solid #D9DFEA;border-radius:8px;padding:9px 12px;font-size:13px">
-      <button class="btn" id="vipUserOn" style="background:linear-gradient(135deg,#A855F7,#7C3AED);padding:9px 18px;border-radius:8px">开通 VIP</button>
-      <button class="btn" id="vipUserOff" style="background:#E8EAF0;color:#333;padding:9px 18px;border-radius:8px">取消 VIP</button>
+      <input type="text" id="vipUserAccount" placeholder="用户账号（手机号/邮箱）" style="flex:1;border:1px solid var(--line-strong);border-radius:8px;padding:9px 12px;font-size:13px">
+      <button class="btn" id="vipUserOn" style="background:var(--vip);padding:9px 18px;border-radius:8px">开通 VIP</button>
+      <button class="btn" id="vipUserOff" style="background:#E8EAF0;color:var(--ink);padding:9px 18px;border-radius:8px">取消 VIP</button>
     </div>
-    <div id="vipUserStatus" style="font-size:12.5px;color:#888"></div>
+    <div id="vipUserStatus" style="font-size:12.5px;color:var(--ink-3)"></div>
   </div>
 
   <!-- 模板配置（训练）弹窗 -->
@@ -138,20 +113,20 @@
         <span style="font-size:17px;font-weight:700">模板配置（训练）· <span id="cfgTplName"></span></span>
         <button class="btn btn-mini" onclick="closeCfgModal()">✕ 关闭</button>
       </div>
-      <div style="font-size:12.5px;color:#8A94A6;margin-bottom:14px;line-height:1.7">
+      <div style="font-size:12.5px;color:var(--ink-3);margin-bottom:14px;line-height:1.7">
         点击预览中任意文本框，在右侧选择它属于哪个信息模块（基本信息/教育背景/工作经验…），
         保存后编辑器按此配置显示/隐藏模块内容。装饰性内容请选「固定内容」。文本框编号即编辑器中的可编辑区域。
       </div>
       <div style="display:flex;gap:16px">
         <div id="cfgCanvas" style="flex:1;position:relative;border:1px solid #e5e7eb;background:#fff;min-height:500px;overflow:hidden"></div>
         <div style="width:240px;flex-shrink:0">
-          <div id="cfgSelInfo" style="font-size:13px;color:#555;margin-bottom:8px;background:#f7f8fa;border-radius:8px;padding:10px;word-break:break-all">未选择文本框</div>
-          <select id="cfgModuleSel" style="width:100%;height:36px;border:1px solid #d9dfea;border-radius:8px;padding:0 8px;margin-bottom:10px;font-size:13px"></select>
-          <button class="btn" id="cfgAssignBtn" style="width:100%;background:#5340f5;color:#fff;border-radius:8px;padding:10px">应用归属</button>
+          <div id="cfgSelInfo" style="font-size:13px;color:var(--ink-2);margin-bottom:8px;background:var(--paper-deep);border-radius:8px;padding:10px;word-break:break-all">未选择文本框</div>
+          <select id="cfgModuleSel" style="width:100%;height:36px;border:1px solid var(--line-strong);border-radius:8px;padding:0 8px;margin-bottom:10px;font-size:13px"></select>
+          <button class="btn" id="cfgAssignBtn" style="width:100%;background:var(--accent);color:#fff;border-radius:8px;padding:10px">应用归属</button>
           <div style="margin-top:16px">
-            <button class="btn" id="cfgSaveBtn" style="width:100%;background:#1e8449;color:#fff;border-radius:8px;padding:11px">💾 保存全部配置</button>
+            <button class="btn" id="cfgSaveBtn" style="width:100%;background:var(--success);color:#fff;border-radius:8px;padding:11px">保存全部配置</button>
           </div>
-          <div id="cfgStats" style="font-size:12px;color:#888;margin-top:10px"></div>
+          <div id="cfgStats" style="font-size:12px;color:var(--ink-3);margin-top:10px"></div>
         </div>
       </div>
     </div>
@@ -159,30 +134,30 @@
 
   <!-- 板块绑定配置 -->
   <div class="card" id="mappingCard" style="display:none">
-    <div class="card-title">🔗 模板板块绑定配置</div>
-    <div style="font-size:12.5px;color:#8A94A6;margin-bottom:12px">系统自动识别模板板块与字段，可手动绑定标准 key；无占位符模板按此映射填充（有数据填、无数据留白）。</div>
+    <div class="card-title">模板板块绑定配置</div>
+    <div style="font-size:12.5px;color:var(--ink-3);margin-bottom:12px">系统自动识别模板板块与字段，可手动绑定标准 key；无占位符模板按此映射填充（有数据填、无数据留白）。</div>
     <div style="display:flex;gap:8px;margin-bottom:12px">
-      <select id="mapTplSelect" style="flex:1;border:1px solid #d9dee5;border-radius:8px;padding:9px 12px;font-size:13px"></select>
+      <select id="mapTplSelect" style="flex:1;border:1px solid var(--line-strong);border-radius:8px;padding:9px 12px;font-size:13px"></select>
       <button class="btn" id="mapLoadBtn" style="padding:9px 18px">读取映射</button>
     </div>
     <div id="mapBody" style="font-size:13px"></div>
     <div style="margin-top:12px">
-      <button class="btn" id="mapSaveBtn" style="background:linear-gradient(135deg,#5B8CFF,#3B6FE0)">保存绑定</button>
-      <span id="mapStatus" style="font-size:12px;color:#888;margin-left:8px"></span>
+      <button class="btn" id="mapSaveBtn" style="background:var(--accent)">保存绑定</button>
+      <span id="mapStatus" style="font-size:12px;color:var(--ink-3);margin-left:8px"></span>
     </div>
   </div>
 
   <!-- 全局同义词库 -->
   <div class="card" id="aliasCard" style="display:none">
-    <div class="card-title">📖 全局同义词库</div>
-    <div style="font-size:12.5px;color:#8A94A6;margin-bottom:12px">新增同义词后全平台模板自动生效（如「工作经验/工作经历/实习经历」→ work_history）。</div>
+    <div class="card-title">全局同义词库</div>
+    <div style="font-size:12.5px;color:var(--ink-3);margin-bottom:12px">新增同义词后全平台模板自动生效（如「工作经验/工作经历/实习经历」→ work_history）。</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-      <select id="aliasKind" style="border:1px solid #d9dee5;border-radius:8px;padding:8px;font-size:13px">
+      <select id="aliasKind" style="border:1px solid var(--line-strong);border-radius:8px;padding:8px;font-size:13px">
         <option value="section">板块同义词</option>
         <option value="field">字段同义词</option>
       </select>
-      <input type="text" id="aliasKey" placeholder="标准 key（如 work_history / phone）" style="flex:1;min-width:180px;border:1px solid #d9dee5;border-radius:8px;padding:9px 12px;font-size:13px">
-      <input type="text" id="aliasName" placeholder="同义词（如 实习工作）" style="flex:1;min-width:140px;border:1px solid #d9dee5;border-radius:8px;padding:9px 12px;font-size:13px">
+      <input type="text" id="aliasKey" placeholder="标准 key（如 work_history / phone）" style="flex:1;min-width:180px;border:1px solid var(--line-strong);border-radius:8px;padding:9px 12px;font-size:13px">
+      <input type="text" id="aliasName" placeholder="同义词（如 实习工作）" style="flex:1;min-width:140px;border:1px solid var(--line-strong);border-radius:8px;padding:9px 12px;font-size:13px">
       <button class="btn" id="aliasAddBtn" style="padding:9px 18px">＋ 添加</button>
     </div>
     <div id="aliasList"></div>
@@ -230,13 +205,11 @@ function enterAdmin() {
   $("logoutBtn").style.display = "inline-block";
   $("uploadCard").style.display = "block";
   $("listCard").style.display = "block";
-  $("vipCard").style.display = "block";
   $("vipUserCard").style.display = "block";
   $("mappingCard").style.display = "block";
   $("aliasCard").style.display = "block";
   loadTemplates();
   loadAliases();
-  loadVipTemplates();
   fillMapTplSelect();
 }
 
@@ -311,15 +284,15 @@ function renderMapping(detected) {
   const sections = detected.sections || [];
   const fields = detected.fields || [];
   let html = '<div style="font-weight:700;margin:8px 0 4px">板块识别</div>';
-  if (!sections.length) html += '<div style="color:#999;font-size:12px">未识别到板块标题</div>';
+  if (!sections.length) html += '<div style="color:var(--ink-3);font-size:12px">未识别到板块标题</div>';
   sections.forEach(function(s, i) {
     html += '<div data-group="section" style="display:flex;align-items:center;gap:8px;margin:5px 0">'
       + '<span style="width:130px;flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + s.title + '">' + s.title + '</span>'
       + bindSelect(STD_SECTION_KEYS, s.key)
-      + '<span style="color:#999;font-size:12px">内容框 ' + s.boxes.length + ' 个</span></div>';
+      + '<span style="color:var(--ink-3);font-size:12px">内容框 ' + s.boxes.length + ' 个</span></div>';
   });
   html += '<div style="font-weight:700;margin:12px 0 4px">基础字段识别</div>';
-  if (!fields.length) html += '<div style="color:#999;font-size:12px">未识别到基础字段行</div>';
+  if (!fields.length) html += '<div style="color:var(--ink-3);font-size:12px">未识别到基础字段行</div>';
   fields.forEach(function(f, i) {
     html += '<div data-group="field" style="display:flex;align-items:center;gap:8px;margin:5px 0">'
       + '<span style="width:130px;flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + f.label + '">' + f.label + '</span>'
@@ -352,7 +325,7 @@ $("mapSaveBtn").addEventListener("click", async function() {
     const resp = await adminFetch("/admin/templates/" + mapTplId + "/mapping", { method: "POST", body: fd });
     const data = await resp.json();
     if (!resp.ok) throw new Error(data.detail || "保存失败");
-    $("mapStatus").textContent = "✅ 绑定已保存，填充时立即生效";
+    $("mapStatus").textContent = "绑定已保存，填充时立即生效";
   } catch (e) {
     $("mapStatus").textContent = "保存失败：" + e.message;
   }
@@ -489,99 +462,11 @@ $("batchUploadBtn").addEventListener("click", async () => {
     showAlert("批量导入失败：" + e.message);
   } finally {
     btn.disabled = false;
-    btn.textContent = "📦 批量导入全部所选";
+    btn.textContent = "批量导入全部所选";
   }
 });
 
-// ── VIP 模板中心 ──
-$("vipPickBtn").addEventListener("click", function() { $("vipTplFile").click(); });
-$("vipTplFile").addEventListener("change", function() {
-  const n = this.files.length;
-  $("vipFilePathBox").textContent = n
-    ? Array.from(this.files).map(function(f) { return f.name; }).join("、")
-    : "未选择文件";
-});
 
-$("vipUploadBtn").addEventListener("click", async () => {
-  hideAlert();
-  const files = $("vipTplFile").files;
-  if (!files.length) { showAlert("请先选择 .docx 模板文件"); return; }
-  const btn = $("vipUploadBtn");
-  btn.disabled = true;
-  btn.textContent = "正在上传…";
-  try {
-    let okCount = 0;
-    for (const file of Array.from(files)) {
-      const fd = new FormData();
-      fd.append("name", "");
-      fd.append("description", "");
-      fd.append("modules", "");
-      fd.append("is_vip", "1");
-      fd.append("file", file);
-      const resp = await adminFetch("/admin/templates/upload", { method: "POST", body: fd });
-      const data = await resp.json();
-      if (!resp.ok) throw new Error(data.detail || data.error || "上传失败");
-      okCount++;
-    }
-    showOk("已上传 " + okCount + " 套 VIP 模板（已自动上架）");
-    $("vipTplFile").value = "";
-    $("vipFilePathBox").textContent = "未选择文件";
-    loadVipTemplates();
-    loadTemplates();
-  } catch (e) {
-    showAlert("上传失败：" + e.message);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "⬆ 上传为VIP模板";
-  }
-});
-
-async function loadVipTemplates() {
-  const box = $("vipList");
-  try {
-    const resp = await adminFetch("/admin/templates/list");
-    const data = await resp.json();
-    if (!resp.ok) throw new Error("加载失败");
-    const list = (data.templates || []).filter(function(t) { return t.is_vip == 1 && t.is_active == 1; }).sort(function(a, b) { return (a.display_id || 0) - (b.display_id || 0); });
-    if (!list.length) {
-      box.innerHTML = '<div class="empty">暂无 VIP 模板，可上传或把免费模板「设为VIP」</div>';
-      return;
-    }
-    box.innerHTML = '<div class="card-title">👑 VIP模板中心（' + list.length + '）</div>'
-      + '<table><thead><tr><th>ID</th><th>名称</th><th>操作</th></tr></thead><tbody>'
-      + list.map(function(t) {
-          return '<tr>'
-            + '<td>' + (t.display_id || t.id) + '</td>'
-            + '<td><b>' + t.name + '</b><br><span style="color:#999;font-size:12px">' + (t.description || "") + '</span></td>'
-            + '<td><div class="ops">'
-            + '<button class="btn btn-mini" onclick="openMapping(' + t.id + ')">🔗 映射</button>'
-            + '<button class="btn btn-mini" style="background:#EEF2FF;color:#4F46E5" onclick="openConfigTool(' + t.id + ')">⚙ 配置</button>'
-            + '<button class="btn btn-mini" style="background:#F3E8FF;color:#7C3AED" onclick="vipSetFlag(' + t.id + ',0)">移出VIP</button>'
-            + '<button class="btn btn-danger" onclick="delTemplate(' + t.id + ')">删除</button></div></td>'
-            + '</tr>';
-        }).join("") + '</tbody></table>';
-  } catch (e) {
-    box.innerHTML = '<div class="empty">加载失败：' + e.message + '</div>';
-  }
-}
-
-async function vipSetFlag(id, isVip) {
-  hideAlert();
-  const actionName = isVip ? "设为VIP" : "移出VIP";
-  if (!confirm("确认将模板 #" + id + " " + actionName + "？")) return;
-  try {
-    const fd = new FormData();
-    fd.append("is_vip", String(isVip));
-    const resp = await adminFetch("/admin/templates/" + id + "/vip", { method: "POST", body: fd });
-    const data = await resp.json();
-    if (!resp.ok) throw new Error(data.detail || data.error || "操作失败");
-    showOk(data.message || "操作成功");
-    loadVipTemplates();
-    loadTemplates();
-  } catch (e) {
-    showAlert("操作失败：" + e.message);
-  }
-}
 
 // ── 编辑器可用性（决定模板是否出现在编辑器「更换模板」面板） ──
 // 注意：与 is_vip 无关。editable=0 的模板仍在首页模板中心展示与下载，
@@ -645,7 +530,7 @@ let cfgState = null;
 async function openConfigTool(id) {
   hideAlert();
   $("cfgModal").style.display = "flex";
-  $("cfgCanvas").innerHTML = '<div style="padding:30px;color:#999">正在加载模板结构…</div>';
+  $("cfgCanvas").innerHTML = '<div style="padding:30px;color:var(--ink-3)">正在加载模板结构…</div>';
   const sel = $("cfgModuleSel");
   sel.innerHTML = CFG_MODULES.map(function(m) { return '<option value="' + m.key + '">' + m.label + "</option>"; }).join("");
   try {
@@ -661,7 +546,7 @@ async function openConfigTool(id) {
     updateCfgStats();
     selectCfgBox(null);
   } catch (e) {
-    $("cfgCanvas").innerHTML = '<div style="padding:30px;color:#c0392b">加载失败：' + e.message + "</div>";
+    $("cfgCanvas").innerHTML = '<div style="padding:30px;color:var(--danger)">加载失败：' + e.message + "</div>";
   }
 }
 
@@ -729,8 +614,7 @@ $("cfgSaveBtn").addEventListener("click", async function() {
     if (!resp.ok) throw new Error(data.detail || "保存失败");
     showOk(data.message || "配置已保存");
     closeCfgModal();
-    loadVipTemplates();
-  } catch (e) {
+    } catch (e) {
     showAlert("保存失败：" + e.message);
   }
 });
@@ -776,11 +660,11 @@ async function loadTemplates() {
     const rejected = list.filter(function(t) { return t.review_status === "rejected"; });
     let html = "";
     if (pending.length) {
-      html += '<div class="card-title" style="color:#E8890C">🕐 待人工审核（' + pending.length + '）</div>';
+      html += '<div class="card-title" style="color:var(--warn)">待人工审核（' + pending.length + '）</div>';
       html += '<div style="margin-bottom:8px;display:flex;align-items:center;gap:8px">'
         + '<label style="font-size:12px;cursor:pointer"><input type="checkbox" id="selAllPending" style="margin-right:4px">全选</label>'
-        + '<span style="font-size:12px;color:#999">已选 <b id="selCountPending">0</b> 套</span>'
-        + '<button class="btn" style="background:#1e8449;padding:4px 14px;font-size:12px" id="batchApproveBtn" disabled>✅ 批量通过上架</button>'
+        + '<span style="font-size:12px;color:var(--ink-3)">已选 <b id="selCountPending">0</b> 套</span>'
+        + '<button class="btn" style="background:var(--success);padding:4px 14px;font-size:12px" id="batchApproveBtn" disabled>批量通过上架</button>'
         + '</div>';
       html += pending.map(renderReviewRow).join("");
     }
@@ -789,43 +673,42 @@ async function loadTemplates() {
       if (activePage > totalPages) activePage = totalPages;
       const startIdx = (activePage - 1) * ACTIVE_PAGE_SIZE;
       const pageItems = freeActive.slice(startIdx, startIdx + ACTIVE_PAGE_SIZE);
-      html += '<div class="card-title">📚 免费模板（' + freeActive.length + '）</div>';
+      html += '<div class="card-title">免费模板（' + freeActive.length + '）</div>';
       html += '<div style="margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">'
         + '<label style="font-size:12px;cursor:pointer"><input type="checkbox" id="selAllActive" style="margin-right:4px">全选</label>'
-        + '<span style="font-size:12px;color:#999">已选 <b id="selCountActive">0</b> 套</span>'
-        + '<button class="btn" id="batchEditableOnBtn" disabled style="background:#E7F6EC;color:#1E8449;padding:4px 14px;font-size:12px">✏️ 允许编辑器使用</button>'
-        + '<button class="btn" id="batchEditableOffBtn" disabled style="background:#F3F4F6;color:#4B5563;padding:4px 14px;font-size:12px">🚫 移出编辑器</button>'
-        + '<button class="btn btn-danger" id="batchDelBtn" disabled style="padding:4px 14px;font-size:12px">🗑 批量删除所选</button>'
+        + '<span style="font-size:12px;color:var(--ink-3)">已选 <b id="selCountActive">0</b> 套</span>'
+        + '<button class="btn" id="batchEditableOnBtn" disabled style="background:var(--success-soft);color:var(--success);padding:4px 14px;font-size:12px">允许编辑器使用</button>'
+        + '<button class="btn" id="batchEditableOffBtn" disabled style="background:var(--paper-deep);color:var(--ink-2);padding:4px 14px;font-size:12px">移出编辑器</button>'
+        + '<button class="btn btn-danger" id="batchDelBtn" disabled style="padding:4px 14px;font-size:12px">批量删除所选</button>'
         + '</div>'
-        + '<table><thead><tr><th style="width:32px"></th><th>ID</th><th>名称</th><th>编辑器</th><th>操作</th></tr></thead><tbody>'
-        + pageItems.map(function(t) {
+        + '<table><thead><tr><th style="width:32px"></th><th>序号</th><th>名称</th><th>编辑器</th><th>操作</th></tr></thead><tbody>'
+        + pageItems.map(function(t, idx) {
           const ed = (t.editable === undefined || t.editable === null) ? 1 : Number(t.editable);
           return '<tr>'
             + '<td><input type="checkbox" class="tpl-chk" data-tpl="' + t.id + '" data-group="active"></td>'
-            + '<td>' + (t.display_id || t.id) + '</td>'
-            + '<td><b>' + t.name + '</b><br><span style="color:#999;font-size:12px">' + (t.description || "") + '</span></td>'
-            + '<td><button class="btn btn-mini" style="background:' + (ed ? '#E7F6EC;color:#1E8449' : '#F3F4F6;color:#6B7280') + '" '
+            + '<td class="num" title="库内 ID ' + t.id + '">' + (startIdx + idx + 1) + '</td>'
+            + '<td><b>' + t.name + '</b><br><span style="color:var(--ink-3);font-size:12px">' + (t.description || "") + '</span></td>'
+            + '<td><button class="btn btn-mini" style="background:' + (ed ? 'var(--success-soft);color:var(--success)' : 'var(--paper-deep);color:#6B7280') + '" '
             + 'title="点击切换：是否出现在编辑器的「更换模板」面板" '
-            + 'onclick="setEditableFlag(' + t.id + ',' + (ed ? 0 : 1) + ')">' + (ed ? '✏️ 可用' : '🚫 已隐藏') + '</button></td>'
+            + 'onclick="setEditableFlag(' + t.id + ',' + (ed ? 0 : 1) + ')">' + (ed ? '可用' : '已隐藏') + '</button></td>'
             + '<td><div class="ops">'
-            + '<button class="btn btn-mini" onclick="openMapping(' + t.id + ')">🔗 映射</button>'
-            + (t.is_vip ? '' : '<button class="btn btn-mini" style="background:#F3E8FF;color:#7C3AED" onclick="vipSetFlag(' + t.id + ',1)">👑 设为VIP</button>')
+            + '<button class="btn btn-mini" onclick="openMapping(' + t.id + ')">映射</button>'
             + '<button class="btn btn-danger" onclick="delTemplate(' + t.id + ')">删除</button></div></td>'
             + '</tr>';
         }).join("") + '</tbody></table>';
       if (totalPages > 1) {
         html += '<div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px">'
           + '<button class="btn btn-mini" id="activePrev" ' + (activePage <= 1 ? "disabled" : "") + '>‹ 上一页</button>'
-          + '<span style="font-size:12px;color:#666">第 ' + activePage + ' / ' + totalPages + ' 页</span>'
+          + '<span style="font-size:12px;color:var(--ink-2)">第 ' + activePage + ' / ' + totalPages + ' 页</span>'
           + '<button class="btn btn-mini" id="activeNext" ' + (activePage >= totalPages ? "disabled" : "") + '>下一页 ›</button>'
           + '</div>';
       }
     }
     if (rejected.length) {
-      html += '<div class="card-title" style="color:#999">🗑 已拒绝（' + rejected.length + '）</div>';
+      html += '<div class="card-title" style="color:var(--ink-3)">已拒绝（' + rejected.length + '）</div>';
       html += rejected.map(function(t) {
         return '<div style="padding:8px 12px;border:1px solid #eee;border-radius:8px;margin-bottom:8px;font-size:13px">'
-          + '<b>' + t.name + '</b> <span style="color:#999">(id=' + t.id + ')</span> '
+          + '<b>' + t.name + '</b> <span style="color:var(--ink-3)">(id=' + t.id + ')</span> '
           + '<button class="btn btn-mini" onclick="reviewTemplate(' + t.id + ',\'approve\')">重新通过</button></div>';
       }).join("");
     }
@@ -840,8 +723,8 @@ function renderReviewRow(t) {
   let report = {};
   try { report = JSON.parse(t.validation_report || "{}"); } catch (e) {}
   const checks = (report.render_checks || []).map(function(c) {
-    return '<div style="font-size:12px;margin:2px 0">' + (c.ok ? "✅" : "❌") + " " + c.name
-      + ' <span style="color:#999">' + (c.detail || "") + '</span></div>';
+    return '<div style="font-size:12px;margin:2px 0">' + (c.ok ? "✓" : "×") + " " + c.name
+      + ' <span style="color:var(--ink-3)">' + (c.detail || "") + '</span></div>';
   }).join("");
   const warns = [];
   if (report.missing_placeholders && report.missing_placeholders.length) {
@@ -850,17 +733,17 @@ function renderReviewRow(t) {
   if (report.unknown_placeholders && report.unknown_placeholders.length) {
     warns.push("未配置占位符：" + report.unknown_placeholders.join("、"));
   }
-  return '<div style="border:1px solid #f0c36d;background:#FFFBF0;border-radius:10px;padding:12px 14px;margin-bottom:10px">'
+  return '<div style="border:1px solid #D9B36A;background:#FFFBF0;border-radius:10px;padding:12px 14px;margin-bottom:10px">'
     + '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">'
     + '<div><label style="cursor:pointer"><input type="checkbox" class="tpl-chk" data-tpl="' + t.id + '" data-group="pending" style="margin-right:6px">'
-    + '<b>' + t.name + '</b></label> <span style="color:#999;font-size:12px">(id=' + t.id + ')</span></div>'
+    + '<b>' + t.name + '</b></label> <span style="color:var(--ink-3);font-size:12px">(id=' + t.id + ')</span></div>'
     + '<div class="ops">'
-    + '<button class="btn" style="background:#1e8449" onclick="reviewTemplate(' + t.id + ',\'approve\')">✅ 通过上架</button>'
+    + '<button class="btn" style="background:var(--success)" onclick="reviewTemplate(' + t.id + ',\'approve\')">通过上架</button>'
     + '<button class="btn btn-danger" onclick="reviewTemplate(' + t.id + ',\'reject\')">✕ 拒绝</button>'
     + '</div></div>'
-    + '<div style="font-size:12px;color:#555;margin-top:8px">' + (t.description || "") + '</div>'
-    + (warns.length ? '<div style="font-size:12px;color:#B45309;margin-top:6px">⚠️ ' + warns.join("；") + '</div>' : "")
-    + (checks ? '<div style="margin-top:6px">' + checks + '</div>' : '<div style="font-size:12px;color:#999;margin-top:6px">未运行渲染体检</div>')
+    + '<div style="font-size:12px;color:var(--ink-2);margin-top:8px">' + (t.description || "") + '</div>'
+    + (warns.length ? '<div style="font-size:12px;color:var(--warn);margin-top:6px">※ ' + warns.join("；") + '</div>' : "")
+    + (checks ? '<div style="margin-top:6px">' + checks + '</div>' : '<div style="font-size:12px;color:var(--ink-3);margin-top:6px">未运行渲染体检</div>')
     + '</div>';
 }
 
@@ -892,8 +775,7 @@ async function delTemplate(id) {
     showOk("模板已删除");
     activePage = 1;
     loadTemplates();
-    loadVipTemplates();
-  } catch (e) {
+    } catch (e) {
     showAlert("删除失败：" + e.message);
   }
 }

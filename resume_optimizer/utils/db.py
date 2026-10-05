@@ -363,7 +363,7 @@ def list_templates() -> List[dict]:
         with conn.cursor() as cur:
             cur.execute(
                 "SELECT id, name, description, file_path, config, created_at, is_vip, display_id, editable "
-                "FROM templates WHERE is_active = 1 AND is_vip = 0 ORDER BY display_id ASC, id ASC"
+                "FROM templates WHERE is_active = 1 ORDER BY display_id ASC, id ASC"
             )
             rows = cur.fetchall()
             for r in rows:
@@ -664,25 +664,23 @@ def remap_draft_template_ids(mapping: Dict[int, int]) -> int:
 
 
 def renumber_display_ids() -> dict:
-    """按模块独立重排 display_id：免费模板 1,2,3…；VIP 模板 1,2,3…（互不影响）。
-    真实 id 保持不变（主键/外键/预览图/草稿引用均不动）。返回 {is_vip: 更新行数}。"""
+    """统一模板池：display_id 重排为 1,2,3…（全部上架模板共用一个序列）。
+    真实 id 保持不变（主键/外键/预览图/草稿引用均不动）。"""
     stats = {"free": 0, "vip": 0}
     with get_conn() as conn:
         with conn.cursor() as cur:
-            for is_vip, key in ((0, "free"), (1, "vip")):
+            cur.execute(
+                "SELECT id FROM templates "
+                "WHERE is_active = 1 "
+                "ORDER BY created_at ASC, id ASC",
+            )
+            rows = cur.fetchall()
+            for idx, r in enumerate(rows, start=1):
                 cur.execute(
-                    "SELECT id FROM templates "
-                    "WHERE is_active = 1 AND is_vip = %s "
-                    "ORDER BY created_at ASC, id ASC",
-                    (is_vip,),
+                    "UPDATE templates SET display_id = %s WHERE id = %s",
+                    (idx, r["id"]),
                 )
-                rows = cur.fetchall()
-                for idx, r in enumerate(rows, start=1):
-                    cur.execute(
-                        "UPDATE templates SET display_id = %s WHERE id = %s",
-                        (idx, r["id"]),
-                    )
-                    stats[key] += cur.rowcount
+                stats["free"] += cur.rowcount
         conn.commit()
     return stats
 

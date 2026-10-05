@@ -3,158 +3,100 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>简历星球 - 管理后台登录</title>
+<title>AI智简历 - 管理后台登录</title>
+<link rel="stylesheet" href="/static/css/app.css?v=20261004c">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  :root {
-    --grad-main: linear-gradient(135deg, #5B5CFF, #9B59B6);
-    --grad-blue: linear-gradient(135deg, #4F8DFF, #5B5CFF);
-    --ink: #1F2933;
-    --gray: #6B7280;
-    --line: #E5E9F2;
-    --purple: #6C5CE7;
-  }
   html, body { height: 100%; }
-  body {
-    font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
-    color: var(--ink);
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(160deg, #F3EEFF 0%, #EAF4FF 48%, #FBF9F3 100%);
-    position: relative;
-    overflow: hidden;
-  }
 
-  .bg-decor { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
-  .blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .5; }
-  .blob-1 { width: 460px; height: 460px; background: radial-gradient(circle, #B79CFF, transparent 70%); top: -160px; left: -120px; }
-  .blob-2 { width: 420px; height: 420px; background: radial-gradient(circle, #7FD4FF, transparent 70%); top: 100px; right: -140px; }
-  .blob-3 { width: 300px; height: 300px; background: radial-gradient(circle, #FFD7A8, transparent 70%); bottom: -100px; left: 12%; }
-
-  .login-wrap { position: relative; z-index: 1; width: 100%; padding: 30px 20px; display: flex; justify-content: center; }
+  .login-wrap { width: 100%; min-height: 100vh; padding: 30px 20px; display: flex; align-items: center; justify-content: center; }
   .login-card {
-    width: 420px;
-    max-width: 100%;
-    background: #fff;
-    border-radius: 24px;
-    padding: 42px 38px 36px;
-    box-shadow: 0 24px 64px rgba(78, 66, 168, .16), 0 2px 8px rgba(78, 66, 168, .06);
-    animation: rise .5s ease both;
+    width: 420px; max-width: 100%;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: var(--r-lg); padding: 40px 38px 34px;
+    box-shadow: var(--shadow-pop);
+    animation: rise .4s ease both;
   }
-  @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 
-  .brand { display: flex; align-items: center; gap: 11px; }
+  .brand { display: flex; align-items: center; gap: 10px; }
   .brand-mark {
-    width: 46px; height: 46px; border-radius: 14px;
-    background: var(--grad-main);
-    display: flex; align-items: center; justify-content: center;
-    color: #fff; box-shadow: 0 8px 18px rgba(91,92,255,.38);
+    width: 38px; height: 38px; border-radius: var(--r-md);
+    background: var(--ink); display: flex; align-items: center; justify-content: center;
+    color: var(--paper);
   }
-  .brand-mark svg { width: 26px; height: 26px; }
-  .brand-name { font-size: 20px; font-weight: 800; letter-spacing: 1px; background: var(--grad-main); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .brand-mark svg { width: 20px; height: 20px; }
+  .brand-name { font-family: var(--serif); font-size: 20px; font-weight: 700; letter-spacing: 2px; color: var(--ink); }
 
   .role-badge {
-    display: inline-flex; align-items: center; gap: 5px;
-    margin-top: 22px; background: #F1EEFF; color: #6C5CE7;
-    font-size: 11.5px; font-weight: 700; padding: 5px 12px; border-radius: 999px;
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 24px; background: var(--paper-deep); color: var(--ink-2);
+    font-size: 11.5px; font-weight: 600; padding: 4px 10px;
+    border-radius: var(--r-sm); border: 1px solid var(--line);
   }
-  .login-title { font-size: 26px; font-weight: 800; margin-top: 14px; letter-spacing: .5px; }
-  .login-title em { font-style: normal; background: var(--grad-blue); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-  .login-sub { color: var(--gray); font-size: 13px; line-height: 1.75; margin-top: 10px; }
+  .role-badge svg { width: 13px; height: 13px; }
 
-  .form { margin-top: 26px; }
+  .login-title { font-size: 26px; margin-top: 12px; letter-spacing: .04em; }
+  .login-sub { color: var(--ink-2); font-size: 13px; line-height: 1.75; margin-top: 8px; }
+
+  .form { margin-top: 24px; }
   .field { margin-bottom: 15px; }
-  .field-label { display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; font-weight: 600; color: #4B5563; margin-bottom: 7px; }
-  .hint { font-size: 12px; color: #A6AEBD; font-weight: 400; }
-  .hint.full { color: #E5484D; }
+  .field-label { display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; margin-bottom: 7px; }
+  .hint { font-size: 12px; color: var(--ink-3); font-weight: 400; }
+  .hint.full { color: var(--danger); }
 
-  .input {
-    width: 100%; height: 46px;
-    border: 1px solid var(--line); border-radius: 12px;
-    background: #FBFBFE;
-    padding: 0 14px;
-    font-size: 14px; font-family: inherit; color: var(--ink);
-    outline: none; transition: all .2s;
-  }
-  .input::placeholder { color: #A6AEBD; }
-  .input:focus { border-color: #8B7CF6; background: #fff; box-shadow: 0 0 0 3px rgba(108,92,231,.13); }
-  .input.error { border-color: #F87171; background: #FFF8F8; }
+  .input { height: 44px; }
 
   .pw-box { position: relative; }
   .pw-box .input { padding-right: 46px; }
   .pw-eye {
     position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
-    width: 36px; height: 36px; border: none; background: transparent;
-    color: #A6AEBD; cursor: pointer; border-radius: 10px; display: flex; align-items: center; justify-content: center;
-    font-size: 17px; transition: .2s;
+    width: 34px; height: 34px; border: none; background: transparent;
+    color: var(--ink-3); cursor: pointer; border-radius: var(--r-sm);
+    display: flex; align-items: center; justify-content: center; transition: color .15s, background-color .15s;
   }
-  .pw-eye:hover { color: var(--purple); background: #F3F0FF; }
-
-  .form-error {
-    display: none; background: #FFF1F0; border: 1px solid #FFD4D1;
-    color: #D64545; font-size: 12.5px; border-radius: 10px;
-    padding: 10px 13px; margin-bottom: 14px; line-height: 1.6;
-  }
-  .form-error.show { display: block; animation: rise .25s ease both; }
+  .pw-eye:hover { color: var(--accent); background: var(--accent-soft); }
+  .pw-eye svg { width: 18px; height: 18px; }
+  .pw-eye .i-off { display: none; }
+  .pw-eye.revealed .i-on { display: none; }
+  .pw-eye.revealed .i-off { display: block; }
 
   .btn-login {
-    width: 100%; height: 48px;
-    border: none; border-radius: 13px;
-    background: var(--grad-blue);
-    color: #fff; font-size: 15px; font-weight: 700; font-family: inherit;
-    cursor: pointer; box-shadow: 0 10px 24px rgba(79,141,255,.35);
-    transition: all .22s; letter-spacing: 2px;
+    width: 100%; height: 46px; letter-spacing: 4px; text-indent: 4px;
+    font-size: 15px; margin-top: 4px;
   }
-  .btn-login:hover { transform: translateY(-1px); box-shadow: 0 14px 30px rgba(79,141,255,.45); }
-  .btn-login:active { transform: translateY(0); }
-  .btn-login:disabled { background: #C4CAF0; box-shadow: none; cursor: not-allowed; transform: none; }
 
-  .switch-line { text-align: center; color: var(--gray); font-size: 13px; margin-top: 22px; }
-  .switch-line a { color: var(--purple); font-weight: 700; text-decoration: none; cursor: pointer; }
-  .switch-line a:hover { opacity: .78; }
+  .switch-line { text-align: center; color: var(--ink-2); font-size: 13px; margin-top: 22px; }
+  .switch-line a { font-weight: 700; cursor: pointer; }
   .back-line { text-align: center; margin-top: 14px; }
-  .back-line a { color: var(--gray); font-size: 13px; text-decoration: none; font-weight: 600; transition: .2s; }
-  .back-line a:hover { color: var(--purple); }
+  .back-line a { color: var(--ink-2); font-size: 13px; font-weight: 600; }
+  .back-line a:hover { color: var(--accent); }
 
   .panel { display: none; }
   .panel.active { display: block; }
 
-  .toast {
-    position: fixed; top: 26px; left: 50%; transform: translateX(-50%) translateY(-16px);
-    background: rgba(31,41,51,.92); color: #fff; font-size: 13px;
-    padding: 11px 20px; border-radius: 999px; z-index: 99;
-    opacity: 0; pointer-events: none; transition: all .3s;
-  }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
   @media (max-width: 480px) {
-    .login-card { padding: 32px 24px 28px; border-radius: 20px; }
+    .login-card { padding: 32px 24px 28px; }
     .login-title { font-size: 22px; }
   }
 </style>
 </head>
 <body>
-  <div class="bg-decor">
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-    <div class="blob blob-3"></div>
-  </div>
-
   <div class="login-wrap">
     <div class="login-card">
       <div class="brand">
         <div class="brand-mark">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 6.1L21 8.5l-4.9 4.3 1.4 6.4L12 15.9l-5.5 3.3 1.4-6.4L3 8.5l6.6-.4z"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.4 5.9 6.3.5-4.8 4.1 1.5 6.2L12 16.3l-5.4 3.4 1.5-6.2-4.8-4.1 6.3-.5z"/></svg>
         </div>
-        <div class="brand-name">简历星球</div>
+        <div class="brand-name">AI智简历</div>
       </div>
 
       <!-- 登录 -->
       <div class="panel active" id="panelLogin">
-        <span class="role-badge">🛡 管理员入口</span>
-        <h1 class="login-title">管理<em>后台</em></h1>
+        <span class="role-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.2 7.7-8 9-4.8-1.3-8-4.5-8-9V6z"/></svg>
+          管理员入口
+        </span>
+        <h1 class="login-title">管理后台</h1>
         <p class="login-sub">模板上传 · 自动识别 · 审核上架 · 批量管理</p>
         <form class="form" id="loginForm" novalidate>
           <div class="form-error" id="loginError"></div>
@@ -166,10 +108,13 @@
             <div class="field-label"><label for="loginPwd">密码</label></div>
             <div class="pw-box">
               <input class="input" id="loginPwd" type="password" placeholder="请输入密码" autocomplete="current-password">
-              <button type="button" class="pw-eye" data-target="loginPwd" title="显示/隐藏密码">👁</button>
+              <button type="button" class="pw-eye" data-target="loginPwd" title="显示/隐藏密码" aria-label="显示或隐藏密码">
+                <svg class="i-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="i-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/><path d="M4 4l16 16"/></svg>
+              </button>
             </div>
           </div>
-          <button class="btn-login" id="loginBtn" type="submit">进入管理后台</button>
+          <button class="btn-login btn-primary" id="loginBtn" type="submit">进入管理后台</button>
         </form>
         <div class="switch-line">还没有管理员账号？<a id="toRegister">立即注册</a></div>
         <div class="back-line"><a href="/">&larr; 返回首页</a></div>
@@ -177,8 +122,11 @@
 
       <!-- 注册 -->
       <div class="panel" id="panelRegister">
-        <span class="role-badge">🛡 管理员注册</span>
-        <h1 class="login-title">注册<em>管理员</em></h1>
+        <span class="role-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.2 7.7-8 9-4.8-1.3-8-4.5-8-9V6z"/></svg>
+          管理员注册
+        </span>
+        <h1 class="login-title">注册管理员</h1>
         <p class="login-sub" id="registerSub">管理员账号最多 3 个</p>
         <form class="form" id="registerForm" novalidate>
           <div class="form-error" id="registerError"></div>
@@ -194,17 +142,23 @@
             <div class="field-label"><label for="regPwd">密码</label></div>
             <div class="pw-box">
               <input class="input" id="regPwd" type="password" placeholder="至少 6 位" autocomplete="new-password">
-              <button type="button" class="pw-eye" data-target="regPwd" title="显示/隐藏密码">👁</button>
+              <button type="button" class="pw-eye" data-target="regPwd" title="显示/隐藏密码" aria-label="显示或隐藏密码">
+                <svg class="i-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="i-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/><path d="M4 4l16 16"/></svg>
+              </button>
             </div>
           </div>
           <div class="field">
             <div class="field-label"><label for="regPwd2">确认密码</label></div>
             <div class="pw-box">
               <input class="input" id="regPwd2" type="password" placeholder="再次输入密码" autocomplete="new-password">
-              <button type="button" class="pw-eye" data-target="regPwd2" title="显示/隐藏密码">👁</button>
+              <button type="button" class="pw-eye" data-target="regPwd2" title="显示/隐藏密码" aria-label="显示或隐藏密码">
+                <svg class="i-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="i-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/><path d="M4 4l16 16"/></svg>
+              </button>
             </div>
           </div>
-          <button class="btn-login" id="registerBtn" type="submit">注 册</button>
+          <button class="btn-login btn-primary" id="registerBtn" type="submit">注册</button>
         </form>
         <div class="switch-line">已有管理员账号？<a id="toLogin">立即登录</a></div>
         <div class="back-line"><a href="/">&larr; 返回首页</a></div>
@@ -265,7 +219,7 @@ document.querySelectorAll(".pw-eye").forEach(function(btn) {
     if (!input) return;
     const show = input.type === "password";
     input.type = show ? "text" : "password";
-    btn.textContent = show ? "🙈" : "👁";
+    btn.classList.toggle("revealed", show);
   });
 });
 
@@ -341,7 +295,7 @@ $("registerForm").addEventListener("submit", async function(e) {
     showError($("registerError"), err.message);
   } finally {
     btn.disabled = false;
-    btn.textContent = "注 册";
+    btn.textContent = "注册";
   }
 });
 
@@ -379,7 +333,7 @@ fetch("/api/admin/status", { cache: "no-store" })
     const sub = $("registerSub");
     if (adminFull) {
       sub.textContent = "管理员账号已满（最多 " + data.max + " 个），无法继续注册";
-      sub.style.color = "#E5484D";
+      sub.style.color = "var(--danger)";
     } else {
       sub.textContent = "管理员账号最多 " + data.max + " 个，还可注册 " + remaining + " 个";
     }

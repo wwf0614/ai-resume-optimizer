@@ -3,22 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>简历星球 - AI 智能简历优化系统</title>
-<link rel="stylesheet" href="/static/editor.css?v=20260918c">
+<title>AI智简历 - AI 智能简历优化系统</title>
+<link rel="stylesheet" href="/static/css/app.css?v=20261004c">
+<link rel="stylesheet" href="/static/editor.css?v=20261005a">
 <link rel="stylesheet" href="/static/resume-render.css?v=20260918a">
 </head>
 <body>
 
-<!-- ─── 顶部工具栏（简历星球风格） ─── -->
+<!-- ─── 顶部工具栏（AI智简历风格） ─── -->
 <header class="ed-toolbar">
   <div class="ed-toolbar-left">
     <a href="/" class="ed-logo" title="返回首页">
       <svg class="ed-logo-icon" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-        <defs><linearGradient id="starGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#5B5CFF"/><stop offset="100%" style="stop-color:#9B59B6"/></linearGradient></defs>
-        <rect width="40" height="40" rx="10" fill="url(#starGrad)"/>
-        <path d="M20 7.5l4.2 8.5 9.4 1.4-6.8 6.6 1.6 9.3L20 28.2l-8.4 4.4 1.6-9.3-6.8-6.6 9.4-1.4z" fill="#fff"/>
+        <rect width="40" height="40" rx="9" fill="#34549B"/>
+        <path d="M20 7.5l4.2 8.5 9.4 1.4-6.8 6.6 1.6 9.3L20 28.2l-8.4 4.4 1.6-9.3-6.8-6.6 9.4-1.4z" fill="#FAF9F6"/>
       </svg>
-      <span class="ed-logo-name">简历星球<small>AI 智能优化</small></span>
+      <span class="ed-logo-name">AI智简历<small>智能简历优化</small></span>
     </a>
     <a href="/my-resumes" class="ed-btn ed-btn-back" title="返回我的简历">
       <span class="ed-back-arrow">←</span>
@@ -29,26 +29,34 @@
 
   <div class="ed-toolbar-center">
     <div class="ed-tb-group" role="toolbar" aria-label="编辑工具">
-      <button class="ed-tb-btn" id="tbTemplate" title="更换模板（每份模板布局完全不同）"><span class="ed-tb-ico">🔄</span><span>更换模板</span></button>
+      <button class="ed-tb-btn" id="tbTemplate" title="更换模板（每份模板布局完全不同）"><span class="ed-tb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg></span><span>更换模板</span></button>
     </div>
   </div>
 
   <div class="ed-toolbar-right">
-    <button class="ed-btn ed-btn-soft" id="saveBtn" title="保存草稿"><span>💾</span><span>保存</span></button>
+    <button class="ed-btn ed-btn-soft" id="saveBtn" title="保存草稿">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg>
+      <span>保存</span></button>
 
     <span class="ed-tb-sep"></span>
 
-    <button class="ed-btn ed-btn-line-ai" id="aiGenBtn" title="AI 一句话生成整份简历"><span>✨</span><span>AI生成</span></button>
-    <button class="ed-btn ed-btn-line-score" id="matchScoreBtn" title="匹配度评分（免费）"><span>🎯</span><span>匹配度评分</span></button>
+    <button class="ed-btn ed-btn-line-ai" id="aiGenBtn" title="AI 一句话生成整份简历">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M12 4l1.8 4.8L18.5 10l-4.7 1.2L12 16l-1.8-4.8L5.5 10l4.7-1.2z"/><path d="M19 15l.9 2.4L22 18l-2.1.6L19 21l-.9-2.4L16 18l2.1-.6z"/></svg>
+      <span>AI生成</span></button>
+    <button class="ed-btn ed-btn-line-score" id="matchScoreBtn" title="匹配度评分（免费）">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>
+      <span>匹配度评分</span></button>
 
     <span class="ed-tb-sep"></span>
 
     <div class="ed-dropdown">
-      <button class="ed-btn ed-btn-download" id="downloadBtn"><span>📥下载简历</span><span class="ed-caret">▼</span></button>
+      <button class="ed-btn ed-btn-download" id="downloadBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M12 4v11m0 0l-4-4m4 4l4-4"/><path d="M5 19h14"/></svg>
+        <span>下载简历</span><span class="ed-caret">▾</span></button>
       <div class="ed-dropdown-menu" id="downloadMenu" hidden>
-        <button data-fmt="docx">📄 下载为 Word (.docx)</button>
-        <button data-fmt="pdf">📕 下载为 PDF (.pdf)</button>
-        <button data-fmt="png">🖼️ 导出为长图 (.png)</button>
+        <button data-fmt="docx">下载为 Word (.docx)</button>
+        <button data-fmt="pdf">下载为 PDF (.pdf)</button>
+        <button data-fmt="png">导出为长图 (.png)</button>
       </div>
     </div>
     <button class="ed-btn ed-btn-vip" id="vipBtn" title="开通 VIP（暂未上线）"><span>开通VIP</span></button>
@@ -57,7 +65,9 @@
 
     <div class="ed-user-avatar" id="userAvatar" title="用户">
       <img src="" alt="" id="avatarImg" onerror="this.style.display='none'">
-      <span class="avatar-placeholder">👤</span>
+      <span class="avatar-placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
+      </span>
     </div>
   </div>
 </header>
@@ -84,9 +94,9 @@
         </div>
         <div class="rp-header-right">
           <div class="rp-deco-icons">
-            <span class="rp-deco-icon">🎓</span>
-            <span class="rp-deco-icon">💼</span>
-            <span class="rp-deco-icon">🚀</span>
+            <span class="rp-deco-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/></svg></span>
+            <span class="rp-deco-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></span>
+            <span class="rp-deco-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.3-2 5-2 5s3.7-.5 5-2c.7-.8.7-2 0-2.8-.8-.7-2.2-.7-3 .8z"/><path d="M12 15l-3-3c1-3.5 3.5-7 8-9.5 1.5-.8 3.5-1 4.5-.5.5 1 .3 3-.5 4.5-2.5 4.5-6 7-9 8.5z"/><path d="M9 12H5.5L4 9.5c1.5-1 3-1.5 4.5-1.5M12 15v3.5l2.5 1.5c1-1.5 1.5-3 1.5-4.5"/></svg></span>
           </div>
         </div>
       </div>
@@ -98,7 +108,9 @@
           <div class="rp-photo-wrap" id="rpPhotoWrap">
             <div class="rp-photo" id="rpPhoto" title="点击更换照片">
               <img id="rpPhotoImg" alt="照片" />
-              <span class="rp-photo-placeholder">📷</span>
+              <span class="rp-photo-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </span>
             </div>
           </div>
         </div>
@@ -141,7 +153,9 @@
 <!-- ─── 登录门禁（VIP 付费门禁已暂停，后续恢复） ─── -->
 <div class="ed-vip-gate" id="vipGate" hidden>
   <div class="ed-vip-gate-box">
-    <div class="ed-vip-gate-icon">🔐</div>
+    <div class="ed-vip-gate-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="34" height="34"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/><circle cx="12" cy="16" r="1.4" fill="currentColor"/></svg>
+    </div>
     <h3>请先登录</h3>
     <p id="vipGateMsg">请先登录后再使用在线编辑器。</p>
     <div class="ed-vip-gate-btns">
@@ -194,7 +208,7 @@
 <!-- ─── 匹配度评分（免费） ─── -->
 <div class="ed-modal-mask" id="matchScoreModal" hidden>
   <div class="ed-modal ed-modal-ai">
-    <div class="ed-modal-head"><h3>🎯 匹配度评分</h3><button class="ed-modal-close" data-close-ms>&times;</button></div>
+    <div class="ed-modal-head"><h3>匹配度评分</h3><button class="ed-modal-close" data-close-ms>&times;</button></div>
     <div class="ed-modal-body">
       <p class="ed-ai-tip">填写目标岗位或粘贴 JD，AI 会对照你简历里的真实内容给出匹配分与提升建议。免费功能，无需 VIP。</p>
       <label class="ed-field-label">求职意向 / 目标岗位</label>
@@ -205,7 +219,7 @@
     </div>
     <div class="ed-modal-foot">
       <button class="ed-btn ed-btn-soft" data-close-ms>关闭</button>
-      <button class="ed-btn ed-btn-primary" id="msRunBtn">⚡ 开始评分</button>
+      <button class="ed-btn ed-btn-primary" id="msRunBtn">开始评分</button>
     </div>
   </div>
 </div>
@@ -213,7 +227,7 @@
 <!-- ─── ATS 文本层校验报告（免费，导出后自动弹出） ─── -->
 <div class="ed-modal-mask" id="atsReportModal" hidden>
   <div class="ed-modal wide ed-modal-ats">
-    <div class="ed-modal-head"><h3>🔍 ATS 文本层校验报告</h3><button class="ed-modal-close" data-close-ats>&times;</button></div>
+    <div class="ed-modal-head"><h3>ATS 文本层校验报告</h3><button class="ed-modal-close" data-close-ats>&times;</button></div>
     <div class="ed-modal-body" id="atsReportBody"></div>
     <div class="ed-modal-foot">
       <button class="ed-btn ed-btn-soft" data-close-ats>关闭</button>
@@ -224,7 +238,7 @@
 <!-- ─── AI 一键生成整份简历 ─── -->
 <div class="ed-modal-mask" id="aiGenModal" hidden>
   <div class="ed-modal ed-modal-ai">
-    <div class="ed-modal-head"><h3>✨ AI 一键生成整份简历</h3><button class="ed-modal-close" data-close>&times;</button></div>
+    <div class="ed-modal-head"><h3>AI 一键生成整份简历</h3><button class="ed-modal-close" data-close>&times;</button></div>
     <div class="ed-modal-body">
       <p class="ed-ai-tip">用一句话描述你自己，或粘贴招聘 JD，AI 会自动生成姓名、教育、工作、项目、技能、自我评价等完整内容，并直接套进当前简历。</p>
       <label class="ed-field-label">求职意向 / 目标岗位（选填）</label>
@@ -236,7 +250,7 @@
     </div>
     <div class="ed-modal-foot">
       <button class="ed-btn ed-btn-soft" data-close>取消</button>
-      <button class="ed-btn ed-btn-primary" id="aiGenRunBtn">⚡ 生成简历</button>
+      <button class="ed-btn ed-btn-primary" id="aiGenRunBtn">生成简历</button>
     </div>
   </div>
 </div>
@@ -245,7 +259,8 @@
 /* 内联兜底模板数据 */
 const FALLBACK_TPLS = [{"id":1,"name":"工程造价员求职","preview_url":"/static/previews/t1.png?v=5"},{"id":2,"name":"高端行政助理求职简历模板","preview_url":"/static/previews/t2.png?v=5"},{"id":3,"name":"简约风求职","preview_url":"/static/previews/t3.png?v=5"},{"id":4,"name":"砖红色通用","preview_url":"/static/previews/t4.png?v=5"},{"id":5,"name":"应聘岗位JAVA开发工程师","preview_url":"/static/previews/t5.png?v=5"},{"id":6,"name":"宝石绿风格","preview_url":"/static/previews/t6.png?v=5"},{"id":7,"name":"财务会计求职简历word模板","preview_url":"/static/previews/t7.png?v=5"},{"id":8,"name":"财务","preview_url":"/static/previews/t8.png?v=5"},{"id":9,"name":"财务相关","preview_url":"/static/previews/t9.png?v=5"},{"id":10,"name":"产品经理个人","preview_url":"/static/previews/t10.png?v=5"}];
 </script>
-<script src="/static/resume-render.js?v=20260918a"></script>
-<script src="/static/editor.js?v=20260918g"></script>
+<script src="/static/resume-render.js?v=20261004c"></script>
+<script src="/static/editor.js?v=20261005a"></script>
+<script src="/static/editor-richtext.js?v=20261005a"></script>
 </body>
 </html>
