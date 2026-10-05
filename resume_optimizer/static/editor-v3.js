@@ -79,11 +79,11 @@
     work: [{ k: 'company', l: '公司' }, { k: 'position', l: '职位' }]
       .concat(DATE_FIELDS, [{ k: 'current', l: '至今', t: 'check' }, { k: 'content', l: '工作内容', t: 'area' }]),
     project: [{ k: 'name', l: '项目名称' }, { k: 'role', l: '担任角色' },
-      { k: 'period', l: '时间段', ph: '2023-01 ~ 2023-06' }, { k: 'content', l: '项目描述', t: 'area' }],
+      { k: 'period', l: '时间段', t: 'period' }, { k: 'content', l: '项目描述', t: 'area' }],
     campus: [{ k: 'name', l: '经历名称' }, { k: 'role', l: '担任角色' },
-      { k: 'period', l: '时间段', ph: '2022-09 ~ 2023-06' }, { k: 'content', l: '经历描述', t: 'area' }],
+      { k: 'period', l: '时间段', t: 'period' }, { k: 'content', l: '经历描述', t: 'area' }],
     skill: [{ k: 'name', l: '技能' }, { k: 'level', l: '程度', ph: '精通/熟练/了解' }, { k: 'content', l: '说明', t: 'area' }],
-    honor: [{ k: 'time', l: '时间', ph: '2024-06' }, { k: 'name', l: '荣誉 / 证书' }, { k: 'issuer', l: '颁发单位' }]
+    honor: [{ k: 'time', l: '时间', t: 'period' }, { k: 'name', l: '荣誉 / 证书' }, { k: 'issuer', l: '颁发单位' }]
   };
 
   var THEMES_ORDER = ['default', 'blue', 'green', 'orange', 'gray', 'wine', 'teal'];
@@ -611,6 +611,30 @@
     var mo = m[2] ? parseInt(m[2], 10) - 1 : new Date().getMonth();
     return { y: parseInt(m[1], 10), m: Math.min(11, Math.max(0, mo)) };
   }
+  /* 时间段（单字段存 "起 ~ 止"）的拆装 */
+  function splitPeriod(v) {
+    var parts = String(v || '').split(/[~～]/);
+    return { a: (parts[0] || '').trim(), b: parts.length > 1 ? (parts[1] || '').trim() : '' };
+  }
+  function joinPeriod(a, b) {
+    a = (a || '').trim(); b = (b || '').trim();
+    return (a && b) ? a + ' ~ ' + b : (a || b);
+  }
+  function setPeriodSide(inp, v) {
+    var path = inp.dataset.path;
+    var parts = splitPeriod(getPath(path));
+    if (inp.dataset.period === 'start') parts.a = v; else parts.b = v;
+    var joined = joinPeriod(parts.a, parts.b);
+    if (getPath(path) === joined) return false;
+    setPath(path, joined);
+    var np = splitPeriod(joined);
+    var wrap = inp.closest('.v3-field');
+    ['start', 'end'].forEach(function (side) {
+      var el = wrap.querySelector('input[data-period="' + side + '"]');
+      if (el) el.value = side === 'start' ? np.a : np.b;
+    });
+    return true;
+  }
   function ensureDatePicker() {
     if (DP.el) return DP.el;
     DP.el = document.createElement('div');
@@ -637,9 +661,15 @@
     var inp = DP.input;
     closeDatePicker();
     if (!inp) return;
-    if (inp.value !== v) {
+    var changed;
+    if (inp.dataset.period) {
+      changed = setPeriodSide(inp, v);
+    } else if (inp.value !== v) {
       inp.value = v;
       setPath(inp.dataset.path, v);
+      changed = true;
+    }
+    if (changed) {
       markDirty();
       renderCenterSoon();
     }
@@ -671,7 +701,8 @@
     var el = ensureDatePicker();
     if (DP.input === inp && DP.el.style.display !== 'none') { closeDatePicker(); return; }
     DP.input = inp;
-    var pv = parseYM(inp.value) || { y: new Date().getFullYear(), m: new Date().getMonth() };
+    var cur = inp.dataset.period ? splitPeriod(getPath(inp.dataset.path))[inp.dataset.period] : inp.value;
+    var pv = parseYM(cur) || { y: new Date().getFullYear(), m: new Date().getMonth() };
     DP.y = pv.y; DP.m = pv.m;
     renderDatePicker();
     el.style.display = 'block';
@@ -707,7 +738,14 @@
     }
     if (opts.t === 'date') {
       return '<div class="v3-field"><label>' + esc(label) + '</label>' +
-        '<input class="v3-input" type="text" data-path="' + path + '" data-date value="' + esc(getPath(path) || '') + '" placeholder="' + esc(opts.ph || '点击选择日期') + '"></div>';
+        '<input class="v3-input" type="text" data-path="' + path + '" data-date value="' + esc(getPath(path) || '') + '" placeholder="' + esc(opts.ph || '点击选择年月') + '"></div>';
+    }
+    if (opts.t === 'period') {
+      var pp = splitPeriod(getPath(path));
+      return '<div class="v3-field"><label>' + esc(label) + '</label>' +
+        '<input class="v3-input v3-input-half" type="text" data-path="' + path + '" data-date data-period="start" value="' + esc(pp.a) + '" placeholder="开始年月">' +
+        '<span class="v3-period-sep">~</span>' +
+        '<input class="v3-input v3-input-half" type="text" data-path="' + path + '" data-date data-period="end" value="' + esc(pp.b) + '" placeholder="结束年月"></div>';
     }
     return '<div class="v3-field"><label>' + esc(label) + '</label>' +
       '<input class="v3-input" type="text" data-path="' + path + '" value="' + esc(getPath(path) || '') + '" placeholder="' + esc(opts.ph || '') + '"></div>';
@@ -819,6 +857,11 @@
       var p = el.dataset.path;
       if (p === 'modules.hobby') {
         S.resume.modules.hobby = String(el.value).split(/[、,，\s]+/).filter(Boolean);
+      } else if (el.dataset.period) {
+        /* 时间段半段手输：只改本侧，保留另一侧 */
+        var ps = splitPeriod(getPath(p));
+        if (el.dataset.period === 'start') ps.a = el.value; else ps.b = el.value;
+        setPath(p, joinPeriod(ps.a, ps.b));
       } else {
         setPath(p, el.value);
       }

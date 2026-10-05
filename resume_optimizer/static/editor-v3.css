@@ -307,6 +307,10 @@ details.v3-more > summary { font-size: 12px; color: var(--v3-accent); cursor: po
 }
 .v3-dp-link:hover { background: var(--v3-accent-soft); }
 
+/* 时间段（起 ~ 止 双半段） */
+.v3-input-half { flex: 1; min-width: 0; padding: 6px 5px; text-align: center; }
+.v3-period-sep { flex: none; color: var(--v3-ink-3); font-size: 12px; padding: 0 2px; }
+
 /* 滚动条 */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-thumb { background: #D3D9E4; border-radius: 4px; }
