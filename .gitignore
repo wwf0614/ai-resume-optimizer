@@ -29,3 +29,6 @@ _deleted_backup_20260924/
 # 系统文件
 .DS_Store
 Thumbs.db
+
+# 验收测试截图（本地留存）
+gui-test-screenshots/
