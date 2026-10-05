@@ -294,6 +294,7 @@
     S.resume.order.forEach(function (k) { visible[k] = S.resume.hidden.indexOf(k) < 0; });
     return {
       basic: S.resume.basic,
+      photo: S.resume.basic.photo || '',
       intention: S.resume.basic.intention || '',
       modules: mods,
       order: S.resume.order,
