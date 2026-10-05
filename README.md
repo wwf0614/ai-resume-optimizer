@@ -4,7 +4,7 @@
 
 ## 功能特性
 
-### 编辑器 v3（visiky 式三栏，所见即所得）
+### 可视化编辑器（三栏所见即所得）
 
 - **统一 JSON 数据模型**：简历 = 内容（basic/modules/order/hidden）+ 主题（theme）；版式与配色只是渲染层皮肤，**更换模板内容零丢失**
 - **左栏内容表单**：教育/实习/工作/项目/校园/技能/荣誉/自我评价/兴趣爱好等模块，条目增删、上下移动、拖拽排序、模块显隐
@@ -54,7 +54,7 @@
 │   │   ├── db.py / auth.py / parser.py / converter.py / llm.py / ...
 │   │   └── templates/           # Word 模板库
 │   ├── static/
-│   │   ├── editor.html + editor-v3.js/.css   # v3 三栏编辑器
+│   │   ├── editor.html + editor-v3.js/.css   # 三栏编辑器
 │   │   ├── resume-render.js/.css             # 参数化 A4 渲染引擎
 │   │   ├── template-editor.html              # 管理端可视化模板编辑器
 │   │   └── admin.html                        # 管理后台
@@ -113,7 +113,7 @@ python tools/smoke_v3.py
 
 ## 更新日志
 
-### v3 编辑器重构（当前）
+### 编辑器重构（当前）
 
 - 编辑器整体推翻重建：统一 JSON 数据模型 + 三栏布局 + 点击直改，换模板零丢失
 - 新增管理端可视化模板编辑器，布局覆盖（overrides）+ 新增盒子（added）即时下发
