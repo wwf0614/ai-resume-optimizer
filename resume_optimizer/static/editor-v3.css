@@ -279,6 +279,34 @@ details.v3-more > summary { font-size: 12px; color: var(--v3-accent); cursor: po
 .v3-toast[hidden] { display: none; }
 .v3-toast.is-err { background: var(--v3-danger); }
 
+/* 年月选择器（开始/结束时间） */
+.v3-dp {
+  position: fixed; z-index: 120; width: 240px;
+  background: #fff; border: 1px solid var(--v3-line); border-radius: 12px;
+  box-shadow: 0 14px 44px rgba(15,20,35,.2); padding: 12px; user-select: none;
+}
+.v3-dp-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.v3-dp-head button {
+  border: 0; background: none; cursor: pointer; color: var(--v3-ink-2);
+  font-size: 15px; width: 28px; height: 28px; border-radius: 7px; line-height: 1;
+}
+.v3-dp-head button:hover { background: var(--v3-accent-soft); color: var(--v3-accent); }
+.v3-dp-title { font-size: 14px; font-weight: 700; color: var(--v3-ink); letter-spacing: 1px; }
+.v3-dp-mons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px 6px; }
+.v3-dp-mon {
+  border: 0; background: none; font-size: 12px; color: var(--v3-ink-2);
+  height: 34px; border-radius: 8px; cursor: pointer; font-family: inherit;
+}
+.v3-dp-mon:hover { background: var(--v3-accent-soft); }
+.v3-dp-mon.is-now { color: var(--v3-accent); font-weight: 700; }
+.v3-dp-mon.is-sel { background: var(--v3-accent); color: #fff; font-weight: 700; }
+.v3-dp-foot { display: flex; justify-content: space-between; margin-top: 8px; border-top: 1px solid var(--v3-line); padding-top: 7px; }
+.v3-dp-link {
+  border: 0; background: none; color: var(--v3-accent); font-size: 12px;
+  cursor: pointer; padding: 3px 10px; border-radius: 6px; font-family: inherit;
+}
+.v3-dp-link:hover { background: var(--v3-accent-soft); }
+
 /* 滚动条 */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-thumb { background: #D3D9E4; border-radius: 4px; }

@@ -66,8 +66,8 @@
 
   /* 模块条目表单字段规格 */
   var DATE_FIELDS = [
-    { k: 'start', l: '开始', ph: '2022-06' },
-    { k: 'end', l: '结束', ph: '2024-06' }
+    { k: 'start', l: '开始', t: 'date', ph: '点击选择年月' },
+    { k: 'end', l: '结束', t: 'date', ph: '点击选择年月' }
   ];
   var FIELD_SPECS = {
     education: [
@@ -598,6 +598,101 @@
     });
   }
 
+  /* ───────── 年月选择器（开始/结束时间，格式 YYYY-MM） ───────── */
+
+  var DP = { el: null, input: null, y: 0, m: 0 };   /* m: 0-11 */
+  var MON_NAMES = ['一月', '二月', '三月', '四月', '五月', '六月',
+                   '七月', '八月', '九月', '十月', '十一月', '十二月'];
+
+  function fmtYM(y, m) { return y + '-' + ('0' + (m + 1)).slice(-2); }
+  function parseYM(v) {
+    var m = /^(\d{4})\s*[-/年.]?\s*(\d{1,2})?/.exec(String(v || '').trim());
+    if (!m) return null;
+    var mo = m[2] ? parseInt(m[2], 10) - 1 : new Date().getMonth();
+    return { y: parseInt(m[1], 10), m: Math.min(11, Math.max(0, mo)) };
+  }
+  function ensureDatePicker() {
+    if (DP.el) return DP.el;
+    DP.el = document.createElement('div');
+    DP.el.id = 'v3DatePicker';
+    DP.el.className = 'v3-dp';
+    document.body.appendChild(DP.el);
+    DP.el.addEventListener('click', function (e) {
+      /* 面板内点击不冒泡：innerHTML 重绘会断开旧按钮的祖先链，
+         冒泡到 document 的关闭监听时会误判为面板外点击 */
+      e.stopPropagation();
+      var btn = e.target.closest('[data-dp]');
+      if (!btn) return;
+      var act = btn.dataset.dp;
+      if (act === 'py') DP.y--;
+      else if (act === 'ny') DP.y++;
+      else if (act === 'thisyear') { DP.y = new Date().getFullYear(); renderDatePicker(); return; }
+      else if (act === 'mon') { applyDate(fmtYM(DP.y, parseInt(btn.dataset.m, 10))); return; }
+      else if (act === 'clear') { applyDate(''); return; }
+      renderDatePicker();
+    });
+    return DP.el;
+  }
+  function applyDate(v) {
+    var inp = DP.input;
+    closeDatePicker();
+    if (!inp) return;
+    if (inp.value !== v) {
+      inp.value = v;
+      setPath(inp.dataset.path, v);
+      markDirty();
+      renderCenterSoon();
+    }
+  }
+  function closeDatePicker() {
+    if (DP.el) DP.el.style.display = 'none';
+    DP.input = null;
+  }
+  function renderDatePicker() {
+    var now = new Date();
+    var cur = DP.input ? String(DP.input.value || '') : '';
+    var h = '<div class="v3-dp-head">' +
+      '<button data-dp="py" type="button" title="上一年">«</button>' +
+      '<span class="v3-dp-title">' + DP.y + '年</span>' +
+      '<button data-dp="ny" type="button" title="下一年">»</button></div>';
+    h += '<div class="v3-dp-mons">';
+    for (var i = 0; i < 12; i++) {
+      var v = fmtYM(DP.y, i);
+      var cls = 'v3-dp-mon' + (v === cur ? ' is-sel' : '') +
+        (DP.y === now.getFullYear() && i === now.getMonth() ? ' is-now' : '');
+      h += '<button type="button" class="' + cls + '" data-dp="mon" data-m="' + i + '">' + MON_NAMES[i] + '</button>';
+    }
+    h += '</div>';
+    h += '<div class="v3-dp-foot"><button type="button" class="v3-dp-link" data-dp="thisyear">今年</button>' +
+      '<button type="button" class="v3-dp-link" data-dp="clear">清除</button></div>';
+    DP.el.innerHTML = h;
+  }
+  function openDatePicker(inp) {
+    var el = ensureDatePicker();
+    if (DP.input === inp && DP.el.style.display !== 'none') { closeDatePicker(); return; }
+    DP.input = inp;
+    var pv = parseYM(inp.value) || { y: new Date().getFullYear(), m: new Date().getMonth() };
+    DP.y = pv.y; DP.m = pv.m;
+    renderDatePicker();
+    el.style.display = 'block';
+    var r = inp.getBoundingClientRect();
+    var w = el.offsetWidth || 240, h = el.offsetHeight || 220;
+    var left = Math.min(Math.max(8, r.left), window.innerWidth - w - 8);
+    var top = r.bottom + 6;
+    if (top + h > window.innerHeight - 8) top = Math.max(8, r.top - h - 6);
+    el.style.left = left + 'px';
+    el.style.top = top + 'px';
+  }
+  document.addEventListener('click', function (e) {
+    if (DP.el && DP.el.style.display !== 'none' &&
+        !e.target.closest('#v3DatePicker') && !e.target.closest('input[data-date]')) {
+      closeDatePicker();
+    }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeDatePicker();
+  });
+
   /* ═════════ 左栏：内容表单 ═════════ */
 
   function fieldHtml(path, label, opts) {
@@ -610,11 +705,16 @@
       return '<div class="v3-field"><label>' + esc(label) + '</label>' +
         '<label class="v3-chk"><input type="checkbox" data-path="' + path + '"' + (getPath(path) ? ' checked' : '') + '>在职/在读至今</label></div>';
     }
+    if (opts.t === 'date') {
+      return '<div class="v3-field"><label>' + esc(label) + '</label>' +
+        '<input class="v3-input" type="text" data-path="' + path + '" data-date value="' + esc(getPath(path) || '') + '" placeholder="' + esc(opts.ph || '点击选择日期') + '"></div>';
+    }
     return '<div class="v3-field"><label>' + esc(label) + '</label>' +
       '<input class="v3-input" type="text" data-path="' + path + '" value="' + esc(getPath(path) || '') + '" placeholder="' + esc(opts.ph || '') + '"></div>';
   }
 
   function buildLeftPanel() {
+    closeDatePicker();
     var body = $('leftBody');
     var scroll = body.scrollTop;
     var h = '';
@@ -765,6 +865,12 @@
     /* 照片上传 */
     body.addEventListener('click', function (e) {
       if (e.target.closest('#basicPhoto')) $('photoInput').click();
+    });
+
+    /* 日期字段：点击弹出日历 */
+    body.addEventListener('click', function (e) {
+      var dinp = e.target.closest('input[data-date]');
+      if (dinp) openDatePicker(dinp);
     });
 
     /* 拖拽排序（按住 ⋮⋮ 手柄才可拖，避免影响输入框选字） */
