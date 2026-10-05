@@ -376,7 +376,7 @@
     var sections = buildSections(data);
     if (!sections.length && !hasText((data.basic || {}).name)) {
       return '<div class="rr-page rr-empty-page"><div class="rr-empty">' +
-        '还没有内容<br>在右侧打开模块填写，预览会即时更新</div></div>';
+        '还没有内容<br>在左侧打开模块填写，预览会即时更新</div></div>';
     }
     var html = buildFamily(data, style, sections);
     return html;
@@ -389,11 +389,29 @@
     return s;
   }
 
+  /** 主色直定：由 hex 派生 accent/deep/soft 三色（v3 自定义主色用） */
+  function mixTheme(hex) {
+    var m = /^#?([0-9a-fA-F]{6})$/.exec(String(hex || ''));
+    if (!m) return THEMES.default;
+    var v = m[1];
+    function ch(i, f) {
+      var c = parseInt(v.substr(i * 2, 2), 16);
+      if (f <= 1) c = Math.round(c * f);
+      else { var k = Math.min(f - 1, 1); c = Math.round(c + (255 - c) * k); }
+      return ('0' + Math.max(0, Math.min(255, c)).toString(16)).slice(-2);
+    }
+    return {
+      accent: '#' + v,
+      deep: '#' + ch(0, 0.72) + ch(1, 0.72) + ch(2, 0.72),
+      soft: '#' + ch(0, 1.88) + ch(1, 1.88) + ch(2, 1.88)
+    };
+  }
+
   /** 只更新外观变量（不重渲染 DOM）—— 调字体/间距/配色走这里，毫秒级 */
   function applyVars(el, style) {
     if (!el) return;
     var s = normalizeStyle(style);
-    var th = THEMES[s.theme] || THEMES.default;
+    var th = s.accent ? mixTheme(s.accent) : (THEMES[s.theme] || THEMES.default);
     var ft = FONTS[s.font] || FONTS.yahei;
     var sc = s.fontScale || 1;
     el.style.setProperty('--rr-accent', th.accent);
@@ -437,6 +455,7 @@
     mount: mount,
     normalizeStyle: normalizeStyle,
     buildSections: buildSections,
+    mixTheme: mixTheme,
     estimatePages: estimatePages
   };
 })(window);

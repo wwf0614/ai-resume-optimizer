@@ -3,264 +3,148 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI智简历 - AI 智能简历优化系统</title>
-<link rel="stylesheet" href="/static/css/app.css?v=20261004c">
-<link rel="stylesheet" href="/static/editor.css?v=20261005a">
-<link rel="stylesheet" href="/static/resume-render.css?v=20260918a">
+<title>AI智简历 - 简历编辑器</title>
+<link rel="stylesheet" href="/static/resume-render.css?v=20261005c">
+<link rel="stylesheet" href="/static/editor-v3.css?v=20261005b">
 </head>
 <body>
 
-<!-- ─── 顶部工具栏（AI智简历风格） ─── -->
-<header class="ed-toolbar">
-  <div class="ed-toolbar-left">
-    <a href="/" class="ed-logo" title="返回首页">
-      <svg class="ed-logo-icon" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+<!-- ─── 顶栏 ─── -->
+<header class="v3-topbar">
+  <div class="v3-tb-left">
+    <a href="/" class="v3-logo" title="返回首页">
+      <svg class="v3-logo-icon" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
         <rect width="40" height="40" rx="9" fill="#34549B"/>
         <path d="M20 7.5l4.2 8.5 9.4 1.4-6.8 6.6 1.6 9.3L20 28.2l-8.4 4.4 1.6-9.3-6.8-6.6 9.4-1.4z" fill="#FAF9F6"/>
       </svg>
-      <span class="ed-logo-name">AI智简历<small>智能简历优化</small></span>
+      <span class="v3-logo-name">AI智简历<small>简历编辑器</small></span>
     </a>
-    <a href="/my-resumes" class="ed-btn ed-btn-back" title="返回我的简历">
-      <span class="ed-back-arrow">←</span>
-      <span>我的简历</span>
-    </a>
-    <span class="ed-saved-tip saved" id="savedTip">已保存</span>
+    <a href="/my-resumes" class="v3-tb-back">← 我的简历</a>
+    <span class="v3-saved" id="savedTip">…</span>
   </div>
 
-  <div class="ed-toolbar-center">
-    <div class="ed-tb-group" role="toolbar" aria-label="编辑工具">
-      <button class="ed-tb-btn" id="tbTemplate" title="更换模板（每份模板布局完全不同）"><span class="ed-tb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg></span><span>更换模板</span></button>
-    </div>
-  </div>
-
-  <div class="ed-toolbar-right">
-    <button class="ed-btn ed-btn-soft" id="saveBtn" title="保存草稿">
+  <div class="v3-tb-right">
+    <button class="v3-btn v3-btn-soft" id="tplBtn" title="更换版式与配色（内容不丢失）">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      <span>更换模板</span>
+    </button>
+    <button class="v3-btn v3-btn-primary" id="saveBtn" title="保存到云端">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg>
-      <span>保存</span></button>
-
-    <span class="ed-tb-sep"></span>
-
-    <button class="ed-btn ed-btn-line-ai" id="aiGenBtn" title="AI 一句话生成整份简历">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M12 4l1.8 4.8L18.5 10l-4.7 1.2L12 16l-1.8-4.8L5.5 10l4.7-1.2z"/><path d="M19 15l.9 2.4L22 18l-2.1.6L19 21l-.9-2.4L16 18l2.1-.6z"/></svg>
-      <span>AI生成</span></button>
-    <button class="ed-btn ed-btn-line-score" id="matchScoreBtn" title="匹配度评分（免费）">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>
-      <span>匹配度评分</span></button>
-
-    <span class="ed-tb-sep"></span>
-
-    <div class="ed-dropdown">
-      <button class="ed-btn ed-btn-download" id="downloadBtn">
+      <span>保存</span>
+    </button>
+    <div class="v3-dropdown">
+      <button class="v3-btn v3-btn-dark" id="downloadBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M12 4v11m0 0l-4-4m4 4l4-4"/><path d="M5 19h14"/></svg>
-        <span>下载简历</span><span class="ed-caret">▾</span></button>
-      <div class="ed-dropdown-menu" id="downloadMenu" hidden>
-        <button data-fmt="docx">下载为 Word (.docx)</button>
-        <button data-fmt="pdf">下载为 PDF (.pdf)</button>
-        <button data-fmt="png">导出为长图 (.png)</button>
+        <span>下载</span><span class="v3-caret">▾</span>
+      </button>
+      <div class="v3-dropdown-menu" id="downloadMenu" hidden>
+        <button data-fmt="docx">Word 文档（.docx）</button>
+        <button data-fmt="pdf">PDF 文档（.pdf）</button>
+        <button data-fmt="png">长图（.png）</button>
       </div>
     </div>
-    <button class="ed-btn ed-btn-vip" id="vipBtn" title="开通 VIP（暂未上线）"><span>开通VIP</span></button>
-
-    <span class="ed-tb-sep"></span>
-
-    <div class="ed-user-avatar" id="userAvatar" title="用户">
-      <img src="" alt="" id="avatarImg" onerror="this.style.display='none'">
-      <span class="avatar-placeholder">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
-      </span>
+    <div class="v3-avatar" id="userAvatar" title="已登录">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
     </div>
   </div>
 </header>
 
+<!-- ─── 三栏主体 ─── -->
+<main class="v3-main">
+  <!-- 左：内容表单 -->
+  <aside class="v3-left">
+    <div class="v3-left-head">内容<div class="v3-left-tip">所有修改实时同步到右侧简历</div></div>
+    <div class="v3-left-body" id="leftBody"></div>
+  </aside>
 
-<!-- ─── 主体：左侧预览 + 右侧模块面板 ─── -->
-<main class="ed-main">
-
-  <!-- 左侧：简历预览区（DOM 渲染，支持10种完全不同的模板布局） -->
-  <section class="ed-preview-wrap" id="previewWrap">
-    <!-- 预览纸容器：JS 根据 templateId 动态渲染不同布局 -->
-    <div class="ed-paper rp-paper" id="previewPaper">
-
-      <!-- 标准头部（用于 classic/creative/academic/warm/tech/elegant 布局） -->
-      <!-- 其他布局（sidebar/color-header/circle-photo/icon-minimal/clean-minimal）会由 JS 完全替换 innerHTML -->
-      <div class="rp-header" id="rpHeader">
-        <div class="rp-header-left">
-          <h1 class="rp-title">个人简历</h1>
-          <span class="rp-title-en">Personal resume</span>
-          <div class="rp-intention" id="rpIntentionText">
-            <span class="rp-intention-label">求职意向：</span>
-            <span id="rpIntentionValue"></span>
-          </div>
-        </div>
-        <div class="rp-header-right">
-          <div class="rp-deco-icons">
-            <span class="rp-deco-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/></svg></span>
-            <span class="rp-deco-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></span>
-            <span class="rp-deco-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.3-2 5-2 5s3.7-.5 5-2c.7-.8.7-2 0-2.8-.8-.7-2.2-.7-3 .8z"/><path d="M12 15l-3-3c1-3.5 3.5-7 8-9.5 1.5-.8 3.5-1 4.5-.5.5 1 .3 3-.5 4.5-2.5 4.5-6 7-9 8.5z"/><path d="M9 12H5.5L4 9.5c1.5-1 3-1.5 4.5-1.5M12 15v3.5l2.5 1.5c1-1.5 1.5-3 1.5-4.5"/></svg></span>
-          </div>
-        </div>
-      </div>
-
-      <!-- 基本信息（标准布局用） -->
-      <div class="rp-section rp-section-basic" id="rpBasic" data-module="basic">
-        <div class="rp-basic-content">
-          <div class="rp-basic-grid" id="rpBasicGrid"></div>
-          <div class="rp-photo-wrap" id="rpPhotoWrap">
-            <div class="rp-photo" id="rpPhoto" title="点击更换照片">
-              <img id="rpPhotoImg" alt="照片" />
-              <span class="rp-photo-placeholder">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 动态板块容器（标准布局用） -->
-      <div class="rp-modules" id="rpModules"></div>
-
-      <!-- 底部页脚（标准布局用） -->
-      <div class="rp-footer"><span>第1页/共1页</span></div>
-
+  <!-- 中：A4 所见即所得 -->
+  <section class="v3-center" id="centerWrap">
+    <div class="v3-pagebox" id="pageBox">
+      <div class="rp-paper rr-host" id="paper"></div>
     </div>
+    <div class="v3-pagehint" id="pageHint"></div>
   </section>
 
-  <!-- 右侧：模块面板 -->
-  <aside class="ed-panel">
-    <div class="ed-panel-tabs">
-      <button class="ed-tab active" data-tab="modules">信息模块</button>
-      <button class="ed-tab" data-tab="appearance">外观</button>
-      <button class="ed-tab" data-tab="sort">排序</button>
-    </div>
+  <!-- 右：设计面板 -->
+  <aside class="v3-right">
+    <div class="v3-right-head">设计</div>
+    <div class="v3-right-body">
 
-    <div class="ed-panel-body">
-      <div class="ed-tab-pane active" id="tab-modules">
-        <div class="ed-module-list" id="moduleList"></div>
+      <div class="v3-group">
+        <div class="v3-group-title">版式</div>
+        <div class="v3-fam-grid" id="famGrid"></div>
       </div>
 
-      <div class="ed-tab-pane" id="tab-appearance">
-        <div class="ed-ap" id="appearancePane"></div>
+      <div class="v3-group">
+        <div class="v3-group-title">主色</div>
+        <div class="v3-swatches" id="swatches"></div>
+        <div class="v3-color-row">
+          <input type="color" id="customColor" value="#34549B">
+          <span>自定义主色</span>
+        </div>
       </div>
 
-      <div class="ed-tab-pane" id="tab-sort">
-        <p class="ed-panel-hint">拖拽模块调整在简历中的显示顺序。</p>
-        <div class="ed-sort-list" id="sortList"></div>
+      <div class="v3-group">
+        <div class="v3-group-title">字体</div>
+        <select class="v3-select" id="fontSel"></select>
+        <div class="v3-slider-row"><span>字号</span><input type="range" id="fontSize" min="11" max="16" step="0.5"><b id="fontSizeVal"></b></div>
+        <div class="v3-slider-row"><span>行距</span><input type="range" id="lineHeight" min="1.4" max="2.1" step="0.02"><b id="lineHeightVal"></b></div>
+        <div class="v3-slider-row"><span>姓名</span><input type="range" id="nameSize" min="20" max="40" step="1"><b id="nameSizeVal"></b></div>
       </div>
+
+      <div class="v3-group">
+        <div class="v3-group-title">间距</div>
+        <div class="v3-slider-row"><span>模块间距</span><input type="range" id="gap" min="10" max="44" step="1"><b id="gapVal"></b></div>
+        <div class="v3-slider-row"><span>版心留白</span><input type="range" id="padding" min="26" max="72" step="1"><b id="paddingVal"></b></div>
+        <div class="v3-slider-row"><span>标题样式</span>
+          <select class="v3-select v3-select-inline" id="sectionStyle">
+            <option value="underline">下划线</option>
+            <option value="leftbar">左侧色条</option>
+            <option value="bar">色块</option>
+            <option value="plain">无装饰</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="v3-group">
+        <div class="v3-group-title">头像</div>
+        <div class="v3-photo-row">
+          <div class="v3-photo-prev" id="photoPrev"><span id="photoPrevTxt">无照片</span><img id="photoPrevImg" alt="" hidden></div>
+          <div class="v3-photo-ops">
+            <label class="v3-btn v3-btn-soft v3-btn-sm">上传照片<input type="file" id="photoInput" accept="image/*" hidden></label>
+            <label class="v3-chk"><input type="checkbox" id="showPhoto">显示头像框</label>
+            <div class="v3-shape-row" id="shapeRow">
+              <button data-shape="rect" class="v3-shape-btn">方框</button>
+              <button data-shape="circle" class="v3-shape-btn">圆框</button>
+            </div>
+            <div class="v3-slider-row"><span>大小</span><input type="range" id="photoSize" min="64" max="130" step="1"><b id="photoSizeVal"></b></div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </aside>
 </main>
 
-<!-- ─── 登录门禁（VIP 付费门禁已暂停，后续恢复） ─── -->
-<div class="ed-vip-gate" id="vipGate" hidden>
-  <div class="ed-vip-gate-box">
-    <div class="ed-vip-gate-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="34" height="34"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/><circle cx="12" cy="16" r="1.4" fill="currentColor"/></svg>
+<!-- ─── 更换模板弹窗 ─── -->
+<div class="v3-mask" id="tplModal" hidden>
+  <div class="v3-modal">
+    <div class="v3-modal-head">
+      <h3>更换模板</h3>
+      <button class="v3-modal-close" data-close-tpl>&times;</button>
     </div>
-    <h3>请先登录</h3>
-    <p id="vipGateMsg">请先登录后再使用在线编辑器。</p>
-    <div class="ed-vip-gate-btns">
-      <a class="ed-btn ed-btn-soft" href="/">返回首页</a>
-      <a class="ed-btn ed-btn-primary" href="/login">去登录</a>
-    </div>
+    <p class="v3-modal-tip">更换版式与配色<b>不会丢失任何内容</b>；之后也可在右侧设计面板继续微调。</p>
+    <div class="v3-tpl-grid" id="tplGrid"></div>
   </div>
 </div>
 
-<!-- ─── 导出中 loading ─── -->
-<div class="ed-loading-mask" id="loadingMask" hidden>
-  <div class="ed-loading-card"><div class="ed-spinner"></div><p id="loadingText">处理中…</p></div>
+<!-- ─── loading / toast ─── -->
+<div class="v3-loading" id="loadingMask" hidden>
+  <div class="v3-loading-card"><div class="v3-spinner"></div><p id="loadingText">处理中…</p></div>
 </div>
+<div class="v3-toast" id="toast" hidden></div>
 
-<!-- ─── 真实模板：文本框弹窗编辑器 ─── -->
-<div class="ed-modal-mask" id="rtBoxModal" hidden>
-  <div class="ed-modal rt-box-modal">
-    <div class="ed-modal-head"><h3 id="rtBoxTitle">编辑内容</h3><button class="ed-modal-close" data-rt-cancel>&times;</button></div>
-    <div class="ed-modal-body">
-      <textarea id="rtBoxTextarea" rows="9"
-        placeholder="输入该区域文字（换行保留）"></textarea>
-      <p class="rt-box-cap" id="rtBoxCap" hidden></p>
-      <p class="rt-box-tip">格式样式由模板自动保留，这里只改文字。内容较多时导出会自动微缩字号以保持版面。</p>
-    </div>
-    <div class="ed-modal-foot">
-      <button class="ed-btn ed-btn-soft" data-rt-cancel>取消</button>
-      <button class="ed-btn ed-btn-primary" id="rtBoxApplyBtn">确定</button>
-    </div>
-  </div>
-</div>
-
-<!-- ─── 通用 toast ─── -->
-<div class="ed-toast" id="toast" hidden></div>
-
-<!-- 模态框将由 JS 动态注入到这里 -->
-<div id="modalRoot"></div>
-
-<!-- ─── 通用设置弹窗 ─── -->
-<div class="ed-modal-mask" id="settingModal" hidden>
-  <div class="ed-modal ed-modal-settings">
-    <div class="ed-modal-head"><h3 id="settingTitle">设置</h3><button class="ed-modal-close" data-close>&times;</button></div>
-    <div class="ed-modal-body" id="settingBody"></div>
-    <div class="ed-modal-foot">
-      <button class="ed-btn ed-btn-soft" data-close>取消</button>
-      <button class="ed-btn ed-btn-primary" id="settingApplyBtn">应用</button>
-    </div>
-  </div>
-</div>
-
-<!-- ─── 匹配度评分（免费） ─── -->
-<div class="ed-modal-mask" id="matchScoreModal" hidden>
-  <div class="ed-modal ed-modal-ai">
-    <div class="ed-modal-head"><h3>匹配度评分</h3><button class="ed-modal-close" data-close-ms>&times;</button></div>
-    <div class="ed-modal-body">
-      <p class="ed-ai-tip">填写目标岗位或粘贴 JD，AI 会对照你简历里的真实内容给出匹配分与提升建议。免费功能，无需 VIP。</p>
-      <label class="ed-field-label">求职意向 / 目标岗位</label>
-      <input class="ed-input" id="msTargetJob" type="text" placeholder="例如：Python 后端开发工程师" />
-      <label class="ed-field-label">招聘 JD（选填，粘贴后更精准）</label>
-      <textarea class="ed-textarea" id="msJd" rows="4" placeholder="粘贴岗位 JD，评分更贴合招聘要求"></textarea>
-      <div id="msResult" class="ms-result" hidden></div>
-    </div>
-    <div class="ed-modal-foot">
-      <button class="ed-btn ed-btn-soft" data-close-ms>关闭</button>
-      <button class="ed-btn ed-btn-primary" id="msRunBtn">开始评分</button>
-    </div>
-  </div>
-</div>
-
-<!-- ─── ATS 文本层校验报告（免费，导出后自动弹出） ─── -->
-<div class="ed-modal-mask" id="atsReportModal" hidden>
-  <div class="ed-modal wide ed-modal-ats">
-    <div class="ed-modal-head"><h3>ATS 文本层校验报告</h3><button class="ed-modal-close" data-close-ats>&times;</button></div>
-    <div class="ed-modal-body" id="atsReportBody"></div>
-    <div class="ed-modal-foot">
-      <button class="ed-btn ed-btn-soft" data-close-ats>关闭</button>
-    </div>
-  </div>
-</div>
-
-<!-- ─── AI 一键生成整份简历 ─── -->
-<div class="ed-modal-mask" id="aiGenModal" hidden>
-  <div class="ed-modal ed-modal-ai">
-    <div class="ed-modal-head"><h3>AI 一键生成整份简历</h3><button class="ed-modal-close" data-close>&times;</button></div>
-    <div class="ed-modal-body">
-      <p class="ed-ai-tip">用一句话描述你自己，或粘贴招聘 JD，AI 会自动生成姓名、教育、工作、项目、技能、自我评价等完整内容，并直接套进当前简历。</p>
-      <label class="ed-field-label">求职意向 / 目标岗位（选填）</label>
-      <input class="ed-input" id="aiTargetJob" type="text" placeholder="例如：Python 后端开发工程师" />
-      <label class="ed-field-label">个人情况描述（一句话或几句话）</label>
-      <textarea class="ed-textarea" id="aiDesc" rows="4" placeholder="例如：3年 Python 后端经验，做过电商与支付系统，熟悉 MySQL 和 Redis，想找一家 AI 公司"></textarea>
-      <label class="ed-field-label">招聘 JD（选填，粘贴后更贴合岗位）</label>
-      <textarea class="ed-textarea" id="aiJd" rows="4" placeholder="粘贴岗位 JD，可让生成内容更贴合招聘要求"></textarea>
-    </div>
-    <div class="ed-modal-foot">
-      <button class="ed-btn ed-btn-soft" data-close>取消</button>
-      <button class="ed-btn ed-btn-primary" id="aiGenRunBtn">生成简历</button>
-    </div>
-  </div>
-</div>
-
-<script>
-/* 内联兜底模板数据 */
-const FALLBACK_TPLS = [{"id":1,"name":"工程造价员求职","preview_url":"/static/previews/t1.png?v=5"},{"id":2,"name":"高端行政助理求职简历模板","preview_url":"/static/previews/t2.png?v=5"},{"id":3,"name":"简约风求职","preview_url":"/static/previews/t3.png?v=5"},{"id":4,"name":"砖红色通用","preview_url":"/static/previews/t4.png?v=5"},{"id":5,"name":"应聘岗位JAVA开发工程师","preview_url":"/static/previews/t5.png?v=5"},{"id":6,"name":"宝石绿风格","preview_url":"/static/previews/t6.png?v=5"},{"id":7,"name":"财务会计求职简历word模板","preview_url":"/static/previews/t7.png?v=5"},{"id":8,"name":"财务","preview_url":"/static/previews/t8.png?v=5"},{"id":9,"name":"财务相关","preview_url":"/static/previews/t9.png?v=5"},{"id":10,"name":"产品经理个人","preview_url":"/static/previews/t10.png?v=5"}];
-</script>
-<script src="/static/resume-render.js?v=20261004c"></script>
-<script src="/static/editor.js?v=20261005a"></script>
-<script src="/static/editor-richtext.js?v=20261005a"></script>
+<script src="/static/resume-render.js?v=20261005c"></script>
+<script src="/static/editor-v3.js?v=20261005b"></script>
 </body>
 </html>

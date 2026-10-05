@@ -24,11 +24,6 @@
   /* 内联实色背景的按钮强制白字（原渐变按钮的替代写法） */
   .btn[style*="--accent"], .btn[style*="--success"], .btn[style*="--vip"] { color: #fff; border-color: transparent; }
   .btn-mini { padding: 4px 12px; font-size: 12px; }
-  /* 模块配置行 */
-  .mod-row { display: grid; grid-template-columns: 1fr 1fr 90px 90px 34px; gap: 8px; align-items: center; margin-bottom: 8px; }
-  .mod-row select, .mod-row input { padding: 8px; font-size: 13px; }
-  .mod-rm { cursor: pointer; color: var(--danger); font-size: 16px; text-align: center; font-weight: 700; user-select: none; }
-  .add-mod { color: var(--accent); font-size: 13px; cursor: pointer; user-select: none; }
   /* 模板列表 */
   th, td { font-size: 13px; }
   .tbl-wrap { overflow: auto; }
@@ -43,12 +38,6 @@
   .pwd-row { display: flex; gap: 10px; align-items: center; }
   .pwd-row input { flex: 1; }
   .lock-note { font-size: 12px; color: var(--ink-3); margin-top: 8px; }
-  /* 模板配置（训练）工具 */
-  .cfg-box { border: 2px dashed var(--accent-line); background: rgba(47,75,124,.04); cursor: pointer; box-sizing: border-box; }
-  .cfg-box:hover { border-color: var(--accent); background: rgba(47,75,124,.08); }
-  .cfg-box.sel { border-style: solid; border-color: var(--accent); background: rgba(47,75,124,.12); box-shadow: 0 0 0 2px rgba(47,75,124,.18); }
-  .cfg-tag { position: absolute; top: 0; left: 0; font-size: 9px; background: var(--accent); color: #fff; padding: 1px 4px; border-radius: 0 0 4px 0; max-width: 100%; overflow: hidden; white-space: nowrap; }
-  .cfg-txt { position: absolute; inset: 0; font-size: 10px; color: var(--ink-2); padding: 16px 4px 2px; overflow: hidden; pointer-events: none; }
 </style>
 </head>
 <body>
@@ -56,7 +45,7 @@
   <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
     <div>
       <h1>管理后台</h1>
-      <p class="subtitle">上传简历模板（.docx，含 {{占位符}}），配置各模块字数限制，管理模板库</p>
+      <p class="subtitle">上传简历模板（.docx），可视化编辑模板布局，管理模板库</p>
     </div>
     <div style="display:flex;gap:8px;flex:none;align-items:center">
       <a class="back-link" href="/" style="float:none">← 返回首页</a>
@@ -90,77 +79,6 @@
   <div class="card" id="listCard" style="display:none">
     <div class="card-title">免费模板</div>
     <div id="tplList"></div>
-  </div>
-
-  <!-- 用户 VIP 管理 -->
-  <div class="card" id="vipUserCard" style="display:none">
-    <div class="card-title">用户 VIP 管理</div>
-    <div style="font-size:12.5px;color:var(--ink-3);margin-bottom:12px">
-      开通/取消用户 VIP：VIP 用户才能使用简历编辑功能。模板统一在上方列表管理，用「编辑器」列控制是否加入编辑器。
-    </div>
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
-      <input type="text" id="vipUserAccount" placeholder="用户账号（手机号/邮箱）" style="flex:1;border:1px solid var(--line-strong);border-radius:8px;padding:9px 12px;font-size:13px">
-      <button class="btn" id="vipUserOn" style="background:var(--vip);padding:9px 18px;border-radius:8px">开通 VIP</button>
-      <button class="btn" id="vipUserOff" style="background:#E8EAF0;color:var(--ink);padding:9px 18px;border-radius:8px">取消 VIP</button>
-    </div>
-    <div id="vipUserStatus" style="font-size:12.5px;color:var(--ink-3)"></div>
-  </div>
-
-  <!-- 模板配置（训练）弹窗 -->
-  <div id="cfgModal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(15,20,35,.55);backdrop-filter:blur(4px);align-items:center;justify-content:center">
-    <div style="width:960px;max-width:96vw;max-height:92vh;overflow:auto;background:#fff;border-radius:14px;padding:20px;box-shadow:0 24px 70px rgba(0,0,0,.3)">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-        <span style="font-size:17px;font-weight:700">模板配置（训练）· <span id="cfgTplName"></span></span>
-        <button class="btn btn-mini" onclick="closeCfgModal()">✕ 关闭</button>
-      </div>
-      <div style="font-size:12.5px;color:var(--ink-3);margin-bottom:14px;line-height:1.7">
-        点击预览中任意文本框，在右侧选择它属于哪个信息模块（基本信息/教育背景/工作经验…），
-        保存后编辑器按此配置显示/隐藏模块内容。装饰性内容请选「固定内容」。文本框编号即编辑器中的可编辑区域。
-      </div>
-      <div style="display:flex;gap:16px">
-        <div id="cfgCanvas" style="flex:1;position:relative;border:1px solid #e5e7eb;background:#fff;min-height:500px;overflow:hidden"></div>
-        <div style="width:240px;flex-shrink:0">
-          <div id="cfgSelInfo" style="font-size:13px;color:var(--ink-2);margin-bottom:8px;background:var(--paper-deep);border-radius:8px;padding:10px;word-break:break-all">未选择文本框</div>
-          <select id="cfgModuleSel" style="width:100%;height:36px;border:1px solid var(--line-strong);border-radius:8px;padding:0 8px;margin-bottom:10px;font-size:13px"></select>
-          <button class="btn" id="cfgAssignBtn" style="width:100%;background:var(--accent);color:#fff;border-radius:8px;padding:10px">应用归属</button>
-          <div style="margin-top:16px">
-            <button class="btn" id="cfgSaveBtn" style="width:100%;background:var(--success);color:#fff;border-radius:8px;padding:11px">保存全部配置</button>
-          </div>
-          <div id="cfgStats" style="font-size:12px;color:var(--ink-3);margin-top:10px"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 板块绑定配置 -->
-  <div class="card" id="mappingCard" style="display:none">
-    <div class="card-title">模板板块绑定配置</div>
-    <div style="font-size:12.5px;color:var(--ink-3);margin-bottom:12px">系统自动识别模板板块与字段，可手动绑定标准 key；无占位符模板按此映射填充（有数据填、无数据留白）。</div>
-    <div style="display:flex;gap:8px;margin-bottom:12px">
-      <select id="mapTplSelect" style="flex:1;border:1px solid var(--line-strong);border-radius:8px;padding:9px 12px;font-size:13px"></select>
-      <button class="btn" id="mapLoadBtn" style="padding:9px 18px">读取映射</button>
-    </div>
-    <div id="mapBody" style="font-size:13px"></div>
-    <div style="margin-top:12px">
-      <button class="btn" id="mapSaveBtn" style="background:var(--accent)">保存绑定</button>
-      <span id="mapStatus" style="font-size:12px;color:var(--ink-3);margin-left:8px"></span>
-    </div>
-  </div>
-
-  <!-- 全局同义词库 -->
-  <div class="card" id="aliasCard" style="display:none">
-    <div class="card-title">全局同义词库</div>
-    <div style="font-size:12.5px;color:var(--ink-3);margin-bottom:12px">新增同义词后全平台模板自动生效（如「工作经验/工作经历/实习经历」→ work_history）。</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-      <select id="aliasKind" style="border:1px solid var(--line-strong);border-radius:8px;padding:8px;font-size:13px">
-        <option value="section">板块同义词</option>
-        <option value="field">字段同义词</option>
-      </select>
-      <input type="text" id="aliasKey" placeholder="标准 key（如 work_history / phone）" style="flex:1;min-width:180px;border:1px solid var(--line-strong);border-radius:8px;padding:9px 12px;font-size:13px">
-      <input type="text" id="aliasName" placeholder="同义词（如 实习工作）" style="flex:1;min-width:140px;border:1px solid var(--line-strong);border-radius:8px;padding:9px 12px;font-size:13px">
-      <button class="btn" id="aliasAddBtn" style="padding:9px 18px">＋ 添加</button>
-    </div>
-    <div id="aliasList"></div>
   </div>
 
 </div>
@@ -205,12 +123,7 @@ function enterAdmin() {
   $("logoutBtn").style.display = "inline-block";
   $("uploadCard").style.display = "block";
   $("listCard").style.display = "block";
-  $("vipUserCard").style.display = "block";
-  $("mappingCard").style.display = "block";
-  $("aliasCard").style.display = "block";
   loadTemplates();
-  loadAliases();
-  fillMapTplSelect();
 }
 
 $("logoutBtn").addEventListener("click", async () => {
@@ -219,173 +132,6 @@ $("logoutBtn").addEventListener("click", async () => {
   } catch (e) {}
   requireAdminLogin();
 });
-
-// ── 板块绑定配置 ──
-const STD_SECTION_KEYS = {
-  education_info: "教育背景", work_history: "工作履历", skill_info: "技能合集",
-  campus_exp: "校园经历", honor_cert: "证书荣誉", self_evaluate: "自我评价",
-};
-const STD_FIELD_KEYS = {
-  name: "姓名", age: "年龄", education_degree: "学历", phone: "手机号",
-  email: "邮箱", wechat: "微信", address: "详细地址", intention_job: "求职意向",
-  city: "现居城市", political_status: "政治面貌",
-};
-let mapTplId = null;
-let mapBindings = { sections: {}, fields: {} };
-
-function fillMapTplSelect() {
-  const sel = $("mapTplSelect");
-  sel.innerHTML = "";
-  const list = window.__ADMIN_TPLS__ || [];
-  list.forEach(function(t) {
-    const opt = document.createElement("option");
-    opt.value = t.id;
-    opt.textContent = "#" + t.id + " " + t.name;
-    sel.appendChild(opt);
-  });
-  if (list.length) sel.value = list[0].id;
-}
-
-async function openMapping(tplId) {
-  $("mapTplSelect").value = tplId;
-  await loadMapping(tplId);
-  $("mappingCard").scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
-async function loadMapping(tplId) {
-  mapTplId = tplId;
-  $("mapStatus").textContent = "读取中…";
-  try {
-    const resp = await adminFetch("/admin/templates/" + tplId + "/mapping");
-    const data = await resp.json();
-    if (!resp.ok) throw new Error(data.detail || "读取失败");
-    mapBindings = {
-      sections: Object.assign({}, data.bindings.sections || {}),
-      fields: Object.assign({}, data.bindings.fields || {}),
-    };
-    renderMapping(data.detected || {});
-    $("mapStatus").textContent = "已读取（自动识别 + 已保存绑定）";
-  } catch (e) {
-    $("mapBody").innerHTML = '<div class="empty">读取失败：' + e.message + '</div>';
-    $("mapStatus").textContent = "";
-  }
-}
-
-function bindSelect(opts, current) {
-  return '<select class="map-bind" data-cur="' + current + '">'
-    + '<option value="">— 不绑定 —</option>'
-    + Object.keys(opts).map(function(k) {
-      return '<option value="' + k + '"' + (current === k ? " selected" : "") + '>' + k + "（" + opts[k] + "）</option>";
-    }).join("")
-    + '</select>';
-}
-
-function renderMapping(detected) {
-  const sections = detected.sections || [];
-  const fields = detected.fields || [];
-  let html = '<div style="font-weight:700;margin:8px 0 4px">板块识别</div>';
-  if (!sections.length) html += '<div style="color:var(--ink-3);font-size:12px">未识别到板块标题</div>';
-  sections.forEach(function(s, i) {
-    html += '<div data-group="section" style="display:flex;align-items:center;gap:8px;margin:5px 0">'
-      + '<span style="width:130px;flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + s.title + '">' + s.title + '</span>'
-      + bindSelect(STD_SECTION_KEYS, s.key)
-      + '<span style="color:var(--ink-3);font-size:12px">内容框 ' + s.boxes.length + ' 个</span></div>';
-  });
-  html += '<div style="font-weight:700;margin:12px 0 4px">基础字段识别</div>';
-  if (!fields.length) html += '<div style="color:var(--ink-3);font-size:12px">未识别到基础字段行</div>';
-  fields.forEach(function(f, i) {
-    html += '<div data-group="field" style="display:flex;align-items:center;gap:8px;margin:5px 0">'
-      + '<span style="width:130px;flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + f.label + '">' + f.label + '</span>'
-      + bindSelect(STD_FIELD_KEYS, f.key)
-      + '</div>';
-  });
-  $("mapBody").innerHTML = html || '<div class="empty">未识别到板块或字段</div>';
-}
-
-$("mapLoadBtn").addEventListener("click", function() {
-  if ($("mapTplSelect").value) loadMapping(parseInt($("mapTplSelect").value, 10));
-});
-
-$("mapSaveBtn").addEventListener("click", async function() {
-  if (!mapTplId) return;
-  const sections = {};
-  const fields = {};
-  $("mapBody").querySelectorAll("div[data-group]").forEach(function(row) {
-    const selEl = row.querySelector("select.map-bind");
-    const label = row.querySelector("span[style*='width']");
-    if (!selEl || !label || !selEl.value) return;
-    const title = label.textContent;
-    if (row.dataset.group === "field") fields[title] = selEl.value;
-    else sections[title] = selEl.value;
-  });
-  $("mapStatus").textContent = "保存中…";
-  try {
-    const fd = new FormData();
-    fd.append("bindings", JSON.stringify({ sections: sections, fields: fields }));
-    const resp = await adminFetch("/admin/templates/" + mapTplId + "/mapping", { method: "POST", body: fd });
-    const data = await resp.json();
-    if (!resp.ok) throw new Error(data.detail || "保存失败");
-    $("mapStatus").textContent = "绑定已保存，填充时立即生效";
-  } catch (e) {
-    $("mapStatus").textContent = "保存失败：" + e.message;
-  }
-});
-
-// ── 全局同义词库 ──
-async function loadAliases() {
-  try {
-    const resp = await adminFetch("/admin/aliases");
-    const data = await resp.json();
-    if (!resp.ok) throw new Error("加载失败");
-    const list = data.aliases || [];
-    if (!list.length) {
-      $("aliasList").innerHTML = '<div class="empty">暂无自定义同义词，使用内置默认映射</div>';
-      return;
-    }
-    $("aliasList").innerHTML = '<table><thead><tr><th>类型</th><th>标准 key</th><th>同义词</th><th></th></tr></thead><tbody>'
-      + list.map(function(a) {
-        return '<tr><td>' + (a.kind === "section" ? "板块" : "字段") + '</td>'
-          + '<td>' + a.std_key + '</td><td>' + a.alias + '</td>'
-          + '<td><button class="btn btn-danger" style="padding:4px 12px;font-size:12px" onclick="deleteAlias(' + a.id + ')">删除</button></td></tr>';
-      }).join("") + '</tbody></table>';
-  } catch (e) {
-    $("aliasList").innerHTML = '<div class="empty">加载失败：' + e.message + '</div>';
-  }
-}
-
-$("aliasAddBtn").addEventListener("click", async function() {
-  const kind = $("aliasKind").value;
-  const key = $("aliasKey").value.trim();
-  const name = $("aliasName").value.trim();
-  if (!key || !name) { showAlert("请填写标准 key 与同义词"); return; }
-  try {
-    const fd = new FormData();
-    fd.append("kind", kind);
-    fd.append("std_key", key);
-    fd.append("alias", name);
-    const resp = await adminFetch("/admin/aliases", { method: "POST", body: fd });
-    const data = await resp.json();
-    if (!resp.ok) throw new Error(data.detail || "添加失败");
-    $("aliasKey").value = "";
-    $("aliasName").value = "";
-    showOk("同义词已添加，全平台模板生效");
-    loadAliases();
-  } catch (e) {
-    showAlert("添加失败：" + e.message);
-  }
-});
-
-async function deleteAlias(id) {
-  if (!confirm("确认删除该同义词？")) return;
-  try {
-    const resp = await adminFetch("/admin/aliases/" + id, { method: "DELETE" });
-    if (!resp.ok) throw new Error("删除失败");
-    showOk("已删除");
-    loadAliases();
-  } catch (e) {
-    showAlert("删除失败：" + e.message);
-  }
-}
 
 // ── 上传模板 ──
 $("pickFileBtn").addEventListener("click", function() { $("tplFile").click(); });
@@ -509,137 +255,6 @@ async function batchSetEditable(editable) {
   }
 }
 
-// ── 模板配置（训练） ──
-const CFG_MODULES = [
-  { key: "", label: "固定内容" },
-  { key: "basic", label: "基本信息" },
-  { key: "job", label: "意向职位" },
-  { key: "education", label: "教育背景" },
-  { key: "work", label: "工作经验" },
-  { key: "project", label: "项目经历" },
-  { key: "internship", label: "实习经历" },
-  { key: "campus", label: "校园经历" },
-  { key: "skills", label: "特长技能" },
-  { key: "honors", label: "荣誉证书" },
-  { key: "selfEval", label: "自我评价" },
-  { key: "hobbies", label: "兴趣爱好" },
-  { key: "custom", label: "自定义" }
-];
-let cfgState = null;
-
-async function openConfigTool(id) {
-  hideAlert();
-  $("cfgModal").style.display = "flex";
-  $("cfgCanvas").innerHTML = '<div style="padding:30px;color:var(--ink-3)">正在加载模板结构…</div>';
-  const sel = $("cfgModuleSel");
-  sel.innerHTML = CFG_MODULES.map(function(m) { return '<option value="' + m.key + '">' + m.label + "</option>"; }).join("");
-  try {
-    const resp = await adminFetch("/api/admin/template-config/" + id);
-    const data = await resp.json();
-    if (!resp.ok) throw new Error("加载失败");
-    cfgState = { id: id, structure: data, assign: {} };
-    Object.keys(data.config || {}).forEach(function(k) {
-      cfgState.assign[k] = (data.config[k] && data.config[k].module) || "";
-    });
-    $("cfgTplName").textContent = data.name || ("#" + id);
-    renderCfgCanvas();
-    updateCfgStats();
-    selectCfgBox(null);
-  } catch (e) {
-    $("cfgCanvas").innerHTML = '<div style="padding:30px;color:var(--danger)">加载失败：' + e.message + "</div>";
-  }
-}
-
-function closeCfgModal() { $("cfgModal").style.display = "none"; cfgState = null; }
-
-function renderCfgCanvas() {
-  const canvas = $("cfgCanvas");
-  const st = cfgState.structure;
-  const scale = Math.min(1, 640 / (st.page_w || 794));
-  canvas.style.height = Math.round((st.page_h || 1123) * scale) + "px";
-  canvas.innerHTML = "";
-  (st.boxes || []).forEach(function(b) {
-    if (b.editable === false) return;
-    const div = document.createElement("div");
-    div.className = "cfg-box";
-    div.dataset.id = b.id;
-    div.style.cssText = "position:absolute;left:" + Math.round(b.x * scale) + "px;top:" + Math.round(b.y * scale)
-      + "px;width:" + Math.max(30, Math.round(b.w * scale)) + "px;height:" + Math.max(18, Math.round(b.h * scale)) + "px;";
-    const label = CFG_MODULES.find(function(m) { return m.key === (cfgState.assign[b.id] || ""); });
-    div.innerHTML = '<span class="cfg-tag">#' + b.id + " " + (label ? label.label : "未配置") + '</span>'
-      + '<span class="cfg-txt">' + (b.text || "").replace(/\{\{[^}]*\}\}/g, "").slice(0, 30).replace(/\n/g, " ") + "</span>";
-    div.addEventListener("click", function() { selectCfgBox(b.id); });
-    canvas.appendChild(div);
-  });
-}
-
-function selectCfgBox(id) {
-  const canvas = $("cfgCanvas");
-  canvas.querySelectorAll(".cfg-box").forEach(function(el) {
-    el.classList.toggle("sel", el.dataset.id === String(id));
-  });
-  if (id === null || id === undefined) {
-    $("cfgSelInfo").textContent = "未选择文本框（点击预览中的框进行配置）";
-    return;
-  }
-  const box = cfgState.structure.boxes.find(function(b) { return String(b.id) === String(id); });
-  $("cfgSelInfo").textContent = "#" + id + "：" + ((box && box.text || "").replace(/\{\{[^}]*\}\}/g, "").slice(0, 60).replace(/\n/g, " ") || "（空文本框）");
-  $("cfgModuleSel").value = cfgState.assign[id] || "";
-}
-
-function updateCfgStats() {
-  const total = Object.keys(cfgState.assign).length;
-  const boxes = (cfgState.structure.boxes || []).filter(function(b) { return b.editable !== false; }).length;
-  $("cfgStats").textContent = "已配置 " + total + " / " + boxes + " 个可编辑文本框";
-}
-
-$("cfgAssignBtn").addEventListener("click", function() {
-  const selBox = $("cfgCanvas").querySelector(".cfg-box.sel");
-  if (!selBox) { showAlert("请先在预览中点击一个文本框"); return; }
-  const id = selBox.dataset.id;
-  cfgState.assign[id] = $("cfgModuleSel").value;
-  renderCfgCanvas();
-  selectCfgBox(id);
-  updateCfgStats();
-  showOk("已设置 #" + id + " → " + $("cfgModuleSel").selectedOptions[0].text);
-});
-
-$("cfgSaveBtn").addEventListener("click", async function() {
-  if (!cfgState) return;
-  const fd = new FormData();
-  fd.append("config", JSON.stringify(cfgState.assign));
-  try {
-    const resp = await adminFetch("/api/admin/template-config/" + cfgState.id, { method: "POST", body: fd });
-    const data = await resp.json();
-    if (!resp.ok) throw new Error(data.detail || "保存失败");
-    showOk(data.message || "配置已保存");
-    closeCfgModal();
-    } catch (e) {
-    showAlert("保存失败：" + e.message);
-  }
-});
-
-// ── 用户 VIP 管理 ──
-$("vipUserOn").addEventListener("click", function() { setUserVip(1); });
-$("vipUserOff").addEventListener("click", function() { setUserVip(0); });
-async function setUserVip(isVip) {
-  hideAlert();
-  const account = $("vipUserAccount").value.trim();
-  if (!account) { showAlert("请输入用户账号"); return; }
-  try {
-    const fd = new FormData();
-    fd.append("account", account);
-    fd.append("is_vip", String(isVip));
-    const resp = await adminFetch("/api/admin/user-vip", { method: "POST", body: fd });
-    const data = await resp.json();
-    if (!resp.ok) throw new Error(data.detail || data.error || "操作失败");
-    $("vipUserStatus").textContent = data.message + "（账号：" + data.user.account + "，VIP：" + (data.user.is_vip ? "已开通" : "未开通") + "）";
-    showOk(data.message);
-  } catch (e) {
-    showAlert("操作失败：" + e.message);
-  }
-}
-
 // ── 模板列表 ──
 async function loadTemplates() {
   const box = $("tplList");
@@ -649,7 +264,6 @@ async function loadTemplates() {
     if (!resp.ok) throw new Error("加载失败");
     const list = data.templates || [];
     window.__ADMIN_TPLS__ = list;
-    fillMapTplSelect();
     if (!list.length) {
       box.innerHTML = '<div class="empty">暂无模板，上传第一个模板吧</div>';
       return;
@@ -692,7 +306,7 @@ async function loadTemplates() {
             + 'title="点击切换：是否出现在编辑器的「更换模板」面板" '
             + 'onclick="setEditableFlag(' + t.id + ',' + (ed ? 0 : 1) + ')">' + (ed ? '可用' : '已隐藏') + '</button></td>'
             + '<td><div class="ops">'
-            + '<button class="btn btn-mini" onclick="openMapping(' + t.id + ')">映射</button>'
+            + '<a class="btn btn-mini" style="text-decoration:none;display:inline-block" href="/static/template-editor.html?id=' + t.id + '" target="_blank" title="可视化调整模板布局、增删文本框">自由编辑</a>'
             + '<button class="btn btn-danger" onclick="delTemplate(' + t.id + ')">删除</button></div></td>'
             + '</tr>';
         }).join("") + '</tbody></table>';

@@ -576,24 +576,6 @@ def admin_logout(authorization: Optional[str] = Header(None)):
     return {"ok": True}
 
 
-@app.post("/api/admin/user-vip")
-def admin_set_user_vip(account: str = Form(""),
-                       is_vip: int = Form(...),
-                       _: None = Depends(_require_admin_header)):
-    """开通/取消用户 VIP：VIP 用户才能使用简历编辑功能。模板池由管理员统一管理。"""
-    if is_vip not in (0, 1):
-        raise HTTPException(status_code=400, detail="is_vip 仅支持 0 / 1")
-    user = db.get_user_by_account((account or "").strip().lower())
-    if user is None:
-        raise HTTPException(status_code=404, detail="用户不存在")
-    db.set_user_vip(user["id"], is_vip)
-    applog.log("admin_user_vip", user_id=user["id"], account=user["account"], is_vip=is_vip)
-    return {
-        "message": "已为用户开通 VIP" if is_vip else "已取消用户 VIP",
-        "user": {"id": user["id"], "account": user["account"], "is_vip": is_vip},
-    }
-
-
 # ══════════════════ 模板库（公开）══════════════════
 
 
@@ -617,14 +599,56 @@ def list_templates():
     return result
 
 
+def _merge_editor_boxes(structure: dict, editor_boxes: dict) -> dict:
+    """把管理端保存的 editor_boxes 合并进解析后的模板结构。
+
+    editor_boxes = {"overrides": {"<id>": {x,y,w,h,font,align,editable,deleted}},
+                    "added": [{id(负数), x,y,w,h, text, font, align}]}
+    覆盖命中 deleted 的盒子被剔除；added 盒子以负数 id 追加到末尾。
+    纯几何/样式覆盖，不携带任何模块语义。"""
+    overrides = (editor_boxes or {}).get("overrides") or {}
+    added = (editor_boxes or {}).get("added") or []
+    boxes = []
+    for b in structure.get("boxes") or []:
+        ov = overrides.get(str(b.get("id"))) or overrides.get(b.get("id"))
+        if isinstance(ov, dict):
+            if ov.get("deleted"):
+                continue
+            for k in ("x", "y", "w", "h", "font", "align"):
+                if ov.get(k) is not None:
+                    b[k] = ov[k]
+            if ov.get("editable") is not None:
+                b["editable"] = bool(ov["editable"])
+        boxes.append(b)
+    for a in added:
+        if not isinstance(a, dict):
+            continue
+        try:
+            bid = int(a.get("id"))
+        except (TypeError, ValueError):
+            continue
+        boxes.append({
+            "id": bid, "kind": "textbox", "added": True,
+            "x": a.get("x") or 0, "y": a.get("y") or 0,
+            "w": a.get("w") or 200, "h": a.get("h") or 40,
+            "text": a.get("text") or "",
+            "paragraphs": [], "placeholders": [],
+            "font": a.get("font") or {}, "align": a.get("align"),
+            "editable": True,
+        })
+    structure["boxes"] = boxes
+    return structure
+
+
 @app.get("/api/template-structure/{template_id}")
 def get_template_structure(template_id: int, _: dict = Depends(_require_user)):
-    """返回真实模板的可编辑结构（文本框位置/内容/占位符），供编辑器就地编辑。"""
+    """返回真实模板的可编辑结构（文本框位置/内容/占位符 + 管理端布局覆盖），供编辑器就地编辑。"""
     tpl = db.get_template(template_id)
     if tpl is None:
         raise HTTPException(status_code=404, detail="模板不存在")
     structure = _get_template_structure_cached(tpl)
     cfg = (tpl.get("config") or {}).get("editor_boxes") or {}
+    _merge_editor_boxes(structure, cfg)
     return {"id": tpl["id"], "name": tpl["name"], "config": cfg, **structure}
 
 
@@ -655,6 +679,7 @@ def admin_get_template_config(template_id: int,
         except Exception as exc:  # noqa: BLE001
             print(f"[WARN] 结构缓存写入失败: {exc}")
     cfg = (tpl.get("config") or {}).get("editor_boxes") or {}
+    _merge_editor_boxes(structure, cfg)
     return {"id": tpl["id"], "name": tpl["name"], "config": cfg, **structure}
 
 
@@ -681,6 +706,7 @@ def admin_save_template_config(template_id: int,
 @app.post("/api/template-save/{template_id}")
 def save_template_edits(template_id: int,
                         edits: str = Form("{}"),
+                        added: str = Form("[]"),
                         format: str = Form("docx"),
                         _: dict = Depends(_require_user)):
     """把就地编辑的文本框内容写回真实模板，导出 Word / PDF。"""
@@ -692,8 +718,13 @@ def save_template_edits(template_id: int,
         assert isinstance(edits_obj, dict)
     except Exception:  # noqa: BLE001
         raise HTTPException(status_code=400, detail="edits 格式错误")
+    try:
+        added_boxes = json.loads(added or "[]")
+        assert isinstance(added_boxes, list)
+    except (ValueError, AssertionError):
+        raise HTTPException(status_code=400, detail="added 格式错误")
     from utils import template_editor
-    data = template_editor.apply_box_texts(BASE_DIR / tpl["file_path"], edits_obj)
+    data = template_editor.apply_box_texts(BASE_DIR / tpl["file_path"], edits_obj, added_boxes)
     fname = f"edited_{tpl['id']}_{uuid.uuid4().hex[:8]}.docx"
     out_path = BASE_DIR / "temp" / fname
     out_path.write_bytes(data)
@@ -709,7 +740,8 @@ def save_template_edits(template_id: int,
 
 
 @app.post("/api/template-preview/{template_id}")
-def preview_template_edits(template_id: int, edits: str = Form("{}")):
+def preview_template_edits(template_id: int, edits: str = Form("{}"),
+                           added: str = Form("[]")):
     """真实模板模式预览：把文本框编辑写回 docx → Word 重排 → 全部页面 PNG。
     前端「热区点击+弹窗编辑」模式用它与导出结果保持像素级一致：
     预览即 Word 渲染成品，而非 HTML 近似模拟。渲染所有页面——内容较长
@@ -737,11 +769,17 @@ def preview_template_edits(template_id: int, edits: str = Form("{}")):
             return dict(cached, cached=True)
         return {"png_b64": cached, "cached": True}
 
+    try:
+        added_boxes = json.loads(added or "[]")
+        assert isinstance(added_boxes, list)
+    except (ValueError, AssertionError):
+        raise HTTPException(status_code=400, detail="added 格式错误")
+
     from utils import template_editor, converter
     out_path = TEMP_DIR / f"tprev_{uuid.uuid4().hex}.docx"
     pdf_path = TEMP_DIR / f"tprev_{uuid.uuid4().hex}.pdf"
     try:
-        data = template_editor.apply_box_texts(BASE_DIR / tpl["file_path"], edits_obj)
+        data = template_editor.apply_box_texts(BASE_DIR / tpl["file_path"], edits_obj, added_boxes)
         out_path.write_bytes(data)
         converter.docx_to_pdf(str(out_path), str(pdf_path))
         doc = _fitz.open(str(pdf_path))
@@ -1032,6 +1070,49 @@ def draft_batch_delete(payload: _DraftBatchDeleteIn, user: dict = Depends(_requi
         raise HTTPException(status_code=400, detail="ids 不能为空")
     deleted = db.delete_drafts_batch(user["id"], ids)
     return {"ok": True, "deleted": deleted}
+
+
+class _V3ExportIn(BaseModel):
+    resume: dict = Field(default_factory=dict)
+    theme: dict = Field(default_factory=dict)
+
+
+@app.post("/api/export/{fmt}")
+def export_resume_v3(fmt: str, payload: _V3ExportIn, user: dict = Depends(_require_user)):
+    """v3 结构化简历导出：统一 JSON 数据模型 → Word / PDF / PNG 长图。"""
+    from urllib.parse import quote
+    if fmt not in ("docx", "pdf", "png"):
+        raise HTTPException(status_code=404, detail="不支持的导出格式")
+    from utils import resume_docx
+    try:
+        docx_bytes = resume_docx.generate_docx(payload.resume, payload.theme)
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(status_code=500, detail=f"生成 Word 失败: {exc}")
+    name = str(((payload.resume or {}).get("basic") or {}).get("name") or "").strip()
+    base = re.sub(r'[\\/:*?"<>|]', "_", name or "简历")
+    disposition = 'attachment; filename="resume.%s"; filename*=UTF-8''%s' % (
+        fmt, quote(base + "." + fmt))
+    if fmt == "docx":
+        return Response(docx_bytes, media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        headers={"Content-Disposition": disposition})
+    from utils import converter
+    docx_path = TEMP_DIR / f"v3exp_{uuid.uuid4().hex}.docx"
+    pdf_path = docx_path.with_suffix(".pdf")
+    try:
+        docx_path.write_bytes(docx_bytes)
+        converter.docx_to_pdf(str(docx_path), str(pdf_path))
+        if fmt == "pdf":
+            return Response(pdf_path.read_bytes(), media_type="application/pdf",
+                            headers={"Content-Disposition": disposition})
+        png_bytes = resume_docx.pdf_to_long_png(str(pdf_path))
+        return Response(png_bytes, media_type="image/png",
+                        headers={"Content-Disposition": disposition})
+    except HTTPException:
+        raise
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(status_code=500, detail=f"导出 {fmt} 失败: {exc}")
+    finally:
+        safe_unlink(docx_path, pdf_path)
 
 
 @app.get("/admin/logs")
@@ -1414,96 +1495,6 @@ def validate_template_admin(template_id: int, _: None = Depends(_require_admin_h
     applog.log("template_validate", template_id=template_id, ok=result["ok"],
                fails=[c["name"] for c in result["checks"] if not c["ok"]])
     return {"template_id": template_id, "ok": result["ok"], "checks": result["checks"]}
-
-
-def _admin_template_row(template_id: int) -> dict:
-    """查询模板（含待审核），不存在抛 404。"""
-    tpl = db.get_template(template_id)
-    if tpl is None:
-        rows = db.admin_list_templates()
-        tpl = next((r for r in rows if r["id"] == template_id), None)
-    if tpl is None:
-        raise HTTPException(status_code=404, detail="模板不存在")
-    return tpl
-
-
-@app.get("/admin/templates/{template_id}/mapping")
-def get_template_mapping(template_id: int, _: None = Depends(_require_admin_header)):
-    """返回模板板块/字段自动识别结果与已保存的手动绑定配置。"""
-    from docx import Document
-    from utils import filler, section_mapper
-    tpl = _admin_template_row(template_id)
-    tpl_file = BASE_DIR / tpl["file_path"]
-    if not tpl_file.exists():
-        raise HTTPException(status_code=404, detail="模板文件缺失")
-    cfg = tpl.get("config") or {}
-    bindings = cfg.get("bindings") or {}
-    doc = Document(str(tpl_file))
-    filler._remove_fallback_duplicates(doc)
-    detected = section_mapper.detect_mapping(doc, bindings)
-    return {"template_id": template_id, "bindings": bindings, "detected": detected}
-
-
-@app.post("/admin/templates/{template_id}/mapping")
-def save_template_mapping(template_id: int, bindings: str = Form("{}"),
-                          _: None = Depends(_require_admin_header)):
-    """保存模板板块/字段手动绑定（bindings JSON：{"sections": {...}, "fields": {...}}）。"""
-    try:
-        data = json.loads(bindings or "{}")
-        assert isinstance(data, dict)
-    except (ValueError, AssertionError):
-        raise HTTPException(status_code=400, detail="bindings 格式错误")
-    cleaned = {"sections": {}, "fields": {}}
-    for group in ("sections", "fields"):
-        for k, v in (data.get(group) or {}).items():
-            if isinstance(v, str) and v.strip():
-                cleaned[group][str(k).strip()] = v.strip()
-    tpl = _admin_template_row(template_id)
-    cfg = dict(tpl.get("config") or {})
-    cfg["bindings"] = cleaned
-    db.update_template_config(template_id, json.dumps(cfg, ensure_ascii=False))
-    applog.log("template_mapping_save", template_id=template_id,
-               sections=len(cleaned["sections"]), fields=len(cleaned["fields"]))
-    return {"ok": True, "bindings": cleaned}
-
-
-# ── 全局同义词库（后台维护）──
-
-
-@app.get("/admin/aliases")
-def list_aliases_admin(_: None = Depends(_require_admin_header)):
-    """返回全部自定义同义词。"""
-    return {"aliases": db.list_aliases()}
-
-
-@app.post("/admin/aliases")
-def add_alias_admin(kind: str = Form(...), std_key: str = Form(...),
-                    alias: str = Form(...), _: None = Depends(_require_admin_header)):
-    """新增同义词：kind=section（板块）| field（字段），全局模板立即生效。"""
-    kind = (kind or "").strip().lower()
-    if kind not in ("section", "field"):
-        raise HTTPException(status_code=400, detail="kind 仅支持 section / field")
-    std_key = (std_key or "").strip()
-    alias = (alias or "").strip()
-    if not std_key or not alias:
-        raise HTTPException(status_code=400, detail="请填写标准 key 与同义词")
-    if not db.add_alias(kind, std_key, alias):
-        raise HTTPException(status_code=400, detail="该同义词已存在")
-    from utils import standard_keys
-    standard_keys.refresh_aliases()
-    applog.log("alias_add", kind=kind, std_key=std_key, alias=alias)
-    return {"ok": True}
-
-
-@app.delete("/admin/aliases/{alias_id}")
-def delete_alias_admin(alias_id: int, _: None = Depends(_require_admin_header)):
-    """删除同义词。"""
-    if not db.delete_alias(alias_id):
-        raise HTTPException(status_code=404, detail="同义词不存在")
-    from utils import standard_keys
-    standard_keys.refresh_aliases()
-    applog.log("alias_delete", alias_id=alias_id)
-    return {"ok": True}
 
 
 # ══════════════════ 简历优化 ══════════════════

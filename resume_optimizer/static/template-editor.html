@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>可视化模板编辑器 - 管理后台</title>
+<style>
+  :root {
+    --accent: #34549B; --accent-soft: #EDF1F8; --ink: #1F2430; --ink-2: #4B5563;
+    --ink-3: #8A93A6; --line: #E4E8F0; --danger: #D6455D; --ok: #1FA67A;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; background: #F3F5F9; color: var(--ink); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* ── 顶栏 ── */
+  .bar { background: #fff; border-bottom: 1px solid var(--line); padding: 10px 18px; display: flex; align-items: center; gap: 14px; flex: none; }
+  .bar h1 { font-size: 16px; font-weight: 700; }
+  .bar .tid { font-size: 12px; color: var(--ink-3); }
+  .bar .sp { flex: 1; }
+  .btn { border: 1px solid var(--line); background: #fff; color: var(--ink-2); border-radius: 8px; padding: 8px 16px; font-size: 13px; cursor: pointer; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:hover { opacity: .92; color: #fff; }
+  .btn.danger { color: var(--danger); }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .back { font-size: 13px; color: var(--ink-3); text-decoration: none; }
+  .back:hover { color: var(--accent); }
+
+  /* ── 主体 ── */
+  .main { flex: 1; display: flex; min-height: 0; }
+  .canvas-wrap { flex: 1; overflow: auto; padding: 24px; display: flex; justify-content: center; align-items: flex-start; }
+  #page { position: relative; background: #fff; box-shadow: 0 4px 24px rgba(15,20,35,.12); flex: none; }
+  #pageBg { position: absolute; inset: 0; width: 100%; height: 100%; user-select: none; -webkit-user-drag: none; }
+  #boxLayer { position: absolute; inset: 0; }
+
+  .box { position: absolute; border: 1px dashed rgba(52,84,155,.55); background: rgba(52,84,155,.05); cursor: move; }
+  .box:hover { border-color: var(--accent); background: rgba(52,84,155,.1); }
+  .box.sel { border: 1.5px solid var(--accent); background: rgba(52,84,155,.12); box-shadow: 0 0 0 2px rgba(52,84,155,.18); }
+  .box.added { border-style: solid; border-color: var(--ok); background: rgba(31,166,122,.07); }
+  .box.added.sel { border-color: var(--ok); box-shadow: 0 0 0 2px rgba(31,166,122,.2); }
+  .box .tag { position: absolute; top: 0; left: 0; font-size: 9px; line-height: 1.4; background: var(--accent); color: #fff; padding: 0 4px; border-radius: 0 0 4px 0; max-width: 100%; overflow: hidden; white-space: nowrap; }
+  .box.added .tag { background: var(--ok); }
+  .box .txt { position: absolute; inset: 0; font-size: 10px; color: var(--ink-2); padding: 13px 3px 2px; overflow: hidden; pointer-events: none; white-space: pre-wrap; word-break: break-all; }
+  .hnd { position: absolute; width: 8px; height: 8px; background: #fff; border: 1.5px solid var(--accent); border-radius: 2px; z-index: 5; }
+  .hnd.nw{left:-5px;top:-5px;cursor:nw-resize} .hnd.n{left:calc(50% - 4px);top:-5px;cursor:n-resize}
+  .hnd.ne{right:-5px;top:-5px;cursor:ne-resize} .hnd.e{right:-5px;top:calc(50% - 4px);cursor:e-resize}
+  .hnd.se{right:-5px;bottom:-5px;cursor:se-resize} .hnd.s{left:calc(50% - 4px);bottom:-5px;cursor:s-resize}
+  .hnd.sw{left:-5px;bottom:-5px;cursor:sw-resize} .hnd.w{left:-5px;top:calc(50% - 4px);cursor:w-resize}
+
+  /* ── 属性面板 ── */
+  .panel { width: 264px; flex: none; background: #fff; border-left: 1px solid var(--line); overflow: auto; padding: 14px; }
+  .panel h3 { font-size: 13px; margin-bottom: 10px; color: var(--ink); }
+  .panel .empty-tip { font-size: 12.5px; color: var(--ink-3); line-height: 1.8; }
+  .frow { display: flex; gap: 6px; margin-bottom: 8px; align-items: center; }
+  .frow label { font-size: 12px; color: var(--ink-3); width: 44px; flex: none; }
+  .frow input[type=number], .frow input[type=text], .frow select { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 6px; padding: 5px 7px; font-size: 12.5px; }
+  .frow input[type=color] { width: 34px; height: 28px; border: 1px solid var(--line); border-radius: 6px; padding: 1px; background: #fff; }
+  .frow .chk { display: flex; align-items: center; gap: 4px; font-size: 12.5px; color: var(--ink-2); cursor: pointer; }
+  .ptext { font-size: 12px; color: var(--ink-2); background: #F6F8FB; border-radius: 6px; padding: 8px; margin-bottom: 10px; max-height: 72px; overflow: auto; word-break: break-all; }
+  .pbtns { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .pbtns .btn { width: 100%; }
+  .hr { border-top: 1px solid var(--line); margin: 12px 0; }
+  .tipbox { font-size: 11.5px; color: var(--ink-3); line-height: 1.7; margin-top: 12px; }
+
+  /* ── 预览弹窗 / toast ── */
+  .mask { position: fixed; inset: 0; background: rgba(15,20,35,.5); display: flex; align-items: center; justify-content: center; z-index: 50; }
+  .mask[hidden] { display: none; }
+  .modal { background: #fff; border-radius: 12px; width: 620px; max-width: 92vw; max-height: 88vh; overflow: auto; padding: 18px; }
+  .modal h3 { font-size: 15px; margin-bottom: 12px; }
+  .modal .pgs img { width: 100%; border: 1px solid var(--line); margin-bottom: 10px; }
+  #toast { position: fixed; left: 50%; bottom: 34px; transform: translateX(-50%); background: #1F2430; color: #fff; font-size: 13px; padding: 9px 18px; border-radius: 8px; z-index: 99; transition: opacity .25s; opacity: 0; pointer-events: none; }
+  #toast.show { opacity: .95; }
+  .loading-tip { text-align: center; color: var(--ink-3); font-size: 13px; padding: 30px 0; }
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <h1>可视化模板编辑器</h1>
+  <span class="tid" id="tplTitle">加载中…</span>
+  <span class="sp"></span>
+  <button class="btn" id="addBoxBtn">＋ 新增文本框</button>
+  <button class="btn" id="previewBtn">预览真实效果</button>
+  <button class="btn danger" id="resetBtn">重置覆盖</button>
+  <button class="btn primary" id="saveBtn">保存布局</button>
+  <a class="back" href="/admin">返回管理后台</a>
+</div>
+
+<div class="main">
+  <div class="canvas-wrap" id="canvasWrap">
+    <div id="page">
+      <img id="pageBg" alt="" draggable="false">
+      <div id="boxLayer"></div>
+    </div>
+  </div>
+
+  <aside class="panel">
+    <div id="panelEmpty">
+      <h3>属性面板</h3>
+      <p class="empty-tip">点击画布中的盒子进行选择。<br><br>· 拖拽移动，8 向手柄缩放<br>· 「新增文本框」加入自定义内容区（绿框），导出时会真实注入 Word<br>· 虚线蓝框为模板原有盒子：调整位置大小、开关可编辑<br>· 保存后编辑器与导出即时生效</p>
+    </div>
+    <div id="panelBox" hidden>
+      <h3 id="boxTitle">盒子</h3>
+      <div class="ptext" id="boxText"></div>
+      <div class="frow"><label>X</label><input type="number" id="fX" step="1"></div>
+      <div class="frow"><label>Y</label><input type="number" id="fY" step="1"></div>
+      <div class="frow"><label>宽度</label><input type="number" id="fW" min="8" step="1"></div>
+      <div class="frow"><label>高度</label><input type="number" id="fH" min="8" step="1"></div>
+      <div class="frow"><label>字体</label><select id="fFamily">
+        <option value="">（不变）</option>
+        <option value="微软雅黑">微软雅黑</option><option value="宋体">宋体</option>
+        <option value="黑体">黑体</option><option value="楷体">楷体</option>
+        <option value="等线">等线</option><option value="Arial">Arial</option>
+      </select></div>
+      <div class="frow"><label>字号px</label><input type="number" id="fSize" min="6" max="72" step="0.5"></div>
+      <div class="frow"><label>颜色</label><input type="color" id="fColor" value="#333333"><input type="text" id="fColorHex" style="flex:1" placeholder="#333333"></div>
+      <div class="frow"><label>样式</label>
+        <label class="chk"><input type="checkbox" id="fBold">加粗</label>
+        <label class="chk"><input type="checkbox" id="fItalic">斜体</label>
+      </div>
+      <div class="frow"><label>对齐</label><select id="fAlign">
+        <option value="left">左对齐</option><option value="center">居中</option><option value="right">右对齐</option>
+      </select></div>
+      <div class="frow"><label>可编辑</label>
+        <label class="chk"><input type="checkbox" id="fEditable">允许用户在编辑器中修改文字</label>
+      </div>
+      <div class="pbtns">
+        <button class="btn danger" id="delBoxBtn">删除此盒子</button>
+      </div>
+      <div class="hr"></div>
+      <div class="tipbox" id="boxTip"></div>
+    </div>
+  </aside>
+</div>
+
+<!-- 预览弹窗 -->
+<div class="mask" id="pvMask" hidden>
+  <div class="modal">
+    <h3>真实渲染预览（Word 排版）</h3>
+    <div id="pvBody"><div class="loading-tip">正在启动 Word 渲染，约 7~17 秒…</div></div>
+    <div style="margin-top:10px;text-align:right"><button class="btn" id="pvClose">关闭</button></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const qs = new URLSearchParams(location.search);
+const TPL_ID = parseInt(qs.get("id"), 10);
+
+let adminToken = sessionStorage.getItem("resume_admin_token") || "";
+if (!TPL_ID || !adminToken) { location.href = adminToken ? "/admin" : "/admin/login"; }
+
+const AUTH = () => ({ "Authorization": "Bearer " + adminToken });
+async function adminFetch(url, opts) {
+  const o = Object.assign({}, opts || {});
+  o.headers = Object.assign({}, o.headers || {}, AUTH());
+  const r = await fetch(url, o);
+  if (r.status === 401 || r.status === 403) { sessionStorage.removeItem("resume_admin_token"); location.href = "/admin/login"; throw new Error("登录过期"); }
+  return r;
+}
+let toastTimer = null;
+function toast(msg, ms) {
+  const t = $("toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), ms || 2400);
+}
+
+/* ───────── 状态 ─────────
+   boxes: 合并后的工作集（含 added），font 为覆盖值或 null
+   pristine: 打开时的快照（不含 added），用于差量 overrides */
+let pageW = 794, pageH = 1123, scale = 1;
+let boxes = [];            // {id,x,y,w,h,text,font:{family,size,color,bold,italic}|null,align,editable,added,deleted}
+let pristine = {};         // id -> {x,y,w,h,editable}
+let addedDefs = [];        // 初始已保存的 added（再保存时合并新 added）
+let selId = null, nextNeg = -1;
+
+function boxById(id) { return boxes.find(b => b.id === id); }
+
+async function load() {
+  $("tplTitle").textContent = "加载模板结构…";
+  const resp = await adminFetch("/api/admin/template-config/" + TPL_ID + "?refresh=1");
+  const data = await resp.json();
+  if (!resp.ok) throw new Error(data.detail || "加载失败");
+  pageW = data.page_w || 794; pageH = data.page_h || 1123;
+  const cfg = data.config || {};
+  const savedOverrides = cfg.overrides || {};
+  addedDefs = Array.isArray(cfg.added) ? cfg.added.filter(a => a && typeof a === "object") : [];
+
+  boxes = (data.boxes || []).map(b => {
+    pristine[b.id] = { x: b.x, y: b.y, w: b.w, h: b.h, editable: b.editable !== false };
+    const ov = savedOverrides[String(b.id)] || {};
+    return {
+      id: b.id, added: false, deleted: false,
+      x: (ov.x != null ? ov.x : b.x), y: (ov.y != null ? ov.y : b.y),
+      w: (ov.w != null ? ov.w : b.w), h: (ov.h != null ? ov.h : b.h),
+      text: b.text || "", editable: ov.editable != null ? !!ov.editable : (b.editable !== false),
+      font: ov.font || null, align: ov.align || null,
+    };
+  });
+  addedDefs.forEach(a => {
+    boxes.push({
+      id: a.id, added: true, deleted: false,
+      x: a.x || 0, y: a.y || 0, w: a.w || 200, h: a.h || 40,
+      text: a.text || "", editable: true,
+      font: a.font || { family: "微软雅黑", size: 14, color: "#333333", bold: false, italic: false },
+      align: a.align || "left",
+    });
+    if (a.id < nextNeg) nextNeg = a.id - 1;
+  });
+
+  $("tplTitle").textContent = "模板 #" + TPL_ID + "（" + (data.name || "") + "）· " + pageW + "×" + pageH;
+  layoutPage();
+}
+
+function layoutPage() {
+  const wrap = $("canvasWrap");
+  const availW = Math.max(320, wrap.clientWidth - 48);
+  const availH = Math.max(400, wrap.clientHeight - 48);
+  scale = Math.min(availW / pageW, availH / pageH, 1.4);
+  const page = $("page");
+  page.style.width = Math.round(pageW * scale) + "px";
+  page.style.height = Math.round(pageH * scale) + "px";
+  const img = $("pageBg");
+  img.onerror = () => {
+    /* 静态底图缺失：用真实 Word 渲染兜底一张（template-preview） */
+    img.style.visibility = "visible";
+    img.onerror = () => { img.style.visibility = "hidden"; };
+    img.alt = "正在生成底图…";
+    const fd = new FormData();
+    fd.append("edits", JSON.stringify({}));
+    fd.append("added", JSON.stringify(buildAdded()));
+    fetch("/api/template-preview/" + TPL_ID, { method: "POST", body: fd })
+      .then(r => r.json())
+      .then(d => { if (d && d.png_b64) img.src = d.png_b64; })
+      .catch(() => { img.style.visibility = "hidden"; });
+  };
+  img.src = "/static/previews/t" + TPL_ID + ".png?v=" + Date.now();
+  renderBoxes();
+}
+
+/* ───────── 画布渲染 ───────── */
+function renderBoxes() {
+  const layer = $("boxLayer");
+  layer.innerHTML = "";
+  boxes.forEach(b => {
+    if (b.deleted) return;
+    const d = document.createElement("div");
+    d.className = "box" + (b.added ? " added" : "") + (b.id === selId ? " sel" : "");
+    d.style.left = (b.x * scale) + "px";
+    d.style.top = (b.y * scale) + "px";
+    d.style.width = Math.max(6, b.w * scale) + "px";
+    d.style.height = Math.max(6, b.h * scale) + "px";
+    d.dataset.id = b.id;
+    d.innerHTML = '<span class="tag">#' + b.id + (b.editable ? "" : " 锁") + "</span>" +
+      '<span class="txt">' + esc(b.text).slice(0, 80) + "</span>";
+    if (b.id === selId) ["nw","n","ne","e","se","s","sw","w"].forEach(dir => {
+      const h = document.createElement("span");
+      h.className = "hnd " + dir; h.dataset.dir = dir;
+      d.appendChild(h);
+    });
+    layer.appendChild(d);
+  });
+}
+function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+/* ───────── 选择与交互 ───────── */
+let drag = null;  // {mode:'move'|'resize', id, dir, sx, sy, ox, oy, ow, oh}
+
+$("boxLayer").addEventListener("mousedown", (e) => {
+  const hnd = e.target.closest(".hnd");
+  const boxEl = e.target.closest(".box");
+  if (!boxEl) { select(null); return; }
+  const id = parseInt(boxEl.dataset.id, 10);
+  select(id);
+  const b = boxById(id);
+  if (!b) return;
+  e.preventDefault();
+  if (hnd) drag = { mode: "resize", dir: hnd.dataset.dir, id, sx: e.clientX, sy: e.clientY, ox: b.x, oy: b.y, ow: b.w, oh: b.h };
+  else drag = { mode: "move", id, sx: e.clientX, sy: e.clientY, ox: b.x, oy: b.y, ow: b.w, oh: b.h };
+});
+window.addEventListener("mousemove", (e) => {
+  if (!drag) return;
+  const b = boxById(drag.id); if (!b) return;
+  const dx = (e.clientX - drag.sx) / scale, dy = (e.clientY - drag.sy) / scale;
+  if (drag.mode === "move") {
+    b.x = Math.round(drag.ox + dx); b.y = Math.round(drag.oy + dy);
+  } else {
+    let { ox, oy, ow, oh } = drag;
+    if (drag.dir.includes("e")) b.w = Math.max(8, Math.round(ow + dx));
+    if (drag.dir.includes("s")) b.h = Math.max(8, Math.round(oh + dy));
+    if (drag.dir.includes("w")) { b.x = Math.round(ox + dx); b.w = Math.max(8, Math.round(ow - dx)); }
+    if (drag.dir.includes("n")) { b.y = Math.round(oy + dy); b.h = Math.max(8, Math.round(oh - dy)); }
+  }
+  syncSelectedDom(b); syncPanel(b);
+});
+window.addEventListener("mouseup", () => { drag = null; });
+
+function syncSelectedDom(b) {
+  const el = $("boxLayer").querySelector('.box[data-id="' + b.id + '"]');
+  if (!el) return;
+  el.style.left = (b.x * scale) + "px"; el.style.top = (b.y * scale) + "px";
+  el.style.width = Math.max(6, b.w * scale) + "px"; el.style.height = Math.max(6, b.h * scale) + "px";
+}
+
+function select(id) {
+  if (selId === id) return;
+  selId = id;
+  renderBoxes();
+  const b = id === null ? null : boxById(id);
+  $("panelEmpty").hidden = !!b;
+  $("panelBox").hidden = !b;
+  if (b) fillPanel(b);
+}
+
+/* ───────── 属性面板 ───────── */
+function fillPanel(b) {
+  $("boxTitle").textContent = "盒子 #" + b.id + (b.added ? "（新增）" : "（模板原有）");
+  $("boxText").textContent = b.text || "（空盒子）";
+  $("fX").value = b.x; $("fY").value = b.y; $("fW").value = b.w; $("fH").value = b.h;
+  $("fFamily").value = (b.font && b.font.family) || "";
+  $("fSize").value = (b.font && b.font.size) || "";
+  const color = (b.font && b.font.color) || "#333333";
+  $("fColor").value = /^#[0-9a-fA-F]{6}$/.test(color) ? color : "#333333";
+  $("fColorHex").value = color;
+  $("fBold").checked = !!(b.font && b.font.bold);
+  $("fItalic").checked = !!(b.font && b.font.italic);
+  $("fAlign").value = b.align || "left";
+  $("fEditable").checked = b.editable !== false;
+  $("delBoxBtn").textContent = b.added ? "移除此盒子" : "标记删除（恢复默认布局可找回）";
+  $("boxTip").textContent = b.added
+    ? "新增盒子保存后：编辑器中可编辑，导出 Word 时按此位置/样式真实注入文本框。"
+    : "位置/大小/可编辑 保存后即时生效于编辑器；文字内容由用户填写，模板字体不改动。";
+}
+
+function panelToF(b) {
+  b.x = parseInt($("fX").value, 10) || 0;
+  b.y = parseInt($("fY").value, 10) || 0;
+  b.w = Math.max(8, parseInt($("fW").value, 10) || b.w);
+  b.h = Math.max(8, parseInt($("fH").value, 10) || b.h);
+  const fam = $("fFamily").value, size = parseFloat($fSize_val()), hex = $("fColorHex").value.trim();
+  const hasFont = fam || size > 0 || /^#?[0-9a-fA-F]{6}$/.test(hex) || $("fBold").checked || $("fItalic").checked;
+  b.font = hasFont ? {
+    family: fam || (b.font && b.font.family) || "微软雅黑",
+    size: size > 0 ? size : (b.font && b.font.size) || 14,
+    color: /^#?[0-9a-fA-F]{6}$/.test(hex) ? (hex[0] === "#" ? hex : "#" + hex) : (b.font && b.font.color) || "#333333",
+    bold: $("fBold").checked, italic: $("fItalic").checked,
+  } : null;
+  b.align = $("fAlign").value;
+  b.editable = $("fEditable").checked;
+}
+function $fSize_val() { return $("fSize").value; }
+
+["fX","fY","fW","fH","fFamily","fSize","fColor","fColorHex","fBold","fItalic","fAlign","fEditable"].forEach(fid => {
+  $(fid).addEventListener("input", () => {
+    const b = boxById(selId); if (!b) return;
+    if (fid === "fColor") $("fColorHex").value = $("fColor").value;
+    panelToF(b);
+    syncSelectedDom(b); fillPanelTextOnly(b);
+  });
+});
+function fillPanelTextOnly(b) {
+  $("fX").value = b.x; $("fY").value = b.y; $("fW").value = b.w; $("fH").value = b.h;
+}
+
+$("delBoxBtn").addEventListener("click", () => {
+  const b = boxById(selId); if (!b) return;
+  if (b.added) {
+    boxes = boxes.filter(x => x.id !== b.id);
+    addedDefs = addedDefs.filter(x => x.id !== b.id);
+    toast("已移除新增盒子（保存后生效）");
+  } else {
+    b.deleted = true;
+    toast("已标记删除，保存后生效；「重置覆盖」可找回");
+  }
+  select(null); renderBoxes();
+});
+
+/* ───────── 保存 / 预览 / 重置 ───────── */
+function buildOverrides() {
+  const ov = {};
+  boxes.forEach(b => {
+    if (b.added) return;
+    const p = pristine[b.id] || {};
+    const changed = b.deleted || b.x !== p.x || b.y !== p.y || b.w !== p.w || b.h !== p.h
+      || b.editable !== p.editable || b.font || (b.align && b.align !== "left");
+    if (!changed) return;
+    const o = {};
+    if (b.deleted) { o.deleted = true; } else {
+      o.x = b.x; o.y = b.y; o.w = b.w; o.h = b.h; o.editable = b.editable;
+      if (b.font) o.font = b.font;
+      if (b.align) o.align = b.align;
+    }
+    ov[String(b.id)] = o;
+  });
+  return ov;
+}
+function buildAdded() {
+  return boxes.filter(b => b.added).map(b => ({
+    id: b.id, x: b.x, y: b.y, w: b.w, h: b.h, text: b.text,
+    font: b.font || { family: "微软雅黑", size: 14, color: "#333333", bold: false, italic: false },
+    align: b.align || "left",
+  }));
+}
+
+$("saveBtn").addEventListener("click", async () => {
+  const fd = new FormData();
+  fd.append("config", JSON.stringify({ overrides: buildOverrides(), added: buildAdded() }));
+  const resp = await adminFetch("/api/admin/template-config/" + TPL_ID, { method: "POST", body: fd });
+  const data = await resp.json();
+  if (!resp.ok) { toast("保存失败：" + (data.detail || "")); return; }
+  toast("布局已保存，编辑器即时生效");
+});
+
+$("previewBtn").addEventListener("click", async () => {
+  $("pvMask").hidden = false;
+  $("pvBody").innerHTML = '<div class="loading-tip">正在启动 Word 渲染，约 7~17 秒…</div>';
+  try {
+    const fd = new FormData();
+    fd.append("edits", JSON.stringify({}));
+    fd.append("added", JSON.stringify(buildAdded()));
+    const resp = await fetch("/api/template-preview/" + TPL_ID, { method: "POST", body: fd });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.detail || "渲染失败");
+    const pages = data.pages && data.pages.length ? data.pages : [data.png_b64];
+    $("pvBody").innerHTML = '<div class="pgs">' + pages.map(src => '<img src="' + src + '">').join("") + "</div>" +
+      '<p style="font-size:12px;color:#8A93A6">注：原有盒子的移动/缩放影响编辑器热区与新增内容注入；此预览展示 Word 真实排版（含新增盒子文字）。</p>';
+  } catch (e) {
+    $("pvBody").innerHTML = '<div class="loading-tip" style="color:#D6455D">渲染失败：' + esc(e.message) + "</div>";
+  }
+});
+$("pvClose").addEventListener("click", () => { $("pvMask").hidden = true; });
+
+$("resetBtn").addEventListener("click", async () => {
+  if (!confirm("确认清空该模板的全部布局覆盖与新增盒子？")) return;
+  const fd = new FormData();
+  fd.append("config", JSON.stringify({ overrides: {}, added: [] }));
+  const resp = await adminFetch("/api/admin/template-config/" + TPL_ID, { method: "POST", body: fd });
+  if (!resp.ok) { toast("重置失败"); return; }
+  toast("已重置，重新加载");
+  load();
+});
+
+/* ───────── 新增盒子 ───────── */
+$("addBoxBtn").addEventListener("click", () => {
+  const b = {
+    id: nextNeg--, added: true, deleted: false,
+    x: 60, y: 60, w: 200, h: 40, text: "新文本框", editable: true,
+    font: { family: "微软雅黑", size: 14, color: "#333333", bold: false, italic: false },
+    align: "left",
+  };
+  boxes.push(b);
+  select(b.id); renderBoxes();
+  toast("已新增盒子 #" + b.id + "，可拖拽调整后保存");
+});
+
+load().catch(e => {
+  $("tplTitle").textContent = "加载失败";
+  toast("加载失败：" + e.message, 4000);
+});
+</script>
+</body>
+</html>

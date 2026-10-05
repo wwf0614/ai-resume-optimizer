@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 from docx import Document
-from docx.oxml import OxmlElement
+from docx.oxml import OxmlElement, parse_xml
 from docx.oxml.ns import qn
 
 WPS_NS = "http://schemas.microsoft.com/office/word/2010/wordprocessingShape"
@@ -587,8 +587,99 @@ def _ensure_shrink_on_overflow(txbx) -> None:
         cur = cur.getparent()
 
 
-def apply_box_texts(docx_path, edits: Dict[str, str]):
-    """把编辑后的文本写回对应文本框/单元格（保留原格式），返回 docx 字节。"""
+_WNS_DECL = (
+    'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" '
+    'xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" '
+    'xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" '
+    'xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape"'
+)
+
+
+def _xml_escape(s: str) -> str:
+    return (s or "").replace("&", "&amp;").replace("<", "&lt;") \
+        .replace(">", "&gt;").replace('"', "&quot;")
+
+
+def _box_run_properties(font: dict) -> str:
+    """added 盒子文字的 rPr 片段：字体/字号(px→pt×0.75)/颜色/加粗/斜体。"""
+    font = font if isinstance(font, dict) else {}
+    parts = []
+    family = str(font.get("family") or "").strip()
+    if family:
+        fam = _xml_escape(family)
+        parts.append(f'<w:rFonts w:ascii="{fam}" w:eastAsia="{fam}" w:hAnsi="{fam}"/>')
+    try:
+        half = int(round(float(font.get("size")) * 0.75 * 2))
+    except (TypeError, ValueError):
+        half = 0
+    if half > 0:
+        parts.append(f'<w:sz w:val="{half}"/><w:szCs w:val="{half}"/>')
+    color = str(font.get("color") or "").strip().lstrip("#")
+    if re.fullmatch(r"[0-9a-fA-F]{6}", color):
+        parts.append(f'<w:color w:val="{color.upper()}"/>')
+    if font.get("bold"):
+        parts.append("<w:b/>")
+    if font.get("italic"):
+        parts.append("<w:i/>")
+    return "".join(parts)
+
+
+def _add_textbox_paragraph(body, box) -> None:
+    """把 added 盒子注入为页面级绝对定位的 wps 文本框（EMU = px × 9525）。
+
+    锚点段落插在 body 首个元素之前，行高压到 1pt 级别避免版面位移；
+    页面级定位使文本框出现在 (x, y)。几何非法时抛异常，由调用方跳过。"""
+    x = int(round(float(box.get("x") or 0) * EMU_PER_PX))
+    y = int(round(float(box.get("y") or 0) * EMU_PER_PX))
+    w = max(1, int(round(float(box.get("w") or 200) * EMU_PER_PX)))
+    h = max(1, int(round(float(box.get("h") or 40) * EMU_PER_PX)))
+    try:
+        shape_id = int(box.get("id"))
+    except (TypeError, ValueError):
+        shape_id = 0
+    doc_pr_id = 9001 + (abs(shape_id) % 9000)
+    jc = {"center": "center", "right": "right"}.get(str(box.get("align") or "").lower(), "left")
+    rpr = _box_run_properties(box.get("font"))
+    text = str(box.get("text") or "")
+    paras_xml = "".join(
+        f'<w:p><w:pPr><w:spacing w:before="0" w:after="0"/><w:jc w:val="{jc}"/></w:pPr>'
+        f'<w:r><w:rPr>{rpr}</w:rPr>'
+        f'<w:t xml:space="preserve">{_xml_escape(ln)}</w:t></w:r></w:p>'
+        for ln in text.split("\n"))
+    xml = (
+        f'<w:p {_WNS_DECL}>'
+        '<w:pPr><w:spacing w:before="0" w:after="0" w:line="20" w:lineRule="exact"/>'
+        '<w:rPr><w:sz w:val="2"/></w:rPr></w:pPr>'
+        '<w:r><w:rPr><w:sz w:val="2"/></w:rPr><w:drawing>'
+        '<wp:anchor distT="0" distB="0" distL="0" distR="0" simplePos="0" '
+        f'relativeHeight="{251650000 + abs(shape_id)}" behindDoc="0" locked="0" '
+        'layoutInCell="1" allowOverlap="1">'
+        '<wp:simplePos x="0" y="0"/>'
+        f'<wp:positionH relativeFrom="page"><wp:posOffset>{x}</wp:posOffset></wp:positionH>'
+        f'<wp:positionV relativeFrom="page"><wp:posOffset>{y}</wp:posOffset></wp:positionV>'
+        f'<wp:extent cx="{w}" cy="{h}"/>'
+        '<wp:effectExtent l="0" t="0" r="0" b="0"/><wp:wrapNone/>'
+        f'<wp:docPr id="{doc_pr_id}" name="AddedBox{shape_id}"/>'
+        '<wp:cNvGraphicFramePr/>'
+        '<a:graphic><a:graphicData uri="http://schemas.microsoft.com/office/word/2010/wordprocessingShape">'
+        '<wps:wsp><wps:cNvSpPr txBox="1"/>'
+        f'<wps:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="{w}" cy="{h}"/></a:xfrm>'
+        '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/>'
+        '<a:ln><a:noFill/></a:ln></wps:spPr>'
+        f'<wps:txbx><w:txbxContent>{paras_xml}</w:txbxContent></wps:txbx>'
+        '<wps:bodyPr rot="0" vert="horz" wrap="square" lIns="9144" tIns="0" '
+        'rIns="9144" bIns="0" anchor="t"><a:noAutofit/></wps:bodyPr>'
+        '</wps:wsp></a:graphicData></a:graphic></wp:anchor></w:drawing></w:r></w:p>'
+    )
+    body.insert(0, parse_xml(xml))
+
+
+def apply_box_texts(docx_path, edits: Dict[str, str], added: Optional[List[dict]] = None):
+    """把编辑后的文本写回对应文本框/单元格（保留原格式），返回 docx 字节。
+
+    added：管理端「自由编辑」新增盒子的定义列表 [{id(负数), x,y,w,h, text, font, align}]，
+    逐个注入为绝对定位文本框；edits 里若带同 id 的负数键，其文本优先。
+    单个盒子注入失败仅打印告警并跳过，不炸导出主链路。"""
     doc = Document(str(docx_path))
     body = doc.element.body
     targets = _collect_edit_targets(body)
@@ -605,6 +696,17 @@ def apply_box_texts(docx_path, edits: Dict[str, str]):
             _ensure_shrink_on_overflow(node)
         # 文本框与单元格统一：保留首段格式，按换行重建段落
         _write_plain_text(node, text)
+    for spec in (added or []):
+        if not isinstance(spec, dict):
+            continue
+        try:
+            spec = dict(spec)
+            bid = spec.get("id")
+            if bid is not None and str(bid) in edits:
+                spec["text"] = edits[str(bid)]
+            _add_textbox_paragraph(body, spec)
+        except Exception as exc:  # noqa: BLE001
+            print(f"[WARN] 追加文本框 #{spec.get('id')} 注入失败，已跳过: {exc}")
     buf = io.BytesIO()
     doc.save(buf)
     return buf.getvalue()
