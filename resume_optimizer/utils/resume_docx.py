@@ -128,6 +128,22 @@ def _para_shading(p, fill: str) -> None:
     ppr.append(shd)
 
 
+def _table_bleed(tbl, total_cm: float, left_margin_cm: float = 1.5) -> None:
+    """表格左侧负缩进顶到页面左缘，总宽 = 指定宽度（实现横幅/侧栏全幅贴边）。"""
+    tbl.autofit = False
+    tblpr = tbl._tbl.tblPr
+    ind = OxmlElement("w:tblInd")
+    ind.set(qn("w:w"), str(-int(left_margin_cm * 567)))
+    ind.set(qn("w:type"), "dxa")
+    tblpr.append(ind)
+    tw = tblpr.find(qn("w:tblW"))
+    if tw is None:
+        tw = OxmlElement("w:tblW")
+        tblpr.append(tw)
+    tw.set(qn("w:w"), str(int(total_cm * 567)))
+    tw.set(qn("w:type"), "dxa")
+
+
 def _cell_shading(cell, fill: str) -> None:
     tcpr = cell._tc.get_or_add_tcPr()
     shd = OxmlElement("w:shd")
@@ -326,12 +342,29 @@ def _head_block(t: _Target, ctx: _Ctx, width_cm: float, with_extras: bool = True
 
 
 def _basic_grid(t: _Target, ctx: _Ctx) -> None:
+    """基本信息两列网格（与编辑器 basicGrid 一致）。仅用于 doc 容器。"""
     if not ctx.extras:
         return
-    p = t.para()
-    _spacing(p, after=2, line=ctx.line_h)
-    run = p.add_run("  |  ".join(f"{label}：{v}" for label, v in ctx.extras))
-    _set_run_font(run, ctx.item_font(), ctx.body_pt, ctx.gray)
+    doc = t.obj
+    if not hasattr(doc, "add_table"):
+        for label, v in ctx.extras:
+            p = t.para()
+            _spacing(p, after=2, line=ctx.line_h)
+            run = p.add_run(f"{label}：{v}")
+            _set_run_font(run, ctx.item_font(), ctx.body_pt, ctx.gray)
+        return
+    n = len(ctx.extras)
+    tbl = doc.add_table(rows=(n + 1) // 2, cols=2)
+    tbl.autofit = False
+    for idx, (label, v) in enumerate(ctx.extras):
+        cell = tbl.rows[idx // 2].cells[idx % 2]
+        cell.width = Cm(9.0)
+        p = cell.paragraphs[0]
+        _spacing(p, after=2, line=ctx.line_h)
+        run = p.add_run(f"{label}：{v}")
+        _set_run_font(run, ctx.item_font(), ctx.body_pt, ctx.gray)
+    p = doc.add_paragraph()
+    _spacing(p, after=0)
 
 
 def _photo_paragraph(t: _Target, ctx: _Ctx, width_cm: float, center: bool = False) -> bool:
@@ -490,35 +523,37 @@ def _build_single_headerBar(doc: Document, ctx: _Ctx, banner: bool) -> None:
     """single / headerBar：headerBar 先画主色横幅（姓名/意向/联系方式 + 照片）。"""
     if banner:
         tbl = doc.add_table(rows=1, cols=2)
-        tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
-        tbl.autofit = False
+        _table_bleed(tbl, 21.0)
         left, right = tbl.rows[0].cells
-        left.width, right.width = Cm(15.0), Cm(3.0)
+        left.width, right.width = Cm(16.6), Cm(4.4)
         for c in (left, right):
             _cell_shading(c, ctx.primary)
         lt = _Target(left)
         p = lt.para()
-        _spacing(p, after=2)
+        _spacing(p, before=10, after=2)
+        p.paragraph_format.left_indent = Cm(0.4)
         run = p.add_run(ctx.name)
         _set_run_font(run, ctx.item_font(), ctx.name_pt, ctx.on_dark_text, bold=True)
         if ctx.intention:
             p = lt.para()
             _spacing(p, after=2)
+            p.paragraph_format.left_indent = Cm(0.4)
             run = p.add_run(ctx.intention)
             _set_run_font(run, ctx.item_font(), ctx.body_pt + 1.5, ctx.on_dark_text, bold=True)
         if ctx.contacts:
             p = lt.para()
-            _spacing(p, after=0)
+            _spacing(p, after=10)
+            p.paragraph_format.left_indent = Cm(0.4)
             run = p.add_run("  |  ".join(f"{label}：{v}" for label, v in ctx.contacts))
             _set_run_font(run, ctx.item_font(), ctx.body_pt, ctx.on_dark_muted)
         if ctx.photo_bytes:
             rt = _Target(right)
             p = rt.para()
-            _spacing(p, after=0)
+            _spacing(p, before=8, after=8)
             p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
             run = p.add_run()
             try:
-                run.add_picture(io.BytesIO(ctx.photo_bytes), width=Cm(2.4))
+                run.add_picture(io.BytesIO(ctx.photo_bytes), width=Cm(2.6))
             except Exception:  # noqa: BLE001
                 pass
         doc.add_paragraph()  # 横幅与正文的间隔
@@ -531,14 +566,17 @@ def _build_single_headerBar(doc: Document, ctx: _Ctx, banner: bool) -> None:
 def _build_sidebar(doc: Document, ctx: _Ctx) -> None:
     """sidebar：左侧深色栏（照片/联系方式/基本信息/技能/爱好）+ 右侧主列。"""
     tbl = doc.add_table(rows=1, cols=2)
-    tbl.autofit = False
+    _table_bleed(tbl, 19.5)
     left, right = tbl.rows[0].cells
-    left.width, right.width = Cm(5.8), Cm(12.2)
+    left.width, right.width = Cm(5.8), Cm(13.7)
     _cell_shading(left, ctx.deep)
-    side_w, main_w = 5.0, 11.6
+    side_w, main_w = 5.0, 13.2
 
     side = _Target(left)
     _photo_paragraph(side, ctx, 3.2, center=True)
+    for p0 in left.paragraphs:
+        p0.paragraph_format.left_indent = Cm(0.35)
+        p0.paragraph_format.right_indent = Cm(0.15)
     first_side = True
     if ctx.contacts:
         _section_title(side, ctx, "联系方式", "", side_w, first_side, on_dark=True)
