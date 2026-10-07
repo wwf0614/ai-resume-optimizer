@@ -75,13 +75,13 @@
       { k: 'major', l: '专业' }
     ].concat(DATE_FIELDS, [{ k: 'current', l: '至今', t: 'check' }, { k: 'content', l: '主修课程 / 校园表现', t: 'area' }]),
     internship: [{ k: 'company', l: '公司' }, { k: 'position', l: '岗位' }]
-      .concat(DATE_FIELDS, [{ k: 'current', l: '至今', t: 'check' }, { k: 'content', l: '工作内容', t: 'area' }]),
+      .concat(DATE_FIELDS, [{ k: 'current', l: '至今', t: 'check' }, { k: 'content', l: '工作内容', t: 'area', preset: true }]),
     work: [{ k: 'company', l: '公司' }, { k: 'position', l: '职位' }]
-      .concat(DATE_FIELDS, [{ k: 'current', l: '至今', t: 'check' }, { k: 'content', l: '工作内容', t: 'area' }]),
+      .concat(DATE_FIELDS, [{ k: 'current', l: '至今', t: 'check' }, { k: 'content', l: '工作内容', t: 'area', preset: true }]),
     project: [{ k: 'name', l: '项目名称' }, { k: 'role', l: '担任角色' },
-      { k: 'period', l: '时间段', t: 'period' }, { k: 'content', l: '项目描述', t: 'area' }],
+      { k: 'period', l: '时间段', t: 'period' }, { k: 'content', l: '项目描述', t: 'area', preset: true }],
     campus: [{ k: 'name', l: '经历名称' }, { k: 'role', l: '担任角色' },
-      { k: 'period', l: '时间段', t: 'period' }, { k: 'content', l: '经历描述', t: 'area' }],
+      { k: 'period', l: '时间段', t: 'period' }, { k: 'content', l: '经历描述', t: 'area', preset: true }],
     skill: [{ k: 'name', l: '技能' }, { k: 'level', l: '程度', ph: '精通/熟练/了解' }, { k: 'content', l: '说明', t: 'area' }],
     honor: [{ k: 'time', l: '时间', t: 'period' }, { k: 'name', l: '荣誉 / 证书' }, { k: 'issuer', l: '颁发单位' }]
   };
@@ -724,12 +724,150 @@
     if (e.key === 'Escape') closeDatePicker();
   });
 
+  /* ───────── 内容预设（序号/符号样式，菜单选择，再点同项取消） ───────── */
+
+  var MARK_STRIP_RE = /^(?:[0-9]{1,2}[.、．）]|[①-⑳]|[●◆✦►▸•·])/;
+  function circledNum(n) { return n <= 20 ? String.fromCharCode(0x2460 + n - 1) : '(' + n + ')'; }
+  var CONTENT_PRESETS = [
+    { key: 'number',   label: '1. 数字序号', name: '数字序号', mark: function (n) { return n + '. '; },  test: /^[0-9]{1,2}[.、．]/ },
+    { key: 'paren',    label: '1）括号数字', name: '括号数字', mark: function (n) { return n + '） '; },  test: /^[0-9]{1,2}）/ },
+    { key: 'circled',  label: '① 带圈数字', name: '带圈数字', mark: function (n) { return circledNum(n) + ' '; }, test: /^[①-⑳]/ },
+    { key: 'dot',      label: '● 实心圆点', name: '实心圆点', mark: function () { return '● '; }, test: /^●/ },
+    { key: 'diamond',  label: '◆ 菱形',     name: '菱形',     mark: function () { return '◆ '; }, test: /^◆/ },
+    { key: 'star',     label: '✦ 四角星',   name: '四角星',   mark: function () { return '✦ '; }, test: /^✦/ },
+    { key: 'triangle', label: '► 三角',     name: '三角',     mark: function () { return '► '; }, test: /^►/ }
+  ];
+  function detectPreset(v) {
+    var lines = String(v || '').split('\n').filter(function (ln) { return ln.trim(); });
+    if (!lines.length) return null;
+    var first = lines[0].trim();
+    var hit = null;
+    for (var i = 0; i < CONTENT_PRESETS.length; i++) {
+      if (CONTENT_PRESETS[i].test.test(first)) { hit = CONTENT_PRESETS[i]; break; }
+    }
+    if (!hit) return null;
+    for (var j = 0; j < lines.length; j++) {
+      if (!hit.test.test(lines[j].trim())) return null;
+    }
+    return hit;
+  }
+  function clearContentPreset(path, btn) {
+    var ta = document.querySelector('.v3-left textarea[data-path="' + path + '"]');
+    if (!ta) return;
+    var out = String(ta.value || '').split('\n').map(function (ln) {
+      var t = ln.trim();
+      return t ? t.replace(MARK_STRIP_RE, '').replace(/^[ ]+/, '') : ln;
+    }).join('\n');
+    if (out !== ta.value) {
+      ta.value = out;
+      setPath(path, out);
+      markDirty();
+      renderCenterSoon();
+    }
+    if (btn) btn.classList.remove('is-on');
+    toast('已取消预设');
+    refreshPresetMenu();
+  }
+  function applyContentPreset(path, preset, btn) {
+    var ta = document.querySelector('.v3-left textarea[data-path="' + path + '"]');
+    if (!ta) return;
+    var lines = String(ta.value || '').split('\n');
+    if (!lines.some(function (ln) { return ln.trim(); })) return;
+    var current = detectPreset(ta.value);
+    if (current && current.key === preset.key) { clearContentPreset(path, btn); return; }
+    var n = 0;
+    var out = lines.map(function (ln) {
+      var t = ln.trim();
+      if (!t) return ln;
+      n++;
+      return preset.mark(n) + t.replace(MARK_STRIP_RE, '').replace(/^[ ]+/, '');
+    }).join('\n');
+    if (out !== ta.value) {
+      ta.value = out;
+      setPath(path, out);
+      markDirty();
+      renderCenterSoon();
+    }
+    if (btn) btn.classList.add('is-on');
+    toast('已套用「' + preset.name + '」');
+    refreshPresetMenu();
+  }
+
+  var PS = { el: null, btn: null };
+  function closePresetMenu() {
+    if (PS.el) PS.el.style.display = 'none';
+    PS.btn = null;
+  }
+  function refreshPresetMenu() {
+    if (!PS.el || PS.el.style.display === 'none' || !PS.btn) return;
+    var ta = document.querySelector('.v3-left textarea[data-path="' + PS.btn.dataset.presetFor + '"]');
+    var cur = ta ? detectPreset(ta.value) : null;
+    Array.prototype.forEach.call(PS.el.querySelectorAll('[data-preset]'), function (b) {
+      b.classList.toggle('is-cur', !!cur && b.dataset.preset === cur.key);
+    });
+    PS.btn.classList.toggle('is-on', !!cur);
+  }
+  function ensurePresetMenu() {
+    if (PS.el) return PS.el;
+    PS.el = document.createElement('div');
+    PS.el.id = 'v3PresetMenu';
+    PS.el.className = 'v3-preset-menu';
+    document.body.appendChild(PS.el);
+    PS.el.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var item = e.target.closest('[data-preset]');
+      if (!item) return;
+      var key = item.dataset.preset;
+      var btn = PS.btn;
+      if (!btn) return;
+      if (key === 'off') { closePresetMenu(); return; }
+      for (var i = 0; i < CONTENT_PRESETS.length; i++) {
+        if (CONTENT_PRESETS[i].key === key) {
+          applyContentPreset(btn.dataset.presetFor, CONTENT_PRESETS[i], btn);
+          refreshPresetMenu();
+          return;
+        }
+      }
+    });
+    return PS.el;
+  }
+  function openPresetMenu(btn) {
+    var el = ensurePresetMenu();
+    if (PS.btn === btn && el.style.display !== 'none') { closePresetMenu(); return; }
+    PS.btn = btn;
+    var ta = document.querySelector('.v3-left textarea[data-path="' + btn.dataset.presetFor + '"]');
+    var cur = ta ? detectPreset(ta.value) : null;
+    el.innerHTML = CONTENT_PRESETS.map(function (p) {
+      return '<button type="button" data-preset="' + p.key + '"' + (cur && cur.key === p.key ? ' class="is-cur"' : '') + '>' + esc(p.label) + '</button>';
+    }).join('') + '<button type="button" data-preset="off" class="v3-preset-off">✕ 关闭</button>';
+    el.style.display = 'block';
+    var r = btn.getBoundingClientRect();
+    var w = el.offsetWidth || 160, h = el.offsetHeight || 260;
+    var left = Math.min(Math.max(8, r.left), window.innerWidth - w - 8);
+    var top = r.bottom + 4;
+    if (top + h > window.innerHeight - 8) top = Math.max(8, r.top - h - 4);
+    el.style.left = left + 'px';
+    el.style.top = top + 'px';
+  }
+  document.addEventListener('click', function (e) {
+    if (PS.el && PS.el.style.display !== 'none' &&
+        !e.target.closest('#v3PresetMenu') && !e.target.closest('.v3-preset-btn')) {
+      closePresetMenu();
+    }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closePresetMenu();
+  });
+
   /* ═════════ 左栏：内容表单 ═════════ */
 
   function fieldHtml(path, label, opts) {
     opts = opts || {};
     if (opts.t === 'area') {
-      return '<div class="v3-field v3-field-col"><label>' + esc(label) + '</label>' +
+      var labelRow = '<div class="v3-field-labelrow"><label>' + esc(label) + '</label>' +
+        (opts.preset ? '<button type="button" class="v3-preset-btn' + (detectPreset(getPath(path)) ? ' is-on' : '') + '" data-preset-for="' + path + '">预设</button>' : '') +
+        '</div>';
+      return '<div class="v3-field v3-field-col">' + labelRow +
         '<textarea class="v3-textarea" rows="3" data-path="' + path + '" placeholder="' + esc(opts.ph || '') + '">' + esc(getPath(path) || '') + '</textarea></div>';
     }
     if (opts.t === 'check') {
@@ -753,6 +891,7 @@
 
   function buildLeftPanel() {
     closeDatePicker();
+    closePresetMenu();
     var body = $('leftBody');
     var scroll = body.scrollTop;
     var h = '';
@@ -803,7 +942,7 @@
       h += '<div class="v3-mod-body">';
 
       if (key === 'self' || key === 'custom') {
-        h += fieldHtml('modules.' + key, key === 'self' ? '自我评价' : '内容', { t: 'area', ph: key === 'self' ? '用 3~5 句话概括你的优势…' : '自定义内容…' });
+        h += fieldHtml('modules.' + key, key === 'self' ? '自我评价' : '内容', { t: 'area', preset: key === 'self', ph: key === 'self' ? '用 3~5 句话概括你的优势…' : '自定义内容…' });
       } else if (key === 'hobby') {
         h += fieldHtml('modules.hobby', '爱好', { ph: '用顿号分隔：阅读、羽毛球、摄影' });
       } else {
@@ -914,6 +1053,12 @@
     body.addEventListener('click', function (e) {
       var dinp = e.target.closest('input[data-date]');
       if (dinp) openDatePicker(dinp);
+    });
+
+    /* 内容预设按钮：点击切换 */
+    body.addEventListener('click', function (e) {
+      var pbtn = e.target.closest('.v3-preset-btn');
+      if (pbtn) openPresetMenu(pbtn);
     });
 
     /* 拖拽排序（按住 ⋮⋮ 手柄才可拖，避免影响输入框选字） */

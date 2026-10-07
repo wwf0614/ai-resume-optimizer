@@ -307,6 +307,28 @@ details.v3-more > summary { font-size: 12px; color: var(--v3-accent); cursor: po
 }
 .v3-dp-link:hover { background: var(--v3-accent-soft); }
 
+/* 内容预设按钮与菜单 */
+.v3-field-labelrow { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; }
+.v3-field-labelrow label { margin-bottom: 0; }
+.v3-preset-btn {
+  border: 1px solid var(--v3-line); background: #fff; color: var(--v3-ink-2);
+  font-size: 11.5px; padding: 2px 9px; border-radius: 6px; cursor: pointer; font-family: inherit;
+}
+.v3-preset-btn:hover { border-color: var(--v3-accent); color: var(--v3-accent); background: var(--v3-accent-soft); }
+.v3-preset-btn.is-on { border-color: var(--v3-accent); background: var(--v3-accent-soft); color: var(--v3-accent); }
+.v3-preset-menu {
+  position: fixed; z-index: 120; background: #fff; border: 1px solid var(--v3-line);
+  border-radius: 10px; box-shadow: 0 12px 36px rgba(15,20,35,.18); padding: 6px; min-width: 152px;
+}
+.v3-preset-menu button {
+  display: block; width: 100%; border: 0; background: none; padding: 7px 10px;
+  font-size: 12.5px; color: var(--v3-ink-2); border-radius: 7px; cursor: pointer; text-align: left;
+}
+.v3-preset-menu button:hover { background: var(--v3-accent-soft); color: var(--v3-accent); }
+.v3-preset-menu button.is-cur { background: var(--v3-accent-soft); color: var(--v3-accent); font-weight: 700; }
+.v3-preset-menu .v3-preset-off { color: var(--v3-ink-2); border-top: 1px solid var(--v3-line); border-radius: 0 0 7px 7px; margin-top: 3px; }
+.v3-preset-menu .v3-preset-off:hover { background: var(--v3-accent-soft); color: var(--v3-accent); }
+
 /* 时间段（起 ~ 止 双半段） */
 .v3-input-half { flex: 1; min-width: 0; padding: 6px 5px; text-align: center; }
 .v3-period-sep { flex: none; color: var(--v3-ink-3); font-size: 12px; padding: 0 2px; }

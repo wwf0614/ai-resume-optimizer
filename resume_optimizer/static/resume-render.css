@@ -92,13 +92,11 @@
   white-space: nowrap;
 }
 .rr-item-sub {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: center;
   color: var(--rr-muted);
   font-size: calc(var(--rr-fs) * 0.96);
-  margin-top: 1px;
 }
 .rr-item-desc {
   margin-top: 4px;

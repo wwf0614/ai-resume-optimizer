@@ -32,3 +32,6 @@ Thumbs.db
 
 # 验收测试截图（本地留存）
 gui-test-screenshots/
+
+# 自动测试输出产物（本地留存）
+auto_test/_*.json

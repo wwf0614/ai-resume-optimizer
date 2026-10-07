@@ -164,9 +164,14 @@ def _content_lines(x: dict) -> List[str]:
     return [ln.strip() for ln in str(c).split("\n") if ln.strip()]
 
 
+BULLET_MARK_RE = re.compile(r"^(?:\d{1,2}\s*[.、．）)]|[①-⑳]|[●◆✦►▸•·])")
+
+
 def _bullet(p_line, text: str, family: str, size_pt: float, color: str) -> None:
     p_line.text = ""
-    run = p_line.add_run("• " + text)
+    # 内容已自带序号/符号标记（1. 1） ① ● ◆ ✦ ► 等）时不再叠加圆点
+    prefix = "" if BULLET_MARK_RE.match(text) else "• "
+    run = p_line.add_run(prefix + text)
     _set_run_font(run, family, size_pt, color)
     pf = p_line.paragraph_format
     pf.left_indent = Cm(0.35)
@@ -325,19 +330,22 @@ def generate_docx(resume: dict, theme: dict) -> bytes:
 
                 p = doc.add_paragraph()
                 _spacing(p, before=2, after=1, line=line_h)
-                p.paragraph_format.tab_stops.add_tab_stop(
-                    Cm(content_width_cm), WD_TAB_ALIGNMENT.RIGHT)
+                sub_text = " · ".join(sub_parts)
+                if sub_text:
+                    p.paragraph_format.tab_stops.add_tab_stop(
+                        Cm(content_width_cm / 2), WD_TAB_ALIGNMENT.CENTER)
+                if meta:
+                    p.paragraph_format.tab_stops.add_tab_stop(
+                        Cm(content_width_cm), WD_TAB_ALIGNMENT.RIGHT)
                 if title:
                     run = p.add_run(title)
                     _set_run_font(run, family, body_pt + 1, body_color, bold=True)
+                if sub_text:
+                    run = p.add_run("\t" + sub_text)
+                    _set_run_font(run, family, body_pt, primary)
                 if meta:
                     run = p.add_run("\t" + meta)
                     _set_run_font(run, family, body_pt, gray)
-                if sub_parts:
-                    p = doc.add_paragraph()
-                    _spacing(p, after=1, line=line_h)
-                    run = p.add_run(" · ".join(sub_parts))
-                    _set_run_font(run, family, body_pt, primary)
                 for ln in lines:
                     p = doc.add_paragraph()
                     _spacing(p, after=1, line=line_h)

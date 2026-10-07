@@ -247,15 +247,15 @@
   }
 
   function itemHtml(it) {
+    /* 条目头行三段式：标题（左）· 副行（居中）· 时间（右） */
+    var hasHead = hasText(it.title) || hasText(it.meta) || hasText(it.sub);
     var head = '';
-    if (hasText(it.title) || hasText(it.meta)) {
+    if (hasHead) {
       head = '<div class="rr-item-head">' +
         (hasText(it.title) ? '<span class="rr-item-title">' + esc(it.title) + '</span>' : '<span></span>') +
+        (hasText(it.sub) ? '<span class="rr-item-sub"><span>' + esc(it.sub) + '</span></span>' : '') +
         (hasText(it.meta) ? '<span class="rr-item-meta">' + esc(it.meta) + '</span>' : '') +
         '</div>';
-    }
-    if (hasText(it.sub)) {
-      head += '<div class="rr-item-sub"><span>' + esc(it.sub) + '</span></div>';
     }
     var desc = hasText(it.desc) ? '<div class="rr-item-desc">' + esc(it.desc) + '</div>' : '';
     return '<div class="rr-item">' + head + desc + '</div>';
