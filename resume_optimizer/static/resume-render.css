@@ -208,6 +208,13 @@
 .rr-side .rr-tag { background: rgba(255, 255, 255, .16); color: #fff; }
 
 /* ── 族三：顶部横幅 ── */
+/* 横幅版式下，色块标题与横幅一样左右全幅贴边 */
+.fam-headerBar .rr-sec-title.is-bar {
+  margin-left: calc(var(--rr-pad) * -1);
+  margin-right: calc(var(--rr-pad) * -1);
+  padding-left: var(--rr-pad);
+  padding-right: var(--rr-pad);
+}
 .rr-banner {
   margin: calc(var(--rr-pad) * -1);
   margin-bottom: var(--rr-gap);

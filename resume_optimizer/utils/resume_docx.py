@@ -315,7 +315,13 @@ def _section_title(t: _Target, ctx: _Ctx, label: str, icon: str,
     if ctx.section_style == "bar":
         _para_shading(p, ctx.soft)
         pf = p.paragraph_format
-        pf.left_indent = Cm(0.12)
+        if ctx.family == "headerBar":
+            # 与横幅对齐：色块左右贴纸张边缘，文字仍在版心位
+            pf.left_indent = Cm(-ctx.pad_cm)
+            pf.first_line_indent = Cm(ctx.pad_cm + 0.12)
+            pf.right_indent = Cm(-ctx.pad_cm)
+        else:
+            pf.left_indent = Cm(0.12)
         run = p.add_run(text)
         _set_run_font(run, ctx.item_font(), title_pt, ctx.deep, bold=True)
     elif ctx.section_style == "leftbar":
