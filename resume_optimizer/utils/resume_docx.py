@@ -268,6 +268,22 @@ class _Ctx:
         self.gap_pt = float(theme.get("gap") or 20) * PX2PT
         self.family = theme.get("family") if theme.get("family") in ("single", "headerBar", "sidebar", "twoCol") else "single"
         self.section_style = theme.get("sectionStyle") if theme.get("sectionStyle") in ("underline", "leftbar", "bar", "plain") else "underline"
+        # ── 像素级垂直节奏（与网页预览对齐）──
+        # 网页 line-height = fontSize × 倍数（px）；Word 用固定行距(exact)按 pt 换算，
+        # 避免 Word「多倍行距 ×字体默认行高」造成的 ~30% 放大导致页数不一致
+        font_px = float(theme.get("fontSize") or 13)
+        name_px = float(theme.get("nameSize") or 30)
+        pad_px = float(theme.get("padding") or 44)
+        lh = self.line_h
+        self.line_pt = Pt(font_px * lh * PX2PT)          # 正文固定行距
+        self.title_line_pt = Pt((font_px + 2) * lh * PX2PT)
+        self.name_line_pt = Pt(name_px * lh * PX2PT)
+        self.gap_pt = float(theme.get("gap") or 20) * PX2PT
+        self.item_gap_pt = 12 * PX2PT                    # .rr-item margin-bottom
+        self.title_after_pt = 10 * PX2PT                 # .rr-sec-title margin-bottom
+        self.desc_before_pt = 4 * PX2PT                  # .rr-item-desc margin-top
+        self.pad_cm = pad_px * 2.54 / 96.0               # 版心边距（px→cm）
+        self.content_cm = 21.0 - self.pad_cm * 2
 
         basic = resume.get("basic") or {}
         self.basic = basic
@@ -288,7 +304,7 @@ def _section_title(t: _Target, ctx: _Ctx, label: str, icon: str,
                    width_cm: float, first: bool, on_dark: bool = False) -> None:
     """模块标题：跟随标题样式（underline/leftbar/bar/plain）；深色栏内固定白字。"""
     p = t.para()
-    _spacing(p, before=0 if first else ctx.gap_pt, after=4, line=ctx.line_h)
+    _spacing(p, before=0 if first else ctx.gap_pt, after=ctx.title_after_pt, line=ctx.title_line_pt)
     title_pt = ctx.body_pt + 2
     text = f"{icon} {label}" if icon else label
     if on_dark:
@@ -309,35 +325,35 @@ def _section_title(t: _Target, ctx: _Ctx, label: str, icon: str,
     elif ctx.section_style == "plain":
         run = p.add_run(text)
         _set_run_font(run, ctx.item_font(), title_pt, ctx.deep, bold=True)
-    else:  # underline
+    else:  # underline：标题字 deep + 主色下划线（与网页一致）
         run = p.add_run(text)
-        _set_run_font(run, ctx.item_font(), title_pt, ctx.primary, bold=True)
+        _set_run_font(run, ctx.item_font(), title_pt, ctx.deep, bold=True)
         _para_border_bottom(p, ctx.primary, 12)
 
 
 def _head_block(t: _Target, ctx: _Ctx, width_cm: float, with_extras: bool = True) -> None:
     """姓名 / 求职意向 / 联系方式（浅色头部，用于 single/twoCol/sidebar 主列）。"""
     p = t.para()
-    _spacing(p, after=2, line=ctx.line_h)
+    _spacing(p, after=4.5, line=ctx.name_line_pt)
     run = p.add_run(ctx.name)
     _set_run_font(run, ctx.item_font(), ctx.name_pt, ctx.deep, bold=True)
     if ctx.intention:
         p = t.para()
-        _spacing(p, after=2)
+        _spacing(p, after=6, line=ctx.line_pt)
         run = p.add_run("求职意向：" + ctx.intention)
         _set_run_font(run, ctx.item_font(), ctx.body_pt + 1.5, ctx.primary, bold=True)
     if ctx.contacts:
         p = t.para()
-        _spacing(p, after=2)
+        _spacing(p, after=0, line=ctx.line_pt)
         run = p.add_run("  |  ".join(f"{label}：{v}" for label, v in ctx.contacts))
         _set_run_font(run, ctx.item_font(), ctx.body_pt, ctx.gray)
     if with_extras and ctx.extras:
         p = t.para()
-        _spacing(p, after=2)
+        _spacing(p, after=0, line=ctx.line_pt)
         run = p.add_run("  |  ".join(f"{label}：{v}" for label, v in ctx.extras))
         _set_run_font(run, ctx.item_font(), ctx.body_pt, ctx.gray)
     p = t.para()
-    _spacing(p, after=4)
+    _spacing(p, after=10.5)
     _para_border_bottom(p, ctx.primary, 12)
 
 
@@ -349,7 +365,7 @@ def _basic_grid(t: _Target, ctx: _Ctx) -> None:
     if not hasattr(doc, "add_table"):
         for label, v in ctx.extras:
             p = t.para()
-            _spacing(p, after=2, line=ctx.line_h)
+            _spacing(p, after=0, line=ctx.line_pt)
             run = p.add_run(f"{label}：{v}")
             _set_run_font(run, ctx.item_font(), ctx.body_pt, ctx.gray)
         return
@@ -360,11 +376,13 @@ def _basic_grid(t: _Target, ctx: _Ctx) -> None:
         cell = tbl.rows[idx // 2].cells[idx % 2]
         cell.width = Cm(9.0)
         p = cell.paragraphs[0]
-        _spacing(p, after=2, line=ctx.line_h)
+        _spacing(p, after=0, line=ctx.line_pt)
         run = p.add_run(f"{label}：{v}")
         _set_run_font(run, ctx.item_font(), ctx.body_pt, ctx.gray)
-    p = doc.add_paragraph()
-    _spacing(p, after=0)
+    gap = doc.add_paragraph()
+    gap.paragraph_format.line_spacing = Pt(1)
+    gap.paragraph_format.space_before = Pt(0)
+    gap.paragraph_format.space_after = Pt(0)
 
 
 def _photo_paragraph(t: _Target, ctx: _Ctx, width_cm: float, center: bool = False) -> bool:
@@ -410,7 +428,7 @@ def _render_module(t: _Target, ctx: _Ctx, key: str, raw,
 
     if kind == "tags":
         p = t.para()
-        _spacing(p, after=2, line=ctx.line_h)
+        _spacing(p, after=0, line=ctx.line_pt)
         run = p.add_run("、".join(_s(x) for x in tags if _s(x)))
         _set_run_font(run, fam, body_pt, body_color)
         return
@@ -418,11 +436,12 @@ def _render_module(t: _Target, ctx: _Ctx, key: str, raw,
     if kind == "text":
         for ln in [x for x in text_val.split("\n") if x.strip()]:
             p = t.para()
-            _spacing(p, after=2, line=ctx.line_h)
+            _spacing(p, after=0, line=ctx.line_pt)
             run = p.add_run(ln.strip())
             _set_run_font(run, fam, body_pt, body_color)
         return
 
+    first_item = True
     for x in items:
         if kind == "list":
             title = _s(x.get("school")) or _s(x.get("company")) or _s(x.get("name"))
@@ -437,7 +456,7 @@ def _render_module(t: _Target, ctx: _Ctx, key: str, raw,
                 continue
 
             p = t.para()
-            _spacing(p, before=2, after=1, line=ctx.line_h)
+            _spacing(p, before=0 if first_item else ctx.item_gap_pt, after=0, line=ctx.line_pt)
             if sub_text := " · ".join(sub_parts):
                 p.paragraph_format.tab_stops.add_tab_stop(Cm(width_cm / 2), WD_TAB_ALIGNMENT.CENTER)
             if meta_text:
@@ -447,14 +466,15 @@ def _render_module(t: _Target, ctx: _Ctx, key: str, raw,
                 _set_run_font(run, fam, body_pt + 1, body_color, bold=True)
             if sub_text:
                 run = p.add_run("\t" + sub_text)
-                _set_run_font(run, fam, body_pt, accent)
+                _set_run_font(run, fam, body_pt, muted)
             if meta_text:
                 run = p.add_run("\t" + meta_text)
                 _set_run_font(run, fam, body_pt, muted)
-            for ln in lines:
+            for li, ln in enumerate(lines):
                 p = t.para()
-                _spacing(p, after=1, line=ctx.line_h)
+                _spacing(p, before=ctx.desc_before_pt if li == 0 else 0, after=0, line=ctx.line_pt)
                 _bullet(p, ln, fam, body_pt, body_color)
+            first_item = False
         elif kind == "skill":
             name_v = _s(x.get("name"))
             level = _s(x.get("level"))
@@ -464,17 +484,18 @@ def _render_module(t: _Target, ctx: _Ctx, key: str, raw,
                 continue
             if head or level:
                 p = t.para()
-                _spacing(p, before=2, after=1, line=ctx.line_h)
+                _spacing(p, before=0 if first_item else ctx.item_gap_pt, after=0, line=ctx.line_pt)
                 p.paragraph_format.tab_stops.add_tab_stop(Cm(width_cm), WD_TAB_ALIGNMENT.RIGHT)
                 run = p.add_run(head)
                 _set_run_font(run, fam, body_pt, body_color, bold=True)
                 if level:
                     run = p.add_run("\t" + level)
                     _set_run_font(run, fam, body_pt, muted)
-            for ln in lines:
+            for li, ln in enumerate(lines):
                 p = t.para()
-                _spacing(p, after=1, line=ctx.line_h)
+                _spacing(p, before=ctx.desc_before_pt if li == 0 else 0, after=0, line=ctx.line_pt)
                 _bullet(p, ln, fam, body_pt, body_color)
+            first_item = False
         elif kind == "honor":
             name_v = _s(x.get("name"))
             time_v = _s(x.get("time")) or _s(x.get("date"))
@@ -482,13 +503,14 @@ def _render_module(t: _Target, ctx: _Ctx, key: str, raw,
             if not (name_v or time_v):
                 continue
             p = t.para()
-            _spacing(p, before=2, after=1, line=ctx.line_h)
+            _spacing(p, before=0 if first_item else ctx.item_gap_pt, after=0, line=ctx.line_pt)
             p.paragraph_format.tab_stops.add_tab_stop(Cm(width_cm), WD_TAB_ALIGNMENT.RIGHT)
             run = p.add_run(name_v + (f"（{issuer}）" if issuer else ""))
             _set_run_font(run, fam, body_pt, body_color)
             if time_v:
                 run = p.add_run("\t" + time_v)
                 _set_run_font(run, fam, body_pt, muted)
+            first_item = False
 
 
 def _render_sections(t: _Target, ctx: _Ctx, width_cm: float,
@@ -508,8 +530,11 @@ def _new_doc(ctx: _Ctx) -> Document:
     doc = Document()
     sec = doc.sections[0]
     sec.page_width, sec.page_height = Cm(21.0), Cm(29.7)
-    sec.left_margin = sec.right_margin = Cm(1.5)
-    sec.top_margin, sec.bottom_margin = Cm(1.4), Cm(1.4)
+    sec.left_margin = sec.right_margin = Cm(ctx.pad_cm)
+    sec.top_margin = sec.bottom_margin = Cm(ctx.pad_cm)
+    if ctx.family in ("headerBar", "sidebar"):
+        # 网页中横幅/侧栏以负 margin 顶到纸张边缘（吃掉顶部留白），Word 同样贴顶
+        sec.top_margin = Cm(0)
     normal = doc.styles["Normal"]
     normal.font.name = ctx.item_font()
     normal.font.size = Pt(ctx.body_pt)
@@ -530,7 +555,7 @@ def _build_single_headerBar(doc: Document, ctx: _Ctx, banner: bool) -> None:
             _cell_shading(c, ctx.primary)
         lt = _Target(left)
         p = lt.para()
-        _spacing(p, before=10, after=2)
+        _spacing(p, before=20, after=2)
         p.paragraph_format.left_indent = Cm(0.4)
         run = p.add_run(ctx.name)
         _set_run_font(run, ctx.item_font(), ctx.name_pt, ctx.on_dark_text, bold=True)
@@ -556,7 +581,10 @@ def _build_single_headerBar(doc: Document, ctx: _Ctx, banner: bool) -> None:
                 run.add_picture(io.BytesIO(ctx.photo_bytes), width=Cm(2.6))
             except Exception:  # noqa: BLE001
                 pass
-        doc.add_paragraph()  # 横幅与正文的间隔
+    gap = doc.add_paragraph()  # 横幅与正文的间隔（1pt 高）
+    gap.paragraph_format.line_spacing = Pt(1)
+    gap.paragraph_format.space_before = Pt(0)
+    gap.paragraph_format.space_after = Pt(0)
 
     t = _Target(doc)
     _basic_grid(t, ctx)
@@ -582,7 +610,7 @@ def _build_sidebar(doc: Document, ctx: _Ctx) -> None:
         _section_title(side, ctx, "联系方式", "", side_w, first_side, on_dark=True)
         for label, v in ctx.contacts:
             p = side.para()
-            _spacing(p, after=2, line=ctx.line_h)
+            _spacing(p, after=0, line=ctx.line_pt)
             run = p.add_run(f"{label}：{v}")
             _set_run_font(run, ctx.item_font(), ctx.body_pt, ctx.on_dark_text)
         first_side = False
@@ -590,23 +618,23 @@ def _build_sidebar(doc: Document, ctx: _Ctx) -> None:
         _section_title(side, ctx, "基本信息", "", side_w, first_side, on_dark=True)
         for label, v in ctx.extras:
             p = side.para()
-            _spacing(p, after=2, line=ctx.line_h)
+            _spacing(p, after=0, line=ctx.line_pt)
             run = p.add_run(f"{label}：{v}")
             _set_run_font(run, ctx.item_font(), ctx.body_pt, ctx.on_dark_text)
         first_side = False
 
     main = _Target(right)
     p = main.para()
-    _spacing(p, after=2, line=ctx.line_h)
+    _spacing(p, after=4.5, line=ctx.name_line_pt)
     run = p.add_run(ctx.name)
     _set_run_font(run, ctx.item_font(), ctx.name_pt, ctx.deep, bold=True)
     if ctx.intention:
         p = main.para()
-        _spacing(p, after=4)
+        _spacing(p, after=6, line=ctx.line_pt)
         run = p.add_run("求职意向：" + ctx.intention)
         _set_run_font(run, ctx.item_font(), ctx.body_pt + 1.5, ctx.primary, bold=True)
     p = main.para()
-    _spacing(p, after=4)
+    _spacing(p, after=10.5)
     _para_border_bottom(p, ctx.primary, 12)
 
     first_main = True
@@ -645,23 +673,23 @@ def _build_two_col(doc: Document, ctx: _Ctx) -> None:
     """twoCol：头部 + 基本信息 + 双栏流式模块。"""
     t = _Target(doc)
     p = t.para()
-    _spacing(p, after=2, line=ctx.line_h)
+    _spacing(p, after=4.5, line=ctx.name_line_pt)
     run = p.add_run(ctx.name)
     _set_run_font(run, ctx.item_font(), ctx.name_pt, ctx.deep, bold=True)
     if ctx.intention:
         p = t.para()
-        _spacing(p, after=2)
+        _spacing(p, after=6, line=ctx.line_pt)
         run = p.add_run("求职意向：" + ctx.intention)
         _set_run_font(run, ctx.item_font(), ctx.body_pt + 1.5, ctx.primary, bold=True)
     if ctx.contacts:
         p = t.para()
-        _spacing(p, after=2)
+        _spacing(p, after=0, line=ctx.line_pt)
         run = p.add_run("  |  ".join(f"{label}：{v}" for label, v in ctx.contacts))
         _set_run_font(run, ctx.item_font(), ctx.body_pt, ctx.gray)
     if ctx.photo_bytes:
         _photo_paragraph(t, ctx, 2.4)
     p = t.para()
-    _spacing(p, after=4)
+    _spacing(p, after=10.5)
     _para_border_bottom(p, ctx.primary, 12)
     _basic_grid(t, ctx)
 
@@ -697,22 +725,22 @@ def generate_docx(resume: dict, theme: dict) -> bytes:
             left.width, right.width = Cm(15.4), Cm(2.6)
             ht = _Target(left)
             p = ht.para()
-            _spacing(p, after=2, line=ctx.line_h)
+            _spacing(p, after=4.5, line=ctx.name_line_pt)
             run = p.add_run(ctx.name)
             _set_run_font(run, ctx.item_font(), ctx.name_pt, ctx.deep, bold=True)
             if ctx.intention:
                 p = ht.para()
-                _spacing(p, after=2)
+                _spacing(p, after=6, line=ctx.line_pt)
                 run = p.add_run("求职意向：" + ctx.intention)
                 _set_run_font(run, ctx.item_font(), ctx.body_pt + 1.5, ctx.primary, bold=True)
             if ctx.contacts:
                 p = ht.para()
-                _spacing(p, after=2)
+                _spacing(p, after=0, line=ctx.line_pt)
                 run = p.add_run("  |  ".join(f"{label}：{v}" for label, v in ctx.contacts))
                 _set_run_font(run, ctx.item_font(), ctx.body_pt, ctx.gray)
             if ctx.extras:
                 p = ht.para()
-                _spacing(p, after=2)
+                _spacing(p, after=0, line=ctx.line_pt)
                 run = p.add_run("  |  ".join(f"{label}：{v}" for label, v in ctx.extras))
                 _set_run_font(run, ctx.item_font(), ctx.body_pt, ctx.gray)
             rt = _Target(right)
