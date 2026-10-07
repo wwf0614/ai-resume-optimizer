@@ -579,15 +579,35 @@ def admin_logout(authorization: Optional[str] = Header(None)):
 # ══════════════════ 模板库（公开）══════════════════
 
 
+_preview_backfill_lock = threading.Lock()
+
+
+def _backfill_previews(missing: list) -> None:
+    """后台补生成缺失的模板预览图（串行，避免 Word COM 并发冲突）。"""
+    if not missing or not _preview_backfill_lock.acquire(blocking=False):
+        return
+    try:
+        for tid, fpath in missing:
+            try:
+                _generate_preview(BASE_DIR / fpath, tid)
+                print(f"[INFO] 预览图已补生成: t{tid}.png")
+            except Exception as exc:  # noqa: BLE001
+                print(f"[WARN] 预览图补生成失败 t{tid}: {exc}")
+    finally:
+        _preview_backfill_lock.release()
+
+
 @app.get("/templates")
 def list_templates():
     """返回全部有效模板（含预览图）。公开接口，首页模板中心免费展示/下载。"""
     rows = db.list_templates()
     result = []
+    missing_previews = []
     ph_map = db.get_placeholders_map([r["id"] for r in rows])
     for r in rows:
         preview_path = BASE_DIR / "static" / "previews" / f"t{r['id']}.png"
         if not preview_path.exists():
+            missing_previews.append((r["id"], r["file_path"]))
             continue
         result.append({"id": r["id"], "name": r["name"],
                        "description": r["description"], "modules": ph_map.get(r["id"], []),
@@ -596,6 +616,9 @@ def list_templates():
                        # 编辑器模板库筛选依据；首页模板中心不据此过滤
                        "editable": 1 if r.get("editable") is None else int(r["editable"]),
                        "preview_url": f"/static/previews/t{r['id']}.png?v=5"})
+    if missing_previews:
+        # 缺预览图的已上架模板后台补生成，下次刷新即出现（实时同步）
+        threading.Thread(target=_backfill_previews, args=(missing_previews,), daemon=True).start()
     return result
 
 
@@ -1355,6 +1378,10 @@ def review_template(
         db.set_review(template_id, "approved", 1)
         applog.log("template_review", template_id=template_id, action="approve")
         _sync_after_renumber()  # 新模板上架后序号保持 1..N 连续
+        # 上架即保证预览图存在（缺失会让首页模板中心跳过该模板）
+        pv = BASE_DIR / "static" / "previews" / f"t{template_id}.png"
+        if not pv.exists():
+            _generate_preview(BASE_DIR / tpl["file_path"], template_id)
         return {"message": "已通过审核，模板上架"}
     if action == "reject":
         db.set_review(template_id, "rejected", 0)
