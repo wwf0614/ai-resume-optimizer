@@ -348,16 +348,28 @@
     var page = $('paper').querySelector('.rr-page');
     var hint = $('pageHint');
     if (!page) { hint.textContent = ''; return; }
-    var extra = page.scrollHeight - A4.h;
-    if (extra > 8) {
-      var pages = Math.ceil(page.scrollHeight / A4.h);
-      hint.textContent = '内容约 ' + pages + ' 页（超出 A4 单页，Word 导出将自动分页）';
+    var pages = Math.max(1, Math.ceil((page.scrollHeight - 4) / A4.h));
+    var breaks = page.querySelector('.rr-pagebreaks');
+    if (!breaks) {
+      breaks = document.createElement('div');
+      breaks.className = 'rr-pagebreaks';
+      page.appendChild(breaks);
+    }
+    var h = '';
+    for (var i = 1; i < pages; i++) {
+      h += '<div class="rr-pagebreak" style="top:' + (i * A4.h) + 'px">' +
+        '<span class="rr-pb-tag">第 ' + (i + 1) + ' 页</span></div>';
+    }
+    breaks.innerHTML = h;
+    if (pages > 1) {
+      hint.textContent = 'A4 · 共 ' + pages + ' 页（虚线为页界，Word/PDF 导出将自动分页）';
       hint.className = 'v3-pagehint is-overflow';
     } else {
-      hint.textContent = 'A4 · 794 × 1123 px';
+      hint.textContent = 'A4 · 1 页 · 794 × 1123 px';
       hint.className = 'v3-pagehint';
     }
   }
+  var updatePageSoon = debounce(updatePageHint, 300);
 
   /* ───────── 内联编辑：DOM ↔ state 写回 ───────── */
 
@@ -1299,6 +1311,7 @@
   function markDirty() {
     S.dirty = true;
     setSavedTip('is-dirty', '编辑中…');
+    updatePageSoon();
     clearTimeout(LOCAL_SAVE_TIMER);
     LOCAL_SAVE_TIMER = setTimeout(saveLocal, 800);
     clearTimeout(DRAFT_SAVE_TIMER);
