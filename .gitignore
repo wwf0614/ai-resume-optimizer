@@ -35,3 +35,7 @@ gui-test-screenshots/
 
 # 自动测试输出产物（本地留存）
 auto_test/_*.json
+
+# 用户上传的模板源文件（本地留存，不入库）
+resume_optimizer/utils/templates/*.docx
+!resume_optimizer/utils/templates/builtin*.docx
